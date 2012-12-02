@@ -193,6 +193,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
                 <extensions>true</extensions>
                 <configuration>
                     <useOSGiDependencies>false</useOSGiDependencies>
+                    <keystore>~/ssh/timboudreau.com.keystore</keystore>
+                    <keystorealias>tim</keystorealias>
+                    <keystorepassword>SECRET</keystorepassword>
+                    <licensefile>../license.txt</licensefile>
+                    <homepageurl>https://github.com/timboudreau/nb-nodejs</homepageurl>
+                    <author>Tim Boudreau</author>
                 </configuration>
                 <executions>
                     <execution>
