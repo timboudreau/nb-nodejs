@@ -24,6 +24,21 @@ Features
 See [this blog](http://timboudreau.com/blog/read/NetBeans_Tools_for_Node_js)
 for a broader description of the project.
 
+Requirements
+------------
+
+   * NodeJS > 0.6.0
+   * npm - Node Package Manager (if you have a recent version of Node, you have it)
+   * A unix-like operating system (Linux, Mac OS, Solaris, AIX)
+      * The plugin makes a few assumptions about being able to run Unix commands;  it could be adapted to be happy on Windows fairly easily - I am just not a Windows user.
+   * Java 7 or greater
+
+The plugin will function without Node installed, but is not very useful.
+
+Installation
+------------
+
+
 License
 -------
 Sources are licensed under the simple MIT license, which amounts to
