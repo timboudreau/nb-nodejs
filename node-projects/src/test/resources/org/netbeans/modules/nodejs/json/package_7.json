@@ -1,0 +1,14 @@
+{
+  "name"          : "wscomm",
+  "description"   : "WebSocket JSON-RPC bidirectional communication library",
+  "keywords"      : ["websocket", "json-rpc", "underscore", "bidirectional", "live"],
+  "author"        : "Vladimir Dronnikov <dronnikov@gmail.com>",
+  "contributors"  : [],
+  "dependencies"  : {
+    "underscore": "",
+    "socket.io": ""
+  },
+  "lib"           : ".",
+  "main"          : "wscomm.js",
+  "version"       : "0.0.5"
+}

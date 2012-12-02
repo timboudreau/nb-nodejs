@@ -1,0 +1,26 @@
+/*
+ *A leading comment
+ */
+{ //hmm, what have you
+  "name": "rasputin", //hey
+  "description": "Rasputin connection for Node.js",
+  //and another comment
+  "version": "0.0.1",
+  "homepage": "https://github.com/jsocol/rasputin-node",
+  "author": {"name": /* ohh, a comment here */ "James Socol",
+             "email": "james.socol@gmail.com",
+             "url": "http://coffeeonthekeyboard.com"},
+  "repository": { //hey, a line comment
+    "type": "git",
+    "url": "https://github.com/jsocol/rasputin-node.git"
+  },
+  /*
+   * hey this is a comment
+   */  "bugs": {
+    "web": "https://github.com/jsocol/rasputin-node/issues"
+  },
+  /*
+  "engine": [ "node >=0.3.0" ],
+  */
+  "main": "./lib/index"
+}

@@ -1,0 +1,35 @@
+{
+    "description" : "A thing to test flatiron",
+    "version" : "0.0.0",
+    "flah" : true,
+    "fbooger" : [12,3,4,false],
+    "dependencies" : {
+        "union" : "0.3.0",
+        "flatiron" : "0.2.2"
+    },
+    "devDependencies" : {
+        "api-easy" : "0.3.2",
+        "vows" : "0.6.1"
+    },
+    "scripts" : {
+        "test" : "vows --spec",
+        "start" : "node app.js"
+    },
+    "name" : "doohickey",
+    "author" : {
+        "name" : "Tim Boudreau",
+        "email" : "niftiness@gmail.com"
+    },
+    "homepage" : "http://timboudreau.com",
+    "keywords" : 
+        [
+            "food"
+        ],
+    "bugs" : {
+        "web" : "null"
+    },
+    "main" : "app.js",
+    "license" : {
+        "type" : "bsd"
+    }
+}

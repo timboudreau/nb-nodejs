@@ -1,0 +1,21 @@
+{
+    "name": "${projectName}",
+    "description": "(pending)",
+    "version": "0.1",
+    "main": "./${projectName}.js",
+    "author": {
+        "name": "${author}",
+        "email": "${email}"
+    },
+    "keywords": [],
+    "licenses": {
+        "type": "${license}"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/${login}/${projectName}.git"
+    },
+    "bugs": {
+        "web": "http://github.com/${login}/${projectName}/issues"
+    },
+}

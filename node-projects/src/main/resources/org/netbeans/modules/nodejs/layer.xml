@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    <folder name="Templates">
+        <folder name="Project">
+            <folder name="nodejs">
+                <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#Templates/Project/nodejs"/>
+                <attr name="position" intvalue="472"/>
+
+                <file name="HelloWorldProjectTemplate.properties" url="templates/HelloWorldProjectTemplate.properties">
+                    <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#Templates/Project/nodejs/HelloWorldProjectTemplate.properties"/>
+                    <attr name="iconBase" stringvalue="org/netbeans/modules/nodejs/resources/logo.png"/>
+                    <attr name="position" intvalue="100"/>
+                    <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.nodejs.wizard.ProjectWizardIterator.create"/>
+                    <attr name="instantiatingWizardURL" urlvalue="nbresloc:/org/netbeans/modules/nodejs/templates/HelloWorldProjectDescription.html"/>
+                    <attr name="template" boolvalue="true"/>
+                </file>
+            </folder>
+        </folder>
+        <folder name="javascript">
+            <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#Templates/javascript"/>
+            <attr name="position" intvalue="1644"/>
+            <file name="Empty.js" url="templates/Empty.js">
+                <attr name="position" intvalue="30"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#Empty.js"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+            </file>
+            <file name="Module.js" url="templates/Module.js">
+                <attr name="position" intvalue="-1"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#Module.js"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+            </file>
+            <file name="HelloWorld.js" url="templates/HelloWorld.js">
+                <attr name="position" intvalue="10"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#nodejs_hidden_templates/HelloWorld.js"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+            </file>
+            <file name="package.json" url="templates/_package.json">
+                <attr name="position" intvalue="20"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#package.json"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+            </file>
+            <file name="script" url="templates/script">
+                <attr name="position" intvalue="3"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#script"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Project">
+        <folder name="NodeJS">
+            
+            <folder name="Actions">
+            </folder>
+            <folder name="Nodes">
+                <file name="org-netbeans-modules-nodejs-node-NodeProjectSourceNodeFactory.instance">
+                    <attr name="position" intvalue="100"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

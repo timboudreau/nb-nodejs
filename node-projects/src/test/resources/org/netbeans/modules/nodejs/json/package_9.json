@@ -1,0 +1,18 @@
+{
+    "author" : {
+        "name" : "Tim Boudreau",
+        "email" : "tim@timboudreau.com"
+    },
+    "keywords" :         [
+            "router"
+        ],
+    "bugs" : {
+        "web" : "null"
+    },
+    "description" : "Practice writing a router",
+    "name" : "nodestuff",
+    "license" : {
+        "type" : "bsd"
+    },
+    "main" : "index.js"
+}

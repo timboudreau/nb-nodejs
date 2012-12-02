@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2012 Tim Boudreau
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy 
+ of this software and associated documentation files (the "Software"), to 
+ deal in the Software without restriction, including without limitation the 
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+ sell copies of the Software, and to permit persons to whom the Software is 
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all 
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+<!DOCTYPE MIME-resolver PUBLIC
+          "-//NetBeans//DTD MIME Resolver 1.0//EN" 
+          "http://www.netbeans.org/dtds/mime-resolver-1_0.dtd">
+<MIME-resolver>
+    <file>
+        <fattr name="known-ant-project-file" text="false"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="java"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="js"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="xml"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="txt"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="json"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="gif"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="jpg"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="png"/>
+        <exit/>
+    </file>
+    <file>
+        <ext name="properties"/>
+        <exit/>
+    </file>
+    <file>
+        <!--<pattern value="/usr/bin/env node" range="24"/>-->        
+        <!--<magic hex="2123752f7273622f6e69652f766e6e20646f0a65"/>-->
+        <!--<magic hex="23212f7573722f62696e2f656e75206e6f6465"/>-->
+        <magic hex="23212f7573722f62696e2f656e76206e6f6465"/>
+        <resolver mime="text/javascript"/>
+    </file>
+</MIME-resolver>

@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+var fs = require('fs'),
+    path = require('path'),
+    util = require ('util');
+
+// Strip out "node" and the module name
+var commandLineArguments = process.argv.slice(2);
+
+// Some help
+var help = '--help, --other stuff';
+
+// Show the help if no arguments, -h or --help
+if (commandLineArguments.length === 0 || commandLineArguments[0] === '-h'
+    || commandLineArguments[0] === '--help') {
+
+    console.log ('Usage:');
+    console.log ('  ' + path.basename(module.filename) + ' ' + help);
+    process.exit(1);
+}
+
+// SAMPLE: Just read a file and echo it to the command-line
+var file = commandLineArguments[0];
+fs.exists (file, function exists(exists) {
+    if (!exists) {
+        process.stderr.write("No such file: " + file + '\n');
+        return process.exit(1);
+    }
+    fs.readFile(file, 'utf8', function (err, contents) {
+        if (err) {
+            process.stderr.write("Error: " + (err.stack || err));
+            return process.exit(1);
+        }
+        console.log (contents);
+    });
+});

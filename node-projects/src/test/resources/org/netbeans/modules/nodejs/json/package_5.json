@@ -1,0 +1,18 @@
+{
+  "name": "rasputin",
+  "description": "Rasputin connection for Node.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/jsocol/rasputin-node",
+  "author": {"name": "James Socol",
+             "email": "james.socol@gmail.com",
+             "url": "http://coffeeonthekeyboard.com"},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jsocol/rasputin-node.git"
+  },
+  "bugs": {
+    "web": "https://github.com/jsocol/rasputin-node/issues"
+  },
+  "engine": [ "node >=0.3.0" ],
+  "main": "./lib/index"
+}
