@@ -38,8 +38,15 @@ The plugin will function without Node installed, but is not very useful.
 Installation
 ------------
 For the moment, a build is available [on timboudreau.com](http://timboudreau.com/files/nodejs-2.0.nbm) - 
-install it using Tools | Plugins.  Long term, it will be avaiilable in Tools | Updates update center
-built into NetBeans.
+install it using Tools | Plugins, on the Downloaded tab.  Long term, it will be available from
+the standard NetBeans update center, so no separate download will be needed.
+
+Building
+--------
+The plugin is built using [Maven](http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/):
+
+    cd node-projects
+    mvn install nbm:nbm
 
 License
 -------
