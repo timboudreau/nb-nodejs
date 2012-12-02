@@ -44,7 +44,7 @@ built into NetBeans.
 License
 -------
 Sources are licensed under the [MIT license](http://en.wikipedia.org/wiki/MIT_License), 
-which amounts to do what you want with it but give credit where credit is due.
+which amounts to: do what you want with it but give credit where credit is due.
 
 The original sources are available in the history of the 
 [netbeans.org contrib repository](http://hg.netbeans.org/main/contrib).
