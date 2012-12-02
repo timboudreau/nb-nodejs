@@ -37,7 +37,9 @@ The plugin will function without Node installed, but is not very useful.
 
 Installation
 ------------
-
+For the moment, a build is available (on timboudreau.com)[http://timboudreau.com/files/nodejs-2.0.nbm] - 
+install it using Tools | Plugins.  Long term, it will be avaiilable in Tools | Updates update center
+built into NetBeans.
 
 License
 -------
@@ -49,4 +51,6 @@ The original sources are available in the history of the
 They were moved here because netbeans.org's process for approving using 
 third-party libraries was slowing down development.  Such restrictions
 exist for good reason, but hosting elsewhere and using a more broadly
-compatible license was the most expedient solution.
+compatible license was the most expedient solution.  As the sole contributor
+and joint copyright holder, I can relicense it, so I did.
+
