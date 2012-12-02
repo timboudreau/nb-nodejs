@@ -1,5 +1,5 @@
-nb-nodejs
-=========
+NetBeans NodeJS Plugin
+======================
 
 NodeJS support for NetBeans, originally hosted on netbeans.org.
 
@@ -19,7 +19,7 @@ Features
        * Ability to download and open NodeJS's sources as links in a stack trace
    * Allows the IDE to recognize scripts beginning with
        ``#!/usr/bin/env node``
-     as a Javascript source
+     as Javascript sources
 
 See [this blog](http://timboudreau.com/blog/read/NetBeans_Tools_for_Node_js)
 for a broader description of the project.
