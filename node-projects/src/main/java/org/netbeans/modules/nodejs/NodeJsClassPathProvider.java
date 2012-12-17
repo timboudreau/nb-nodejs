@@ -20,7 +20,10 @@ package org.netbeans.modules.nodejs;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.spi.java.classpath.ClassPathProvider;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
@@ -28,6 +31,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.Exceptions;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -83,6 +87,7 @@ public final class NodeJsClassPathProvider implements ClassPathProvider {
     }
 
     // TODO - add classpath recognizer for these ? No, don't need go to declaration inside these files...
+    @SuppressWarnings ({"null", "ConstantConditions"})
     private static FileObject getJsStubs () {
         if (jsStubsFO == null) {
             // Core classes: Stubs generated for the "builtin" Ruby libraries.
@@ -90,8 +95,17 @@ public final class NodeJsClassPathProvider implements ClassPathProvider {
             if (allstubs == null) {
                 // Probably inside unit test.
                 try {
-                    File moduleJar = new File( NodeJsClassPathProvider.class.getProtectionDomain().getCodeSource().getLocation().toURI() );
-                    allstubs = new File( moduleJar.getParentFile().getParentFile(), "jsstubs/allstubs.zip" );
+                    URI u = NodeJsClassPathProvider.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+                    try {
+                        File moduleJar = Utilities.toFile( u );
+                        allstubs = new File( moduleJar.getParentFile().getParentFile(), "jsstubs/allstubs.zip" );
+                        if (allstubs == null) {
+                            return null;
+                        }
+                    } catch ( IllegalArgumentException e ) {
+                        Logger.getLogger( NodeJsClassPathProvider.class.getName() ).log( Level.INFO, "" + u, e );
+                        return null;
+                    }
                 } catch ( URISyntaxException x ) {
                     assert false : x;
                     return null;

@@ -32,7 +32,7 @@
                 <attr name="template" boolvalue="true"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
             </file>
-            <file name="HelloWorld.js" url="templates/HelloWorld.js">
+            <file name="HelloWorld.js" url="templates/HelloWorld._js">
                 <attr name="position" intvalue="10"/>
                 <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#nodejs_hidden_templates/HelloWorld.js"/>
                 <attr name="template" boolvalue="true"/>
