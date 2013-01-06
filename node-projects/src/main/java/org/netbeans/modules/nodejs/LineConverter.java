@@ -136,10 +136,11 @@ final class LineConverter implements LineConvertorFactory {
                     if (ck != null) {
                         LineCookie l = dob.getLookup().lookup( LineCookie.class );
                         if (l != null) {
-                            Line goTo = l.getLineSet().getCurrent( line );
-                            if (l != null) {
-                                goTo.show( ShowOpenType.REUSE_NEW, ShowVisibilityType.FOCUS, charPos );
-                            }
+                            Line goTo = l.getLineSet().getCurrent( Math.max (0, line -1) );
+                            int length = goTo.getText().length();
+                            int position = charPos >= length ? 0 : charPos;
+                            goTo.show( ShowOpenType.REUSE_NEW, 
+                                    ShowVisibilityType.FOCUS, position );
                         }
                     }
                 } catch ( DataObjectNotFoundException ex ) {
