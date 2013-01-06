@@ -244,7 +244,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     public int compareTo ( NodeJSProject t ) {
         int myPathLength = getProjectDirectory().getPath().length();
         int otherPathLength = t.getProjectDirectory().getPath().length();
-        return myPathLength > otherPathLength ? -1 : myPathLength < otherPathLength ? 0 : 1;
+        return myPathLength > otherPathLength ? -1 : myPathLength < otherPathLength ? 1 : 0;
     }
 
     @Override
