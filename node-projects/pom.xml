@@ -196,7 +196,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
                     <keystore>~/ssh/timboudreau.com.keystore</keystore>
                     <keystorealias>tim</keystorealias>
                     <keystorepassword>SECRET</keystorepassword>
-                    <licensefile>../license.txt</licensefile>
+                    <licensefile>license.txt</licensefile>
                     <homepageurl>https://github.com/timboudreau/nb-nodejs</homepageurl>
                     <author>Tim Boudreau</author>
                 </configuration>
