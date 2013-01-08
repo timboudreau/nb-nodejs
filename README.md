@@ -37,7 +37,7 @@ The plugin will function without Node installed, but is not very useful.
 
 Installation
 ------------
-For the moment, a build is available [on timboudreau.com](http://timboudreau.com/files/nodejs-2.2.nbm) - 
+For the moment, a build is available [on timboudreau.com](http://timboudreau.com/files/nodejs-2.4.nbm) - 
 install it using Tools | Plugins, on the Downloaded tab.  Long term, it will be available from
 the standard NetBeans update center, so no separate download will be needed.
 

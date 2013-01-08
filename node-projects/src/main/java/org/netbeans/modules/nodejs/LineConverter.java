@@ -22,6 +22,8 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.netbeans.api.extexecution.ExecutionDescriptor.LineConvertorFactory;
@@ -137,10 +139,21 @@ final class LineConverter implements LineConvertorFactory {
                         LineCookie l = dob.getLookup().lookup( LineCookie.class );
                         if (l != null) {
                             Line goTo = l.getLineSet().getCurrent( Math.max (0, line -1) );
-                            int length = goTo.getText().length();
-                            int position = charPos >= length ? 0 : charPos;
-                            goTo.show( ShowOpenType.REUSE_NEW, 
+                            if (goTo == null) {
+                                goTo =  l.getLineSet().getOriginal(line -1);
+                            }
+                            if (goTo != null) {
+                                String txt = goTo.getText();
+                                int length = txt == null ? -1 : txt.length();
+                                int position = charPos >= length && txt != null ? 0 : charPos;
+                                goTo.show( ShowOpenType.REUSE_NEW, 
                                     ShowVisibilityType.FOCUS, position );
+                            } else {
+                                Logger.getLogger(LineConvertor.class.getName()).log(
+                                        Level.WARNING, 
+                                        "Could not go to line {0} of {1}", 
+                                        new Object[]{line - 1, fo.getPath()});
+                            }
                         }
                     }
                 } catch ( DataObjectNotFoundException ex ) {
