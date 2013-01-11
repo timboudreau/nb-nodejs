@@ -75,8 +75,16 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
                 }
             }
             if (result == null) {
-                result = System.getProperty( "user.home" ) + File.separatorChar + "NetBeans Projects";
+                result = System.getProperty( "user.home" ) + File.separatorChar + "NetBeans Projects"; //NOI18N
             }
+            File f = new File(result);
+            if (!f.exists() || !f.isDirectory()) {
+                f = new File (f.getParent(), "NetBeansProjects"); //NOI18N
+            }
+            if (!f.exists() || !f.isDirectory()) {
+                f = f.getParentFile();
+            }
+            result = f.getAbsolutePath();
         }
         return result;
     }
