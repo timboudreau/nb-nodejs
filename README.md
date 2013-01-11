@@ -35,6 +35,10 @@ Requirements
 
 The plugin will function without Node installed, but is not very useful.
 
+Recent NetBeans builds have a rewritten Javascript editor with much better code completion
+which works with NodeJS.  Get a [daily build](http://bits.netbeans.org/download/trunk/nightly/latest/)
+or [7.3 beta](http://dlc.sun.com.edgesuite.net/netbeans/7.3/beta2/) or later for the best experience.
+
 Installation
 ------------
 For the moment, a build is available [on timboudreau.com](http://timboudreau.com/files/nodejs-2.5.nbm) - 
