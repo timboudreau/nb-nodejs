@@ -103,7 +103,8 @@ public final class NodeJsClassPathProvider implements ClassPathProvider {
                             return null;
                         }
                     } catch ( IllegalArgumentException e ) {
-                        Logger.getLogger( NodeJsClassPathProvider.class.getName() ).log( Level.INFO, "" + u, e );
+                        // Can happen with an unresolvable symlink in the project dir
+                        Logger.getLogger( NodeJsClassPathProvider.class.getName() ).log( Level.FINE, "" + u, e );
                         return null;
                     }
                 } catch ( URISyntaxException x ) {

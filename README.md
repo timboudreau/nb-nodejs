@@ -41,7 +41,7 @@ or [7.3 beta](http://dlc.sun.com.edgesuite.net/netbeans/7.3/beta2/) or later for
 
 Installation
 ------------
-For the moment, a build is available [on timboudreau.com](http://timboudreau.com/files/nodejs-2.5.nbm) - 
+For the moment, a build is available [on timboudreau.com](http://timboudreau.com/files/nodejs-2.6.nbm) - 
 install it using Tools | Plugins, on the Downloaded tab.  Long term, it will be available from
 the standard NetBeans update center, so no separate download will be needed.
 
