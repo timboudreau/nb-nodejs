@@ -18,10 +18,12 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.logging.Level;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.MIMEResolver;
 import org.openide.util.Exceptions;
@@ -61,6 +63,13 @@ public class ScriptResolver extends MIMEResolver {
                 } finally {
                     in.close();
                 }
+            } catch ( FileNotFoundException fnfe) {
+                // Happens on files which do not have read permissions, and
+                // some symlinks
+                java.util.logging.Logger.getLogger( 
+                        ScriptResolver.class.getName() ).log( 
+                        Level.FINE, "Could not read file " + fo.getPath(), 
+                        fnfe );
             } catch ( IOException ex ) {
                 Exceptions.printStackTrace( ex );
             }
