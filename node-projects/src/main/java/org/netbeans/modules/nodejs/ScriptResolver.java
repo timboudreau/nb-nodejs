@@ -51,8 +51,7 @@ public class ScriptResolver extends MIMEResolver {
         String ext = fo.getExt();
         if (ext.isEmpty() || "sh".equals( ext )) {
             try {
-                InputStream in = fo.getInputStream();
-                try {
+                try (InputStream in = fo.getInputStream()) {
                     byte[] nue = new byte[lookFor.length];
                     int ct = in.read( nue );
                     if (ct == nue.length) {
@@ -60,8 +59,6 @@ public class ScriptResolver extends MIMEResolver {
                             return "text/javascript";
                         }
                     }
-                } finally {
-                    in.close();
                 }
             } catch ( FileNotFoundException fnfe) {
                 // Happens on files which do not have read permissions, and

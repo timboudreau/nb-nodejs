@@ -41,9 +41,13 @@ or [7.3 beta](http://dlc.sun.com.edgesuite.net/netbeans/7.3/beta2/) or later for
 
 Installation
 ------------
-For the moment, a build is available [on timboudreau.com](http://timboudreau.com/files/nodejs-2.7.nbm) - 
-install it using Tools | Plugins, on the Downloaded tab.  Long term, it will be available from
-the standard NetBeans update center, so no separate download will be needed.
+Download the NBM file from the continuous build
+<a href="https://glo.ms/builds/job/NetBeans-NodeJS-Plugin/lastSuccessfulBuild/">on 
+timboudreau.com</a>.  It will be named ``nodejs-$VERSION.nbm``.
+
+install it using Tools | Plugins, on the Downloaded tab, in the IDE.  
+Longer term, it will be available from the standard NetBeans update 
+center, so no separate download will be needed.
 
 Building
 --------
