@@ -1,5 +1,6 @@
 var fs = require('fs'),
         http = require('http'),
+        boo = require('boo'),
         other = require('./other');
 
 exports.hello = function(what) {

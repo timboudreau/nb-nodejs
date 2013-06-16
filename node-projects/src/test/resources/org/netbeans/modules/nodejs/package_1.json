@@ -1,0 +1,17 @@
+{
+    "name" : "boo",
+    "version" : "1.2.3",
+    "description" : "Another test project",
+    "main" : "./boo.js",
+    "repository" : {
+        "type" : "git",
+        "url" : "http://github.com/timboudreau/boo"
+    },
+    "author" : {
+        "name" : "Moe Blow",
+        "email" : "moe@mail.example",
+        "url" : "http://stuff.example"
+    },
+    "license" : "MIT/X11",
+    "engine" : { "node" : ">=0.5.0" }
+}

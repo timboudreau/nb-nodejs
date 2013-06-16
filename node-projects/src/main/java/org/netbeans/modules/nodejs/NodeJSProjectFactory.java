@@ -108,7 +108,7 @@ public class NodeJSProjectFactory implements ProjectFactory2 {
         fo = resolve( fo );
         Iterator<NodeJSProject> i;
         synchronized ( this ) {
-            i = new HashSet<NodeJSProject>( cache ).iterator();
+            i = new HashSet<>( cache ).iterator();
         }
         while ( i.hasNext() ) {
             NodeJSProject prj = i.next();

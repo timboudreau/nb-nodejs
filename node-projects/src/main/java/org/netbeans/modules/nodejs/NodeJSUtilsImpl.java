@@ -84,6 +84,9 @@ public class NodeJSUtilsImpl extends NodeJSUtils {
                                         if (props != null) {
                                             return props.getMainFile();
                                         }
+                                    } else {
+                                        FileObject theFile = FileUtil.toFileObject(libdir).getFileObject( name + ".js");
+                                        return theFile;
                                     }
                                 }
                             }

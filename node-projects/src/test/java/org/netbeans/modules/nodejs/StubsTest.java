@@ -30,6 +30,9 @@ public class StubsTest {
     File prjdir;
     FileObject prjFo;
     NodeJSProject prj;
+    FileObject booDir;
+
+    NodeJSProject booProject;
 
     @Before
     public void setup () throws Exception {
@@ -40,17 +43,22 @@ public class StubsTest {
             copy( name );
         }
         prjFo = FileUtil.toFileObject( prjdir );
-        prj = new NodeJSProject( prjFo, new ProjectState() {
-            @Override
-            public void markModified () {
-            }
-
-            @Override
-            public void notifyDeleted () throws IllegalStateException {
-            }
-        } );
+        prj = new NodeJSProject( prjFo, new PS() );
         NodeJSProjectFactory fac = Lookup.getDefault().lookup( NodeJSProjectFactory.class );
         fac.register( prj );
+        File modulesdir = new File( prjdir, "node_modules" );
+        assertTrue( modulesdir.getAbsolutePath(), modulesdir.mkdir() );
+
+        File boo = new File( modulesdir, "boo" );
+        assertTrue( boo.getAbsolutePath(), boo.mkdir() );
+
+        copy( "package_1.json", "package.json", boo );
+        copy( "boo.js", "boo.js", boo );
+
+        booDir = FileUtil.toFileObject( boo );
+
+        booProject = new NodeJSProject( booDir, new PS() );
+        fac.register( booProject );
     }
 
     @After
@@ -59,8 +67,12 @@ public class StubsTest {
     }
 
     private void copy ( String name ) throws IOException {
+        copy( name, name, prjdir );
+    }
+
+    private void copy ( String name, String destName, File prjdir ) throws IOException {
         try (InputStream in = StubsTest.class.getResourceAsStream( name )) {
-            File f = new File( prjdir, name );
+            File f = new File( prjdir, destName );
             assertTrue( f.getAbsolutePath(), f.createNewFile() );
             try (FileOutputStream out = new FileOutputStream( f )) {
                 FileUtil.copy( in, out );
@@ -88,17 +100,43 @@ public class StubsTest {
         assertNotNull( http );
 
         assertEquals( actualHttp, http );
-        System.out.println( "HTTP CONTENT: " + actualHttp.asText() );
 
         LibrariesChildFactory f = new LibrariesChildFactory( prj );
         Set<String> libs = new HashSet<>();
         for (ProjectNodeKey key : f.libraries()) {
-            libs.add(key.toString());
+            libs.add( key.toString() );
+            if (!"boo".equals( key.toString() )) {
+                assertTrue( key.isBuiltIn() );
+            } else {
+                assertFalse( key.isBuiltIn() );
+            }
         }
-        System.out.println( "LIBS: " + libs );
-        assertTrue(libs.contains("util"));
-        assertTrue(libs.contains("fs"));
-        assertTrue(libs.contains("http"));
-        assertFalse(libs.contains("url"));
+        assertTrue( libs.contains( "util" ) );
+        assertTrue( libs.contains( "fs" ) );
+        assertTrue( libs.contains( "http" ) );
+        assertFalse( libs.contains( "url" ) );
+        assertTrue( libs.contains( "boo" ) );
+
+        FileObject boo = utils.resolve( "boo", index );
+        assertNotNull( boo );
+        assertEquals( booDir.getFileObject( "boo.js" ), boo );
+
+        NodeJSProjectProperties props = prj.getLookup().lookup( NodeJSProjectProperties.class );
+        assertNotNull( props );
+        assertEquals( "testproject", props.getDisplayName() );
+
+        assertEquals( "joe@mail.example", props.getAuthorEmail() );
     }
+
+    private static class PS implements ProjectState {
+
+        @Override
+        public void markModified () {
+        }
+
+        @Override
+        public void notifyDeleted () throws IllegalStateException {
+        }
+    }
+
 }
