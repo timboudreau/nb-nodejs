@@ -161,4 +161,8 @@ public class NodeJSProjectFactory implements ProjectFactory2 {
         }
         return null;
     }
+
+    void register ( NodeJSProject prj ) { //for tests
+        cache.add( prj );
+    }
 }

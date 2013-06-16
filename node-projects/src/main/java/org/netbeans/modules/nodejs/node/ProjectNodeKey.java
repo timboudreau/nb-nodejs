@@ -89,7 +89,7 @@ public class ProjectNodeKey implements Comparable<ProjectNodeKey> {
         return toString().compareToIgnoreCase( o.toString() );
     }
 
-    File toCanonoicalFile () {
+    public File toCanonoicalFile () {
         File f = getFld() == null ? null : FileUtil.toFile( getFld() );
         if (f != null) {
             try {

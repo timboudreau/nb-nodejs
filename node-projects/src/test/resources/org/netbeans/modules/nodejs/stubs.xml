@@ -1,0 +1,917 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+<file name="assert.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.AssertionError=function(options){}
+exports.fail=function(actual, expected, message, operator, stackStartFunction){}
+exports.ok=function(value, message){}
+exports.equal=function(actual, expected, message){}
+exports.notEqual=function(actual, expected, message){}
+exports.deepEqual=function(actual, expected, message){}
+exports.notDeepEqual=function(actual, expected, message){}
+exports.strictEqual=function(actual, expected, message){}
+exports.notStrictEqual=function(actual, expected, message){}
+exports.throws=function(block, /*optional*/error, /*optional*/message){}
+exports.doesNotThrow=function(block, /*optional*/message){}
+exports.ifError=function(err){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="buffer.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.INSPECT_MAX_BYTES = 50
+exports.SlowBuffer=function(){}
+exports.Buffer=function(subject, encoding, offset){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="child_process.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.fork=function(modulePath /*, args, options*/){}
+exports.exec=function(command /*, options, callback */){}
+exports.execFile=function(file /* args, options, callback */){}
+exports.spawn=function(file, args, options){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="cluster.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.domain = null
+exports.isWorker = false
+exports.isMaster = true
+exports.worker = null
+exports.workers = {}
+exports.settings = {}
+exports.setupMaster=function(options){}
+exports.Worker=function(customEnv){}
+exports.fork=function(env){}
+exports.disconnect=function(callback){}
+exports.setMaxListeners=function(n){}
+exports.emit=function(type){}
+exports.addListener=function(type, listener){}
+exports.on=function(type, listener){}
+exports.once=function(type, listener){}
+exports.removeListener=function(type, listener){}
+exports.removeAllListeners=function(type){}
+exports.listeners=function(type){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="console.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.log=function(){}
+exports.info=function(){}
+exports.warn=function(){}
+exports.error=function(){}
+exports.dir=function(){}
+exports.time=function(){}
+exports.timeEnd=function(){}
+exports.trace=function(){}
+exports.assert=function(){}
+exports.Console=function(stdout, stderr){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="constants.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.O_RDONLY = 0
+exports.O_WRONLY = 1
+exports.O_RDWR = 2
+exports.S_IFMT = 61440
+exports.S_IFREG = 32768
+exports.S_IFDIR = 16384
+exports.S_IFCHR = 8192
+exports.S_IFBLK = 24576
+exports.S_IFIFO = 4096
+exports.S_IFLNK = 40960
+exports.S_IFSOCK = 49152
+exports.O_CREAT = 64
+exports.O_EXCL = 128
+exports.O_NOCTTY = 256
+exports.O_TRUNC = 512
+exports.O_APPEND = 1024
+exports.O_DIRECTORY = 65536
+exports.O_NOFOLLOW = 131072
+exports.O_SYNC = 1052672
+exports.O_DIRECT = 16384
+exports.S_IRWXU = 448
+exports.S_IRUSR = 256
+exports.S_IWUSR = 128
+exports.S_IXUSR = 64
+exports.S_IRWXG = 56
+exports.S_IRGRP = 32
+exports.S_IWGRP = 16
+exports.S_IXGRP = 8
+exports.S_IRWXO = 7
+exports.S_IROTH = 4
+exports.S_IWOTH = 2
+exports.S_IXOTH = 1
+exports.E2BIG = 7
+exports.EACCES = 13
+exports.EADDRINUSE = 98
+exports.EADDRNOTAVAIL = 99
+exports.EAFNOSUPPORT = 97
+exports.EAGAIN = 11
+exports.EALREADY = 114
+exports.EBADF = 9
+exports.EBADMSG = 74
+exports.EBUSY = 16
+exports.ECANCELED = 125
+exports.ECHILD = 10
+exports.ECONNABORTED = 103
+exports.ECONNREFUSED = 111
+exports.ECONNRESET = 104
+exports.EDEADLK = 35
+exports.EDESTADDRREQ = 89
+exports.EDOM = 33
+exports.EDQUOT = 122
+exports.EEXIST = 17
+exports.EFAULT = 14
+exports.EFBIG = 27
+exports.EHOSTUNREACH = 113
+exports.EIDRM = 43
+exports.EILSEQ = 84
+exports.EINPROGRESS = 115
+exports.EINTR = 4
+exports.EINVAL = 22
+exports.EIO = 5
+exports.EISCONN = 106
+exports.EISDIR = 21
+exports.ELOOP = 40
+exports.EMFILE = 24
+exports.EMLINK = 31
+exports.EMSGSIZE = 90
+exports.EMULTIHOP = 72
+exports.ENAMETOOLONG = 36
+exports.ENETDOWN = 100
+exports.ENETRESET = 102
+exports.ENETUNREACH = 101
+exports.ENFILE = 23
+exports.ENOBUFS = 105
+exports.ENODATA = 61
+exports.ENODEV = 19
+exports.ENOENT = 2
+exports.ENOEXEC = 8
+exports.ENOLCK = 37
+exports.ENOLINK = 67
+exports.ENOMEM = 12
+exports.ENOMSG = 42
+exports.ENOPROTOOPT = 92
+exports.ENOSPC = 28
+exports.ENOSR = 63
+exports.ENOSTR = 60
+exports.ENOSYS = 38
+exports.ENOTCONN = 107
+exports.ENOTDIR = 20
+exports.ENOTEMPTY = 39
+exports.ENOTSOCK = 88
+exports.ENOTSUP = 95
+exports.ENOTTY = 25
+exports.ENXIO = 6
+exports.EOPNOTSUPP = 95
+exports.EOVERFLOW = 75
+exports.EPERM = 1
+exports.EPIPE = 32
+exports.EPROTO = 71
+exports.EPROTONOSUPPORT = 93
+exports.EPROTOTYPE = 91
+exports.ERANGE = 34
+exports.EROFS = 30
+exports.ESPIPE = 29
+exports.ESRCH = 3
+exports.ESTALE = 116
+exports.ETIME = 62
+exports.ETIMEDOUT = 110
+exports.ETXTBSY = 26
+exports.EWOULDBLOCK = 11
+exports.EXDEV = 18
+exports.SIGHUP = 1
+exports.SIGINT = 2
+exports.SIGQUIT = 3
+exports.SIGILL = 4
+exports.SIGTRAP = 5
+exports.SIGABRT = 6
+exports.SIGIOT = 6
+exports.SIGBUS = 7
+exports.SIGFPE = 8
+exports.SIGKILL = 9
+exports.SIGUSR1 = 10
+exports.SIGSEGV = 11
+exports.SIGUSR2 = 12
+exports.SIGPIPE = 13
+exports.SIGALRM = 14
+exports.SIGTERM = 15
+exports.SIGCHLD = 17
+exports.SIGSTKFLT = 16
+exports.SIGCONT = 18
+exports.SIGSTOP = 19
+exports.SIGTSTP = 20
+exports.SIGTTIN = 21
+exports.SIGTTOU = 22
+exports.SIGURG = 23
+exports.SIGXCPU = 24
+exports.SIGXFSZ = 25
+exports.SIGVTALRM = 26
+exports.SIGPROF = 27
+exports.SIGWINCH = 28
+exports.SIGIO = 29
+exports.SIGPOLL = 29
+exports.SIGPWR = 30
+exports.SIGSYS = 31
+exports.SIGUNUSED = 31
+exports.SSL_OP_ALL = 2147486719
+exports.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION = 262144
+exports.SSL_OP_CIPHER_SERVER_PREFERENCE = 4194304
+exports.SSL_OP_CISCO_ANYCONNECT = 32768
+exports.SSL_OP_COOKIE_EXCHANGE = 8192
+exports.SSL_OP_CRYPTOPRO_TLSEXT_BUG = 2147483648
+exports.SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS = 2048
+exports.SSL_OP_EPHEMERAL_RSA = 2097152
+exports.SSL_OP_LEGACY_SERVER_CONNECT = 4
+exports.SSL_OP_MICROSOFT_BIG_SSLV3_BUFFER = 32
+exports.SSL_OP_MICROSOFT_SESS_ID_BUG = 1
+exports.SSL_OP_MSIE_SSLV2_RSA_PADDING = 64
+exports.SSL_OP_NETSCAPE_CA_DN_BUG = 536870912
+exports.SSL_OP_NETSCAPE_CHALLENGE_BUG = 2
+exports.SSL_OP_NETSCAPE_DEMO_CIPHER_CHANGE_BUG = 1073741824
+exports.SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG = 8
+exports.SSL_OP_NO_COMPRESSION = 131072
+exports.SSL_OP_NO_QUERY_MTU = 4096
+exports.SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION = 65536
+exports.SSL_OP_NO_SSLv2 = 16777216
+exports.SSL_OP_NO_SSLv3 = 33554432
+exports.SSL_OP_NO_TICKET = 16384
+exports.SSL_OP_NO_TLSv1 = 67108864
+exports.SSL_OP_NO_TLSv1_1 = 268435456
+exports.SSL_OP_NO_TLSv1_2 = 134217728
+exports.SSL_OP_PKCS1_CHECK_1 = 0
+exports.SSL_OP_PKCS1_CHECK_2 = 0
+exports.SSL_OP_SINGLE_DH_USE = 1048576
+exports.SSL_OP_SINGLE_ECDH_USE = 524288
+exports.SSL_OP_SSLEAY_080_CLIENT_DH_BUG = 128
+exports.SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG = 16
+exports.SSL_OP_TLS_BLOCK_PADDING_BUG = 512
+exports.SSL_OP_TLS_D5_BUG = 256
+exports.SSL_OP_TLS_ROLLBACK_BUG = 8388608
+exports.NPN_ENABLED = 1
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="crypto.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.DEFAULT_ENCODING = 'buffer'
+exports.Credentials=function(secureProtocol, flags, context){}
+exports.createCredentials=function(options, context){}
+exports.Hash=function(algorithm, options){}
+exports.createHash=function(algorithm, options){}
+exports.Hmac=function(hmac, key, options){}
+exports.createHmac=function(hmac, key, options){}
+exports.Cipher=function(cipher, password, options){}
+exports.createCipher=function(cipher, password, options){}
+exports.Cipheriv=function(cipher, key, iv, options){}
+exports.createCipheriv=function(cipher, key, iv, options){}
+exports.Decipher=function(cipher, password, options){}
+exports.createDecipher=function(cipher, password, options){}
+exports.Decipheriv=function(cipher, key, iv, options){}
+exports.createDecipheriv=function(cipher, key, iv, options){}
+exports.Sign=function(algorithm, options){}
+exports.createSign=function(algorithm, options){}
+exports.Verify=function(algorithm, options){}
+exports.createVerify=function(algorithm, options){}
+exports.DiffieHellman=function(sizeOrKey, encoding){}
+exports.createDiffieHellman=function(sizeOrKey, encoding){}
+exports.getDiffieHellman=function(name){}
+exports.createDiffieHellmanGroup=function(name){}
+exports.DiffieHellmanGroup=function(name){}
+exports.pbkdf2=function(password, salt, iterations, keylen, callback){}
+exports.pbkdf2Sync=function(password, salt, iterations, keylen){}
+exports.randomBytes=function(){}
+exports.pseudoRandomBytes=function(){}
+exports.rng=function(){}
+exports.prng=function(){}
+exports.getCiphers=function(){}
+exports.getHashes=function(){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="dgram.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.Socket=function(type, listener){}
+exports.createSocket=function(type, listener){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="dns.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.lookup=function(domain, family, callback){}
+exports.resolve4=function(name, callback){}
+exports.resolve6=function(name, callback){}
+exports.resolveCname=function(name, callback){}
+exports.resolveMx=function(name, callback){}
+exports.resolveNs=function(name, callback){}
+exports.resolveTxt=function(name, callback){}
+exports.resolveSrv=function(name, callback){}
+exports.resolveNaptr=function(name, callback){}
+exports.reverse=function(name, callback){}
+exports.resolve=function(domain, type_, callback_){}
+exports.NODATA = 'ENODATA'
+exports.FORMERR = 'EFORMERR'
+exports.SERVFAIL = 'ESERVFAIL'
+exports.NOTFOUND = 'ENOTFOUND'
+exports.NOTIMP = 'ENOTIMP'
+exports.REFUSED = 'EREFUSED'
+exports.BADQUERY = 'EBADQUERY'
+exports.ADNAME = 'EADNAME'
+exports.BADFAMILY = 'EBADFAMILY'
+exports.BADRESP = 'EBADRESP'
+exports.CONNREFUSED = 'ECONNREFUSED'
+exports.TIMEOUT = 'ETIMEOUT'
+exports.EOF = 'EOF'
+exports.FILE = 'EFILE'
+exports.NOMEM = 'ENOMEM'
+exports.DESTRUCTION = 'EDESTRUCTION'
+exports.BADSTR = 'EBADSTR'
+exports.BADFLAGS = 'EBADFLAGS'
+exports.NONAME = 'ENONAME'
+exports.BADHINTS = 'EBADHINTS'
+exports.NOTINITIALIZED = 'ENOTINITIALIZED'
+exports.LOADIPHLPAPI = 'ELOADIPHLPAPI'
+exports.ADDRGETNETWORKPARAMS = 'EADDRGETNETWORKPARAMS'
+exports.CANCELLED = 'ECANCELLED'
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="domain.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.Domain=function(){}
+exports.createDomain=function(cb){}
+exports.create=function(cb){}
+exports.active = null
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="events.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.usingDomains = true
+exports.EventEmitter=function(){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="freelist.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.FreeList=function(name, max, constructor){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="fs.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.Stats=function(){}
+exports.exists=function(path, callback){}
+exports.existsSync=function(path){}
+exports.readFile=function(path, options, callback_){}
+exports.readFileSync=function(path, options){}
+exports.close=function(fd, callback){}
+exports.closeSync=function(fd){}
+exports.open=function(path, flags, mode, callback){}
+exports.openSync=function(path, flags, mode){}
+exports.read=function(fd, buffer, offset, length, position, callback){}
+exports.readSync=function(fd, buffer, offset, length, position){}
+exports.write=function(fd, buffer, offset, length, position, callback){}
+exports.writeSync=function(fd, buffer, offset, length, position){}
+exports.rename=function(oldPath, newPath, callback){}
+exports.renameSync=function(oldPath, newPath){}
+exports.truncate=function(path, len, callback){}
+exports.truncateSync=function(path, len){}
+exports.ftruncate=function(fd, len, callback){}
+exports.ftruncateSync=function(fd, len){}
+exports.rmdir=function(path, callback){}
+exports.rmdirSync=function(path){}
+exports.fdatasync=function(fd, callback){}
+exports.fdatasyncSync=function(fd){}
+exports.fsync=function(fd, callback){}
+exports.fsyncSync=function(fd){}
+exports.mkdir=function(path, mode, callback){}
+exports.mkdirSync=function(path, mode){}
+exports.readdir=function(path, callback){}
+exports.readdirSync=function(path){}
+exports.fstat=function(fd, callback){}
+exports.lstat=function(path, callback){}
+exports.stat=function(path, callback){}
+exports.fstatSync=function(fd){}
+exports.lstatSync=function(path){}
+exports.statSync=function(path){}
+exports.readlink=function(path, callback){}
+exports.readlinkSync=function(path){}
+exports.symlink=function(destination, path, type_, callback){}
+exports.symlinkSync=function(destination, path, type){}
+exports.link=function(srcpath, dstpath, callback){}
+exports.linkSync=function(srcpath, dstpath){}
+exports.unlink=function(path, callback){}
+exports.unlinkSync=function(path){}
+exports.fchmod=function(fd, mode, callback){}
+exports.fchmodSync=function(fd, mode){}
+exports.chmod=function(path, mode, callback){}
+exports.chmodSync=function(path, mode){}
+exports.fchown=function(fd, uid, gid, callback){}
+exports.fchownSync=function(fd, uid, gid){}
+exports.chown=function(path, uid, gid, callback){}
+exports.chownSync=function(path, uid, gid){}
+exports.utimes=function(path, atime, mtime, callback){}
+exports.utimesSync=function(path, atime, mtime){}
+exports.futimes=function(fd, atime, mtime, callback){}
+exports.futimesSync=function(fd, atime, mtime){}
+exports.writeFile=function(path, data, options, callback){}
+exports.writeFileSync=function(path, data, options){}
+exports.appendFile=function(path, data, options, callback_){}
+exports.appendFileSync=function(path, data, options){}
+exports.watch=function(filename){}
+exports.watchFile=function(filename){}
+exports.unwatchFile=function(filename, listener){}
+exports.realpathSync=function(p, cache){}
+exports.realpath=function(p, cache, cb){}
+exports.createReadStream=function(path, options){}
+exports.ReadStream=function(path, options){}
+exports.FileReadStream=function(path, options){}
+exports.createWriteStream=function(path, options){}
+exports.WriteStream=function(path, options){}
+exports.FileWriteStream=function(path, options){}
+exports.SyncWriteStream=function(fd){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="http.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.parsers = { name: 'parsers', constructor: [Function], max: 1000, list: [] }
+exports.STATUS_CODES = { '100': 'Continue',
+  '101': 'Switching Protocols',
+  '102': 'Processing',
+  '200': 'OK',
+  '201': 'Created',
+  '202': 'Accepted',
+  '203': 'Non-Authoritative Information',
+  '204': 'No Content',
+  '205': 'Reset Content',
+  '206': 'Partial Content',
+  '207': 'Multi-Status',
+  '300': 'Multiple Choices',
+  '301': 'Moved Permanently',
+  '302': 'Moved Temporarily',
+  '303': 'See Other',
+  '304': 'Not Modified',
+  '305': 'Use Proxy',
+  '307': 'Temporary Redirect',
+  '400': 'Bad Request',
+  '401': 'Unauthorized',
+  '402': 'Payment Required',
+  '403': 'Forbidden',
+  '404': 'Not Found',
+  '405': 'Method Not Allowed',
+  '406': 'Not Acceptable',
+  '407': 'Proxy Authentication Required',
+  '408': 'Request Time-out',
+  '409': 'Conflict',
+  '410': 'Gone',
+  '411': 'Length Required',
+  '412': 'Precondition Failed',
+  '413': 'Request Entity Too Large',
+  '414': 'Request-URI Too Large',
+  '415': 'Unsupported Media Type',
+  '416': 'Requested Range Not Satisfiable',
+  '417': 'Expectation Failed',
+  '418': 'I\'m a teapot',
+  '422': 'Unprocessable Entity',
+  '423': 'Locked',
+  '424': 'Failed Dependency',
+  '425': 'Unordered Collection',
+  '426': 'Upgrade Required',
+  '428': 'Precondition Required',
+  '429': 'Too Many Requests',
+  '431': 'Request Header Fields Too Large',
+  '500': 'Internal Server Error',
+  '501': 'Not Implemented',
+  '502': 'Bad Gateway',
+  '503': 'Service Unavailable',
+  '504': 'Gateway Time-out',
+  '505': 'HTTP Version Not Supported',
+  '506': 'Variant Also Negotiates',
+  '507': 'Insufficient Storage',
+  '509': 'Bandwidth Limit Exceeded',
+  '510': 'Not Extended',
+  '511': 'Network Authentication Required' }
+exports.IncomingMessage=function(socket){}
+exports.OutgoingMessage=function(){}
+exports.ServerResponse=function(req){}
+exports.Agent=function(options){}
+exports.globalAgent = { domain: null,
+  _events: { free: [Function] },
+  _maxListeners: 10,
+  options: {},
+  requests: {},
+  sockets: {},
+  maxSockets: 5,
+  createConnection: [Function] }
+exports.ClientRequest=function(options, cb){}
+exports.request=function(options, cb){}
+exports.get=function(options, cb){}
+exports.Server=function(requestListener){}
+exports.createServer=function(requestListener){}
+exports.Client=function(){}
+exports.createClient=function(){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="https.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.Server=function(opts, requestListener){}
+exports.createServer=function(opts, requestListener){}
+exports.globalAgent = { domain: null,
+  _events: { free: [Function] },
+  _maxListeners: 10,
+  options: {},
+  requests: {},
+  sockets: {},
+  maxSockets: 5,
+  createConnection: [Function: createConnection] }
+exports.Agent=function(options){}
+exports.request=function(options, cb){}
+exports.get=function(options, cb){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="module.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.globalPaths = [ '/home/tim/.node_modules',
+  '/home/tim/.node_libraries',
+  '/usr/lib/node' ]
+exports.wrapper = [ '(function (exports, require, module, __filename, __dirname) { ',
+  '\n});' ]
+exports.wrap=function(script){}
+exports.runMain=function(){}
+exports.requireRepl=function(){}
+exports.Module=function(id, parent){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="net.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.createServer=function(){}
+exports.createConnection=function(){}
+exports.connect=function(){}
+exports.Socket=function(options){}
+exports.Stream=function(options){}
+exports.Server=function(/* [ options, ] listener */){}
+exports.isIP=function(){}
+exports.isIPv4=function(input){}
+exports.isIPv6=function(input){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="os.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.endianness=function(){}
+exports.hostname=function(){}
+exports.loadavg=function(){}
+exports.uptime=function(){}
+exports.freemem=function(){}
+exports.totalmem=function(){}
+exports.cpus=function(){}
+exports.type=function(){}
+exports.release=function(){}
+exports.networkInterfaces=function(){}
+exports.arch=function(){}
+exports.platform=function(){}
+exports.tmpdir=function(){}
+exports.tmpDir=function(){}
+exports.getNetworkInterfaces=function(){}
+exports.EOL = '\n'
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="path.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.resolve=function(){}
+exports.normalize=function(path){}
+exports.join=function(){}
+exports.relative=function(from, to){}
+exports.sep = '/'
+exports.delimiter = ':'
+exports.dirname=function(path){}
+exports.basename=function(path, ext){}
+exports.extname=function(path){}
+exports.exists=function(){}
+exports.existsSync=function(){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="punycode.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.version = '1.2.0'
+exports.ucs2 = { decode: [Function: ucs2decode],
+  encode: [Function: ucs2encode] }
+exports.decode=function(input){}
+exports.encode=function(input){}
+exports.toASCII=function(domain){}
+exports.toUnicode=function(domain){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="querystring.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.unescapeBuffer=function(s, decodeSpaces){}
+exports.unescape=function(s, decodeSpaces){}
+exports.escape=function(str){}
+exports.encode=function(obj, sep, eq, name){}
+exports.stringify=function(obj, sep, eq, name){}
+exports.decode=function(qs, sep, eq, options){}
+exports.parse=function(qs, sep, eq, options){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="readline.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.createInterface=function(input, output, completer, terminal){}
+exports.Interface=function(input, output, completer, terminal){}
+exports.emitKeypressEvents=function(stream){}
+exports.cursorTo=function(stream, x, y){}
+exports.moveCursor=function(stream, dx, dy){}
+exports.clearLine=function(stream, dir){}
+exports.clearScreenDown=function(stream){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="repl.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.writer=function(obj, opts){}
+exports.REPLServer=function(prompt, stream, eval_, useGlobal, ignoreUndefined){}
+exports.start=function(prompt, source, eval_, useGlobal, ignoreUndefined){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="stream.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.super_=function(){}
+exports.Readable=function(options){}
+exports.Writable=function(options){}
+exports.Duplex=function(options){}
+exports.Transform=function(options){}
+exports.PassThrough=function(options){}
+exports.Stream=function(){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="string_decoder.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.StringDecoder=function(encoding){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="sys.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.format=function(f){}
+exports.deprecate=function(fn, msg){}
+exports.print=function(){}
+exports.puts=function(){}
+exports.debug=function(x){}
+exports.error=function(x){}
+exports.inspect=function(obj, opts){}
+exports.isArray=function(ar){}
+exports.isRegExp=function(re){}
+exports.isDate=function(d){}
+exports.isError=function(e){}
+exports.p=function(){}
+exports.log=function(msg){}
+exports.exec=function(){}
+exports.pump=function(){}
+exports.inherits=function(ctor, superCtor){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="timers.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.unenroll=function(item){}
+exports.enroll=function(item, msecs){}
+exports.active=function(item){}
+exports.setTimeout=function(callback, after){}
+exports.clearTimeout=function(timer){}
+exports.setInterval=function(callback, repeat){}
+exports.clearInterval=function(timer){}
+exports.setImmediate=function(callback){}
+exports.clearImmediate=function(immediate){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="tls.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.CLIENT_RENEG_LIMIT = 3
+exports.CLIENT_RENEG_WINDOW = 600
+exports.SLAB_BUFFER_SIZE = 10485760
+exports.getCiphers=function(){}
+exports.checkServerIdentity=function(host, cert){}
+exports.Server=function(/* [options], listener */){}
+exports.createServer=function(options, listener){}
+exports.connect=function(/* [port, host], options, cb */){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="tty.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.isatty=function(fd){}
+exports.setRawMode=function(){}
+exports.ReadStream=function(fd, options){}
+exports.WriteStream=function(fd){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="url.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.parse=function(url, parseQueryString, slashesDenoteHost){}
+exports.resolve=function(source, relative){}
+exports.resolveObject=function(source, relative){}
+exports.format=function(obj){}
+exports.Url=function(){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="util.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.format=function(f){}
+exports.deprecate=function(fn, msg){}
+exports.print=function(){}
+exports.puts=function(){}
+exports.debug=function(x){}
+exports.error=function(x){}
+exports.inspect=function(obj, opts){}
+exports.isArray=function(ar){}
+exports.isRegExp=function(re){}
+exports.isDate=function(d){}
+exports.isError=function(e){}
+exports.p=function(){}
+exports.log=function(msg){}
+exports.exec=function(){}
+exports.pump=function(){}
+exports.inherits=function(ctor, superCtor){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="vm.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.Script=function(code, ctx, filename){}
+exports.createScript=function(code, ctx, name){}
+exports.createContext=function(){}
+exports.runInContext=function(){}
+exports.runInThisContext=function(){}
+exports.runInNewContext=function(){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+<file name="zlib.js"><![CDATA[
+/* THIS IS A STUB FILE FOR CODE COMPLETION
+Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */
+
+exports.Zlib=function(){}
+exports.Z_NO_FLUSH = 0
+exports.Z_PARTIAL_FLUSH = 1
+exports.Z_SYNC_FLUSH = 2
+exports.Z_FULL_FLUSH = 3
+exports.Z_FINISH = 4
+exports.Z_BLOCK = 5
+exports.Z_OK = 0
+exports.Z_STREAM_END = 1
+exports.Z_NEED_DICT = 2
+exports.Z_ERRNO = -1
+exports.Z_STREAM_ERROR = -2
+exports.Z_DATA_ERROR = -3
+exports.Z_MEM_ERROR = -4
+exports.Z_BUF_ERROR = -5
+exports.Z_VERSION_ERROR = -6
+exports.Z_NO_COMPRESSION = 0
+exports.Z_BEST_SPEED = 1
+exports.Z_BEST_COMPRESSION = 9
+exports.Z_DEFAULT_COMPRESSION = -1
+exports.Z_FILTERED = 1
+exports.Z_HUFFMAN_ONLY = 2
+exports.Z_RLE = 3
+exports.Z_FIXED = 4
+exports.Z_DEFAULT_STRATEGY = 0
+exports.ZLIB_VERNUM = 4736
+exports.ZLIB_VERSION = '1.2.8'
+exports.Z_MIN_WINDOWBITS = 8
+exports.Z_MAX_WINDOWBITS = 15
+exports.Z_DEFAULT_WINDOWBITS = 15
+exports.Z_MIN_CHUNK = 64
+exports.Z_MAX_CHUNK = Infinity
+exports.Z_DEFAULT_CHUNK = 16384
+exports.Z_MIN_MEMLEVEL = 1
+exports.Z_MAX_MEMLEVEL = 9
+exports.Z_DEFAULT_MEMLEVEL = 8
+exports.Z_MIN_LEVEL = -1
+exports.Z_MAX_LEVEL = 9
+exports.Z_DEFAULT_LEVEL = -1
+exports.codes = { '0': 'Z_OK',
+  '1': 'Z_STREAM_END',
+  '2': 'Z_NEED_DICT',
+  Z_OK: 0,
+  Z_STREAM_END: 1,
+  Z_NEED_DICT: 2,
+  Z_ERRNO: -1,
+  Z_STREAM_ERROR: -2,
+  Z_DATA_ERROR: -3,
+  Z_MEM_ERROR: -4,
+  Z_BUF_ERROR: -5,
+  Z_VERSION_ERROR: -6,
+  '-1': 'Z_ERRNO',
+  '-2': 'Z_STREAM_ERROR',
+  '-3': 'Z_DATA_ERROR',
+  '-4': 'Z_MEM_ERROR',
+  '-5': 'Z_BUF_ERROR',
+  '-6': 'Z_VERSION_ERROR' }
+exports.Deflate=function(opts){}
+exports.Inflate=function(opts){}
+exports.Gzip=function(opts){}
+exports.Gunzip=function(opts){}
+exports.DeflateRaw=function(opts){}
+exports.InflateRaw=function(opts){}
+exports.Unzip=function(opts){}
+exports.createDeflate=function(o){}
+exports.createInflate=function(o){}
+exports.createDeflateRaw=function(o){}
+exports.createInflateRaw=function(o){}
+exports.createGzip=function(o){}
+exports.createGunzip=function(o){}
+exports.createUnzip=function(o){}
+exports.deflate=function(buffer, callback){}
+exports.gzip=function(buffer, callback){}
+exports.deflateRaw=function(buffer, callback){}
+exports.unzip=function(buffer, callback){}
+exports.inflate=function(buffer, callback){}
+exports.gunzip=function(buffer, callback){}
+exports.inflateRaw=function(buffer, callback){}
+]]>
+<attr name="nodeversion" stringvalue="v0.10.10"/>
+</file>
+</filesystem>

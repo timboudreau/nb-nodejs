@@ -218,12 +218,12 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
 
     public List<ProjectNodeKey> libraries () {
         VisibilityQuery q = VisibilityQuery.getDefault();
-        List<ProjectNodeKey> keys = new ArrayList<ProjectNodeKey>();
+        List<ProjectNodeKey> keys = new ArrayList<>();
         Map<String, List<FileObject>> otherLibs = findOtherModules( project.getProjectDirectory() );
         FileObject libFolder = project.getProjectDirectory().getFileObject( NodeJSProjectFactory.NODE_MODULES_FOLDER );
         if (libFolder != null) {
-            Set<ProjectNodeKey> libFolders = new HashSet<ProjectNodeKey>();
-            Set<FileObject> childFolders = new LinkedHashSet<FileObject>();
+            Set<ProjectNodeKey> libFolders = new HashSet<>();
+            Set<FileObject> childFolders = new LinkedHashSet<>();
             for (FileObject lib : libFolder.getChildren()) {
                 File f = FileUtil.toFile( lib );
                 try {

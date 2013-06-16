@@ -1,0 +1,71 @@
+#!/usr/bin/env node
+var util = require('util');
+
+console.log('<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">\n<filesystem>');
+
+var modules = [
+    'assert',
+    'buffer',
+    'child_process',
+    'cluster',
+    'console',
+    'constants',
+    'crypto',
+    'dgram',
+    'dns',
+    'domain',
+    'events',
+    'freelist',
+    'fs',
+    'http',
+    'https',
+    'module',
+    'net',
+    'os',
+    'path',
+    'punycode',
+    'querystring',
+    'readline',
+    'repl',
+    'stream',
+    'string_decoder',
+    'sys',
+    'timers',
+    'tls',
+    'tty',
+    'url',
+    'util',
+    'vm',
+    'zlib',
+]
+
+var version = process.version;
+var verAttr = '<attr name="nodeversion" stringvalue="' + version + '"/>';
+modules.forEach(function(module) {
+    var curr = require(module);
+    console.log('<file name="' + module + ".js" + '"><![CDATA[');
+    var lines = ['/* THIS IS A STUB FILE FOR CODE COMPLETION',
+        'Use Tools | Options | Miscellaneous | NodeJS to download the actual sources */\n'];
+
+    for (var key in curr) {
+        var item = curr[key];
+        if (key[0] === '_') {
+            continue;
+        }
+//        console.log('TYPEOF ' + key + " " + typeof item)
+        if (typeof item === 'function') {
+            var str = item + '';
+            var def = /.*function.*\((.*?)\)/.exec(str);
+            if (def) {
+                lines.push('exports.' + key + '=function(' + def[1] + '){}');
+            }
+        } else {
+            lines.push('exports.' + key + ' = ' + util.inspect(item));
+        }
+    }
+    lines.push(']]>\n' + verAttr + '\n</file>')
+    console.log(lines.join('\n'));
+})
+
+console.log('</filesystem>');
+
