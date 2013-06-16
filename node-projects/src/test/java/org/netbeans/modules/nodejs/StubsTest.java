@@ -55,7 +55,7 @@ public class StubsTest {
 
     @After
     public void teardown () throws IOException {
-//        prjFo.delete();
+        prjFo.delete();
     }
 
     private void copy ( String name ) throws IOException {
