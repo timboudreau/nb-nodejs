@@ -37,6 +37,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import org.netbeans.modules.nodejs.NodeJSProject;
+import org.netbeans.modules.nodejs.Npm;
 import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.openide.awt.HtmlBrowser.URLDisplayer;
 import org.openide.util.Exceptions;
@@ -208,7 +209,7 @@ public class LibrariesPanel extends javax.swing.JPanel implements Runnable, Docu
         if (txt[0].trim().equals( "" )) {
             return;
         }
-        ProcessBuilder pb = new ProcessBuilder( "npm", "search", txt[0] ); //NOI18N
+        ProcessBuilder pb = new ProcessBuilder( Npm.getDefault().exe(), "search", txt[0] ); //NOI18N
         try {
             Process p = pb.start();
             synchronized ( lock ) {

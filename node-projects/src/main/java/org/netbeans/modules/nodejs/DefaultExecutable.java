@@ -52,24 +52,24 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tim Boudreau
  */
 @ServiceProvider (service = NodeJSExecutable.class)
-public final class DefaultExectable extends NodeJSExecutable {
+public final class DefaultExecutable extends NodeJSExecutable {
     private static final String NODE_EXE_KEY = "nodejs_binary";
     private static final String PORT_KEY = "port";
-    private static DefaultExectable instance;
+    private static DefaultExecutable instance;
 
     @SuppressWarnings ("LeakingThisInConstructor")
-    public DefaultExectable () {
+    public DefaultExecutable () {
         assert instance == null;
         instance = this;
     }
 
-    public static DefaultExectable get () {
+    public static DefaultExecutable get () {
         if (instance == null) {
             NodeJSExecutable e = NodeJSExecutable.getDefault();
-            if (e instanceof DefaultExectable) {
-                instance = (DefaultExectable) e;
+            if (e instanceof DefaultExecutable) {
+                instance = (DefaultExecutable) e;
             } else {
-                instance = new DefaultExectable();
+                instance = new DefaultExecutable();
             }
         }
         return instance;
@@ -78,21 +78,33 @@ public final class DefaultExectable extends NodeJSExecutable {
     private Preferences preferences () {
         return NbPreferences.forModule( NodeJSExecutable.class );
     }
+    
+    private static final String[] COMMON_LOCATIONS = new String[] {
+            "/usr/bin/node",
+            "/usr/local/bin/node",
+            "/opt/bin/node",
+            "/opt/local/bin/node",
+    };
+    
+    private String find(String... opts) {
+        for (String s : opts) {
+            File f = new File(s);
+            if (f.exists() && f.canExecute()) {
+                return f.getAbsolutePath();
+            }
+        }
+        return null;
+    }
 
     @Override
     public String getNodeExecutable ( boolean showDialog ) {
         Preferences p = preferences();
         String loc = p.get( NODE_EXE_KEY, null );
         if (loc == null) {
-            if (loc == null) {
-                File f = new File( "usr/local/bin/node" );
-                if (f.exists()) {
-                    loc = f.getAbsolutePath();
-                }
-            }
-            if (loc == null) {
-                loc = lookForNodeExecutable( showDialog );
-            }
+            loc = find(COMMON_LOCATIONS);
+        }
+        if (loc == null) {
+            loc = lookForNodeExecutable( showDialog );
         }
         return loc;
     }
@@ -136,7 +148,7 @@ public final class DefaultExectable extends NodeJSExecutable {
         String executable = getNodeExecutable( true );
         if (executable == null) {
             StatusDisplayer.getDefault().setStatusText(
-                    NbBundle.getMessage( DefaultExectable.class, "NO_BINARY" ) );
+                    NbBundle.getMessage( DefaultExecutable.class, "NO_BINARY" ) );
             Toolkit.getDefaultToolkit().beep();
             return null;
         }
@@ -304,7 +316,7 @@ public final class DefaultExectable extends NodeJSExecutable {
 
     private String lookForNodeExecutable ( boolean showDialog ) {
         StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage(
-                DefaultExectable.class, "LOOK_FOR_EXE" ) ); //NOI18N
+                DefaultExecutable.class, "LOOK_FOR_EXE" ) ); //NOI18N
         if (!Utilities.isWindows()) {
             String pathToBinary = runExternal( "which", "node" ); //NOI18N
             if (pathToBinary == null) {
@@ -329,8 +341,14 @@ public final class DefaultExectable extends NodeJSExecutable {
         }
     }
 
-    private String runExternal ( String... cmdline ) {
+    static String runExternal ( String... cmdline ) {
+        return runExternal(null, cmdline);
+    }
+    static String runExternal ( File dir, String... cmdline ) {
         ProcessBuilder b = new ProcessBuilder( cmdline );
+        if (dir != null) {
+            b.directory( dir );
+        }
         try {
             Process p = b.start();
             try {
@@ -359,7 +377,7 @@ public final class DefaultExectable extends NodeJSExecutable {
     }
 
     public String askUserForExecutableLocation () {
-        File f = new FileChooserBuilder( DefaultExectable.class ).setTitle( NbBundle.getMessage( DefaultExectable.class, "LOCATE_EXECUTABLE" ) ).setFilesOnly( true ).setApproveText( NbBundle.getMessage( DefaultExectable.class, "LOCATE_EXECUTABLE_APPROVE" ) ).showOpenDialog();
+        File f = new FileChooserBuilder( DefaultExecutable.class ).setTitle( NbBundle.getMessage( DefaultExecutable.class, "LOCATE_EXECUTABLE" ) ).setFilesOnly( true ).setApproveText( NbBundle.getMessage( DefaultExecutable.class, "LOCATE_EXECUTABLE_APPROVE" ) ).showOpenDialog();
         return f == null ? null : f.getAbsolutePath();
     }
 

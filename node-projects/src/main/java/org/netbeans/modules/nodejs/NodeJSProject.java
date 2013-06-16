@@ -18,7 +18,6 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
-import org.netbeans.modules.nodejs.node.NodeJSLogicalViewProvider;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
@@ -45,6 +44,7 @@ import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.api.validation.adapters.DialogBuilder;
 import org.netbeans.api.validation.adapters.DialogBuilder.DialogType;
 import org.netbeans.modules.nodejs.libraries.LibrariesPanel;
+import org.netbeans.modules.nodejs.node.NodeJSLogicalViewProvider;
 import org.netbeans.modules.nodejs.registry.FileChangeRegistry;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.CopyOperationImplementation;
@@ -227,7 +227,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             throw new AssertionError( string );
         }
     }
-    private static final Set<String> ALWAYS_ENABLED = new HashSet<String>( Arrays.asList(
+    private static final Set<String> ALWAYS_ENABLED = new HashSet<>( Arrays.asList(
             LIBRARIES_COMMAND, COMMAND_DELETE, COMMAND_MOVE, COMMAND_COPY,
             COMMAND_RENAME, MAIN_FILE_COMMAND, CLOSE_COMMAND, COMMAND_RUN ) );
 
@@ -412,8 +412,9 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
                     "Templates/javascript/Module.js", //NOI18N
                     "Templates/javascript/HelloWorld.js", //NOI18N
                     "Templates/Other/javascript.js", //NOI18N
-                    "Templates/Web/Xhtml.html", //NOI18N
+                    "Templates/Other/file", //NOI18N
                     "Templates/Web/Html.html", //NOI18N
+                    "Templates/Web/Xhtml.html", //NOI18N
                     "Templates/Web/CascadingStyleSheet.css", //NOI18N
                     "Templates/Other/json.json", //NOI18N
                     "Templates/Other/Folder", //NOI18N
@@ -434,7 +435,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             result.put( "project.license", license ); //NOI18N
             result.put( "license", license ); //NOI18N
         }
-        result.put( "port", "" + DefaultExectable.get().getDefaultPort() ); //NOI18N
+        result.put( "port", "" + DefaultExecutable.get().getDefaultPort() ); //NOI18N
         return result;
     }
 
@@ -465,7 +466,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public void notifyRenaming () throws IOException {
-        DefaultExectable.get().stopRunningProcesses( this );
+        DefaultExecutable.get().stopRunningProcesses( this );
     }
 
     @Override
@@ -475,7 +476,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public void notifyMoving () throws IOException {
-        DefaultExectable.get().stopRunningProcesses( this );
+        DefaultExecutable.get().stopRunningProcesses( this );
     }
 
     @Override
@@ -485,7 +486,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public List<FileObject> getMetadataFiles () {
-        List<FileObject> result = new ArrayList<FileObject>();
+        List<FileObject> result = new ArrayList<>();
         FileObject projectProps = getProjectDirectory().getFileObject( NodeJSProjectFactory.PACKAGE_JSON );
         if (projectProps != null) {
             result.add( projectProps );
@@ -504,7 +505,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public void notifyDeleting () throws IOException {
-        DefaultExectable.get().stopRunningProcesses( this );
+        DefaultExecutable.get().stopRunningProcesses( this );
     }
 
     @Override

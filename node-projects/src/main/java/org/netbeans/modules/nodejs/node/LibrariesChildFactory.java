@@ -40,9 +40,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.netbeans.api.queries.VisibilityQuery;
-import org.netbeans.modules.nodejs.DefaultExectable;
+import org.netbeans.modules.nodejs.DefaultExecutable;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
+import org.netbeans.modules.nodejs.Npm;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
 import org.openide.filesystems.FileChangeAdapter;
 import org.openide.filesystems.FileEvent;
@@ -138,44 +139,44 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
                 return new LibraryFilterNode( key, latch );
             case BUILT_IN_LIBRARY:
                 if (key.getFld() != null && key.getFld().isValid()) {
-                    return new LibraryFilterNode( key, latch );
-                } else {
-                    AbstractNode li = new AbstractNode( Children.LEAF ) {
-                        @Override
-                        public String getHtmlDisplayName () {
-                            return "<font color=\"#22AA22\">" + key; //NOI18N
-                        }
-                    };
-                    li.setName( key.toString() );
-                    li.setDisplayName( key.toString() );
-                    li.setShortDescription( "Built-in library '" + key + "'" );
-                    li.setIconBaseWithExtension( ProjectNodeKey.LIBRARY_ICON ); //NOI18N
-                    return li;
-                }
+                return new LibraryFilterNode( key, latch );
+            } else {
+                AbstractNode li = new AbstractNode( Children.LEAF ) {
+                    @Override
+                    public String getHtmlDisplayName () {
+                        return "<font color=\"#22AA22\">" + key; //NOI18N
+                    }
+                };
+                li.setName( key.toString() );
+                li.setDisplayName( key.toString() );
+                li.setShortDescription( "Built-in library '" + key + "'" );
+                li.setIconBaseWithExtension( ProjectNodeKey.LIBRARY_ICON ); //NOI18N
+                return li;
+            }
             case MISSING_LIBRARY:
                 if (key.getFld() != null && key.getFld().isValid()) {
-                    return new LibraryFilterNode( key, latch );
-                } else {
-                    AbstractNode an = new AbstractNode( Children.LEAF ) {
-                        @Override
-                        public String getHtmlDisplayName () {
-                            return "<font color=\"#CC0000\">" + key; //NOI18N
-                        }
-                    };
-                    an.setName( key.toString() );
-                    an.setDisplayName( key.toString() );
-                    StringBuilder sb = new StringBuilder( "<html>Missing library <b><i>" + key + "</i></b>" );
-                    if (key instanceof ProjectNodeKey.MissingLibrary && ((ProjectNodeKey.MissingLibrary) key).references != null && !((ProjectNodeKey.MissingLibrary) key).references.isEmpty()) {
-                        sb.append( "<p>Referenced By<br><ul>" );
-                        for (String path : ((ProjectNodeKey.MissingLibrary) key).references) {
-                            sb.append( "<li>" ).append( path ).append( "</li>\n" );
-                        }
-                        sb.append( "</ul></pre></blockquote></html>" );
+                return new LibraryFilterNode( key, latch );
+            } else {
+                AbstractNode an = new AbstractNode( Children.LEAF ) {
+                    @Override
+                    public String getHtmlDisplayName () {
+                        return "<font color=\"#CC0000\">" + key; //NOI18N
                     }
-                    an.setShortDescription( sb.toString() );
-                    an.setIconBaseWithExtension( ProjectNodeKey.LIBRARY_ICON ); //NOI18N
-                    return an;
+                };
+                an.setName( key.toString() );
+                an.setDisplayName( key.toString() );
+                StringBuilder sb = new StringBuilder( "<html>Missing library <b><i>" + key + "</i></b>" );
+                if (key instanceof ProjectNodeKey.MissingLibrary && ((ProjectNodeKey.MissingLibrary) key).references != null && !((ProjectNodeKey.MissingLibrary) key).references.isEmpty()) {
+                    sb.append( "<p>Referenced By<br><ul>" );
+                    for (String path : ((ProjectNodeKey.MissingLibrary) key).references) {
+                        sb.append( "<li>" ).append( path ).append( "</li>\n" );
+                    }
+                    sb.append( "</ul></pre></blockquote></html>" );
                 }
+                an.setShortDescription( sb.toString() );
+                an.setIconBaseWithExtension( ProjectNodeKey.LIBRARY_ICON ); //NOI18N
+                return an;
+            }
             default:
                 throw new AssertionError();
         }
@@ -249,10 +250,15 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
             }
             keys.addAll( libFolders );
         }
-        //XXX get this from "npm root"
-        File userHomeModules = new File( new File( System.getProperty( "user.home" ) ), NodeJSProjectFactory.NODE_MODULES_FOLDER ); //NOI18N
+        File home = new File(System.getProperty("user.home"));
+        File userHomeModules = new File( home, NodeJSProjectFactory.NODE_MODULES_FOLDER ); //NOI18N
         userHomeModules = (userHomeModules.exists()) && (userHomeModules.isDirectory()) ? userHomeModules : null;
-        //XXX get this from "npm root -g"
+        if (userHomeModules == null) {
+            String s = Npm.getDefault().run( home, "root");
+            if (s != null) {
+                userHomeModules = new File(s);
+            }
+        }
         File libModules = new File( "/usr/local/lib/node_modules" ); //NOI18N
         if (!libModules.exists()) {
             libModules = new File( "/usr/lib/node_modules" ); //NOI18N
@@ -263,9 +269,15 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
         if (!libModules.exists()) {
             libModules = new File( "/opt/local/lib/node_modules" ); //NOI18N
         }
+        if (!libModules.exists()) {
+            String s = Npm.getDefault().run( new File( System.getProperty( "user.home" ) ), "root", "-g" );
+            if (s != null) {
+                libModules = new File( s );
+            }
+        }
 
         libModules = (libModules.exists()) && (libModules.isDirectory()) ? libModules : null;
-        String src = DefaultExectable.get().getSourcesLocation();
+        String src = DefaultExecutable.get().getSourcesLocation();
         File nodeSources = src == null ? null : new File( src );
         File libDir = nodeSources == null ? null : new File( nodeSources, "lib" );
         for (String lib : otherLibs.keySet()) {
@@ -311,7 +323,7 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
             }
             ProjectNodeKey.MissingLibrary key = new ProjectNodeKey.MissingLibrary( lib );
             List<FileObject> referencedBy = otherLibs.get( lib );
-            List<String> paths = new LinkedList<String>();
+            List<String> paths = new LinkedList<>();
             for (FileObject fo : referencedBy) {
                 if (FileUtil.isParentOf( project.getProjectDirectory(), fo )) {
                     paths.add( FileUtil.getRelativePath( project.getProjectDirectory(), fo ) );
@@ -326,7 +338,7 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
         for (Iterator<ProjectNodeKey> it = keys.iterator(); it.hasNext();) {
             ProjectNodeKey k = it.next();
             if (k.getType() == ProjectNodeKeyTypes.MISSING_LIBRARY) {
-                for (ProjectNodeKey k1 : new LinkedList<ProjectNodeKey>( keys )) {
+                for (ProjectNodeKey k1 : new LinkedList<>( keys )) {
                     if (k == k1) {
                         continue;
                     }
@@ -412,7 +424,7 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
     }
 
     private Map<String, List<FileObject>> findOtherModules ( FileObject fld ) {
-        Map<String, List<FileObject>> libs = new HashMap<String, List<FileObject>>();
+        Map<String, List<FileObject>> libs = new HashMap<>();
         assert (!EventQueue.isDispatchThread());
         for (FileObject fo : NbCollections.iterable( fld.getChildren( true ) )) {
             if (("js".equals( fo.getExt() )) && (fo.isData()) && (fo.canRead())) {

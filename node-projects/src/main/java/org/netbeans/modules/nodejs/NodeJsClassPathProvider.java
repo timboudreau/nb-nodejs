@@ -76,7 +76,7 @@ public final class NodeJsClassPathProvider implements ClassPathProvider {
 
     private static FileObject getNodeJsSources () {
         if (nodeStubsFO == null) {
-            String loc = DefaultExectable.get().getSourcesLocation();
+            String loc = DefaultExecutable.get().getSourcesLocation();
             if (loc != null) {
                 File dir = new File( loc );
                 return nodeStubsFO = FileUtil.toFileObject( dir );

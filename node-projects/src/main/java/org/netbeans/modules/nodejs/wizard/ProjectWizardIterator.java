@@ -26,7 +26,7 @@ import java.util.Set;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.modules.nodejs.DefaultExectable;
+import org.netbeans.modules.nodejs.DefaultExecutable;
 import org.netbeans.modules.nodejs.options.NodePanel;
 import org.netbeans.modules.projecttemplates.GeneratedProject;
 import org.netbeans.modules.projecttemplates.ProjectCreator;
@@ -72,7 +72,7 @@ public class ProjectWizardIterator implements WizardDescriptor.ProgressInstantia
         ProjectCreator gen = new ProjectCreator( dest );
 
         Map<String, String> templateProperties = NbCollections.checkedMapByFilter( wiz.getProperties(), String.class, String.class, false );
-        templateProperties.put( ProjectWizardKeys.WIZARD_PROP_PORT, DefaultExectable.get().getDefaultPort() + "" );
+        templateProperties.put( ProjectWizardKeys.WIZARD_PROP_PORT, DefaultExecutable.get().getDefaultPort() + "" );
         templateProperties.put( "project.license", panel.getLicense() );
         templateProperties.put( "license", panel.getLicense() == null ? "none" : panel.getLicense() );
         templateProperties.put( "author", NodePanel.getAuthor() );

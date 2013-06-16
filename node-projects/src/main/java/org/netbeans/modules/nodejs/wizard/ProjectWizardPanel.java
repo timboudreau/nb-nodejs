@@ -31,7 +31,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.validation.adapters.WizardDescriptorAdapter;
-import org.netbeans.modules.nodejs.DefaultExectable;
+import org.netbeans.modules.nodejs.DefaultExecutable;
 import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problem;
@@ -282,7 +282,7 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
             }
         });
 
-        portField.setText("" + DefaultExectable.get().getDefaultPort());
+        portField.setText("" + DefaultExecutable.get().getDefaultPort());
 
         createInLabel.setLabelFor(createInLabel);
         createInLabel.setText(org.openide.util.NbBundle.getMessage(ProjectWizardPanel.class, "ProjectWizardPanel.createInLabel.text")); // NOI18N

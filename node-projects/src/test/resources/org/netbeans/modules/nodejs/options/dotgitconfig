@@ -1,0 +1,35 @@
+[user]
+	name = Joe Blow
+	email = joe@bobmail.info
+[core]
+        #editor = emacsclient
+        #autocrlf = input 
+        #safecrlf = warn
+        excludesfile = ~/.gitignore
+	autocrlf = input
+[apply]
+        whitespace = fix
+
+[color]
+        pager = false
+        ui = auto
+	diff = always
+[alias]
+        lg1 = log --pretty=oneline --abbrev-commit --decorate
+        lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cn, %cr)%Creset' --abbrev-commit --date=relative
+        co = checkout
+        ci = commit
+        br = branch
+        st = status
+        stat = status
+        unstage = rm --cached
+        un = rm --cached
+[web]
+        browser = /usr/bin/chromium
+[diff]
+        renamelimit = 0
+	renames = copies
+[merge]
+	tool = meld
+[push]
+	default = matching

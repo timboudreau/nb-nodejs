@@ -43,6 +43,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
+import org.netbeans.modules.nodejs.Npm;
 import org.netbeans.modules.nodejs.ProjectMetadataImpl;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
 import org.netbeans.modules.nodejs.libraries.LibrariesPanel;
@@ -77,6 +78,7 @@ public class AddLibraryAction extends AbstractAction {
         if (DialogDisplayer.getDefault().notify( dd ).equals( DialogDescriptor.OK_OPTION )) {
             final Set<String> libraries = new HashSet<String>( pn.getLibraries() );
             if (libraries.size() > 0) {
+                final String npmPath = Npm.getDefault().exe( );
                 final AtomicInteger jobs = new AtomicInteger();
                 final ProgressHandle h = ProgressHandleFactory.createHandle( NbBundle.getMessage( AddLibraryAction.class,
                         "MSG_RUNNING_NPM", libraries.size(), project.getDisplayName() ) ); //NOI18N
@@ -88,7 +90,7 @@ public class AddLibraryAction extends AbstractAction {
                             h.start( totalLibs * 2 );
                             for (String lib : libraries) {
                                 int job = jobs.incrementAndGet();
-                                ExternalProcessBuilder epb = new ExternalProcessBuilder( "npm" ) //NOI18N
+                                ExternalProcessBuilder epb = new ExternalProcessBuilder( npmPath ) //NOI18N
                                         .addArgument( "install" ) //NOI18N
                                         .addArgument( lib )
                                         .workingDirectory( FileUtil.toFile( project.getProjectDirectory() ) );
@@ -134,7 +136,7 @@ public class AddLibraryAction extends AbstractAction {
 
     private synchronized List<LibraryAndVersion> updateDependencies ( NodeJSProject prj, List<LibraryAndVersion> onDisk, String added ) {
         System.out.println( "UPDATE DEPENDENCIES FOR " + added );
-        List<LibraryAndVersion> l = new ArrayList<LibraryAndVersion>();
+        List<LibraryAndVersion> l = new ArrayList<>();
         ProjectMetadataImpl metadata = prj.metadata();
         if (metadata != null) {
             Map<String, Object> deps = metadata.getMap( "dependencies" );
@@ -147,8 +149,6 @@ public class AddLibraryAction extends AbstractAction {
                     }
                 }
             }
-            System.out.println( "Dependencies from project.json: " + l );
-            System.out.println( "Dependencies from disk: " + onDisk );
             for (LibraryAndVersion v : onDisk) {
                 if (!l.contains( v )) {
                     if (v.version != null) {
@@ -160,7 +160,7 @@ public class AddLibraryAction extends AbstractAction {
                 }
             }
             Collections.sort( l );
-            LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
             for (LibraryAndVersion lib : l) {
                 map.put( lib.name, lib.version );
             }
@@ -239,11 +239,11 @@ public class AddLibraryAction extends AbstractAction {
         // This is really backwards, and we should have a model of libraries
         // represented by nodes, rather than a model of nodes from which we
         // derive libraries.  Ah, expediency.
-        List<LibraryAndVersion> result = new ArrayList<LibraryAndVersion>();
-        List<ProjectNodeKey> keys = new ArrayList<ProjectNodeKey>();
+        List<LibraryAndVersion> result = new ArrayList<>();
+        List<ProjectNodeKey> keys = new ArrayList<>();
         LibrariesChildFactory f = new LibrariesChildFactory( prj );
         f.createKeys( keys );
-        Map<LibraryFilterNode, CountDownLatch> latches = new LinkedHashMap<LibraryFilterNode, CountDownLatch>();
+        Map<LibraryFilterNode, CountDownLatch> latches = new LinkedHashMap<>();
         for (ProjectNodeKey k : keys) {
             CountDownLatch latch = new CountDownLatch( 1 );
             Node n = f.node( k, latch );

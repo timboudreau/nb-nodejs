@@ -1,20 +1,20 @@
 /* Copyright (C) 2012 Tim Boudreau
 
- Permission is hereby granted, free of charge, to any person obtaining a copy 
- of this software and associated documentation files (the "Software"), to 
- deal in the Software without restriction, including without limitation the 
- rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- sell copies of the Software, and to permit persons to whom the Software is 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in all 
+ The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.options;
 
@@ -31,7 +31,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.netbeans.modules.nodejs.DefaultExectable;
+import org.netbeans.modules.nodejs.DefaultExecutable;
+import org.netbeans.modules.nodejs.Npm;
 import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problem;
@@ -52,7 +53,7 @@ import org.openide.util.RequestProcessor;
 public final class NodePanel extends JPanel implements ValidationUI, DocumentListener {
     private final NodeOptionsPanelController controller;
     private final SwingValidationGroup g;
-    private final DefaultExectable exe = DefaultExectable.get();
+    private final DefaultExecutable exe = DefaultExecutable.get();
 
     @SuppressWarnings ("LeakingThisInConstructor")
     NodePanel ( NodeOptionsPanelController controller ) {
@@ -155,6 +156,9 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
         loginField = new javax.swing.JTextField();
         downloadButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        npmLabel = new javax.swing.JLabel();
+        npmField = new javax.swing.JTextField();
+        npmBrowse = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(problemLabel, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.problemLabel.text")); // NOI18N
 
@@ -162,6 +166,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
         org.openide.awt.Mnemonics.setLocalizedText(binaryLabel, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.binaryLabel.text")); // NOI18N
 
         binaryField.setText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.binary.text")); // NOI18N
+        binaryField.setToolTipText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.binaryField.toolTipText")); // NOI18N
         binaryField.setName("binary"); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.browseButton.text")); // NOI18N
@@ -175,6 +180,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
         org.openide.awt.Mnemonics.setLocalizedText(portLabel, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.portLabel.text")); // NOI18N
 
         portField.setText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.port.text")); // NOI18N
+        portField.setToolTipText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.portField.toolTipText")); // NOI18N
         portField.setName("port"); // NOI18N
 
         sourceLabel.setLabelFor(sourcesField);
@@ -185,26 +191,32 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
         sourcesField.setName("sources"); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(browseForSources, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.browseForSources.text")); // NOI18N
+        browseForSources.setToolTipText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.browseForSources.toolTipText")); // NOI18N
         browseForSources.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 browseForSourcesActionPerformed(evt);
             }
         });
 
+        packageHeading.setFont(packageHeading.getFont().deriveFont(packageHeading.getFont().getStyle() | java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(packageHeading, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.packageHeading.text")); // NOI18N
+        packageHeading.setToolTipText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.packageHeading.toolTipText")); // NOI18N
         packageHeading.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, javax.swing.UIManager.getDefaults().getColor("controlShadow")));
 
+        authorLabel.setLabelFor(authorField);
         org.openide.awt.Mnemonics.setLocalizedText(authorLabel, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.authorLabel.text")); // NOI18N
 
-        authorField.setText(System.getProperty("user.name"));
+        authorField.setText(NodePanel.getAuthor());
         authorField.setName("author"); // NOI18N
 
+        emailLabel.setLabelFor(emailField);
         org.openide.awt.Mnemonics.setLocalizedText(emailLabel, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.emailLabel.text")); // NOI18N
 
-        emailField.setText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.email.text")); // NOI18N
+        emailField.setText(NodePanel.getEmail());
         emailField.setToolTipText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.emailField.toolTipText")); // NOI18N
         emailField.setName("email"); // NOI18N
 
+        jLabel1.setLabelFor(loginField);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.jLabel1.text")); // NOI18N
 
         loginField.setText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.login.text")); // NOI18N
@@ -212,6 +224,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
         loginField.setName("login"); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(downloadButton, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.downloadButton.text")); // NOI18N
+        downloadButton.setToolTipText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.downloadButton.toolTipText")); // NOI18N
         downloadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 downloadSources(evt);
@@ -220,61 +233,98 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.jLabel2.text")); // NOI18N
 
+        npmLabel.setLabelFor(npmField);
+        org.openide.awt.Mnemonics.setLocalizedText(npmLabel, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.npmLabel.text")); // NOI18N
+
+        npmField.setText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.npmField.text")); // NOI18N
+        npmField.setToolTipText(org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.npmField.toolTipText")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(npmBrowse, org.openide.util.NbBundle.getMessage(NodePanel.class, "NodePanel.npmBrowse.text")); // NOI18N
+        npmBrowse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                npmBrowseActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(packageHeading, javax.swing.GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE)
-                .addContainerGap(151, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(problemLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
-                .addContainerGap(250, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(binaryLabel)
-                    .addComponent(portLabel)
-                    .addComponent(sourceLabel)
-                    .addComponent(authorLabel)
-                    .addComponent(emailLabel)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(binaryField, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                    .addComponent(portField, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                    .addComponent(downloadButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(loginField, javax.swing.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(packageHeading, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(184, 184, 184))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(portLabel)
+                            .addComponent(sourceLabel)
+                            .addComponent(authorLabel)
+                            .addComponent(emailLabel)
+                            .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2))
-                    .addComponent(authorField, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                    .addComponent(emailField, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(sourcesField)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(downloadButton))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(loginField, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel2))
+                                    .addComponent(emailField, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(authorField, javax.swing.GroupLayout.Alignment.TRAILING))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(browseForSources)
+                        .addContainerGap())))
+            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(browseButton)
-                    .addComponent(browseForSources))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(problemLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(binaryLabel)
+                            .addComponent(npmLabel))
+                        .addGap(23, 23, 23)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(portField, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(binaryField)
+                                    .addComponent(npmField))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(browseButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(npmBrowse, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(117, 117, 117)
-                .addComponent(sourcesField, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
-                .addGap(229, 229, 229))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(binaryLabel)
                     .addComponent(binaryField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(browseButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(npmLabel)
+                    .addComponent(npmField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(npmBrowse))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(portLabel)
                     .addComponent(portField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(17, 17, 17)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sourcesField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(browseForSources)
@@ -295,9 +345,8 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
                     .addComponent(jLabel1)
                     .addComponent(loginField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
-                .addComponent(problemLabel)
-                .addContainerGap())
+                .addGap(18, 18, 18)
+                .addComponent(problemLabel))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -367,7 +416,6 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
                         b2.directory( dest.getParentFile() );
                         System.out.println( "starting git clone in " + dest.getAbsolutePath() );
                         Process p2 = b2.start();
-                        System.out.println( "updating field" );
                         h.progress( "git clone ", 2 );
                         Thread.sleep( 1000 );
                         h.progress( 3 );
@@ -387,15 +435,15 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
                     switch ( eqCount++ ) {
                         case 0:
                             if (dest != null) {
-                                sourcesField.setText( dest.getAbsolutePath() );
-                                g.performValidation(); //get rid of the warning
-                                break;
-                            }
+                            sourcesField.setText( dest.getAbsolutePath() );
+                            g.performValidation(); //get rid of the warning
+                            break;
+                        }
                         case 1:
                             downloadButton.setEnabled( true );
                             if (dest != null && dest.exists()) {
                                 sourcesField.setText( dest.getAbsolutePath() );
-                                DefaultExectable.get().setSourcesLocation( dest.getAbsolutePath() );
+                                DefaultExecutable.get().setSourcesLocation( dest.getAbsolutePath() );
                             }
                     }
                 }
@@ -403,8 +451,15 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
             }
         } );
 
-
     }//GEN-LAST:event_downloadSources
+
+    private void npmBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_npmBrowseActionPerformed
+        Npm npm = Npm.getDefault();
+        String pth = npm.askUser( false );
+        if (pth != null) {
+            npmField.setText( pth );
+        }
+    }//GEN-LAST:event_npmBrowseActionPerformed
 
     void load () {
         g.runWithValidationSuspended( new Runnable() {
@@ -422,9 +477,14 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
                     sourcesField.setText( s );
                 }
                 Preferences p = preferences();
-                authorField.setText( p.get( "author", System.getProperty( "user.name" ) ) );
-                emailField.setText( p.get( "email", "" ) );
+                authorField.setText( getAuthor() );
+                emailField.setText( getEmail() );
                 loginField.setText( p.get( "login", "YOUR_LOGIN" ) );
+                Npm npm = Npm.getDefault();
+                String npmPath = npm.exePath( false);
+                if (npmPath != null) {
+                    npmField.setText(npmPath);
+                }
             }
         } );
     }
@@ -441,6 +501,12 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
         p.put( "author", authorField.getText() );
         p.put( "email", emailField.getText() );
         p.put( "login", loginField.getText() );
+        Npm npm = Npm.getDefault();
+        String s = npmField.getText().trim();
+        if (!s.isEmpty()) {
+            // will not actually change it unless modified and exists
+            npm.setExePath( s );
+        }
         try {
             p.flush();
         } catch ( BackingStoreException ex ) {
@@ -449,7 +515,8 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
     }
 
     public static String getAuthor () {
-        return preferences().get( "author", System.getProperty( "user.name" ) );
+        String nm = DotGitConfig.getDefault().get( "user", "name", System.getProperty("user.name"));
+        return preferences().get( "author", nm );
     }
 
     public static String getLogin () {
@@ -457,7 +524,8 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
     }
 
     public static String getEmail () {
-        return preferences().get( "email", "" );
+        String em = DotGitConfig.getDefault().get( "user", "email", "you@email.example");
+        return preferences().get( "email", em );
     }
 
     boolean valid () {
@@ -476,6 +544,9 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField loginField;
+    private javax.swing.JButton npmBrowse;
+    private javax.swing.JTextField npmField;
+    private javax.swing.JLabel npmLabel;
     private javax.swing.JLabel packageHeading;
     private javax.swing.JTextField portField;
     private javax.swing.JLabel portLabel;
