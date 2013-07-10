@@ -4,17 +4,22 @@
     <parent>
         <artifactId>netbeans-nodejs</artifactId>
         <groupId>org.netbeans.modules</groupId>
-        <version>2.2</version>
+        <version>2.3</version>
     </parent>
-    <artifactId>nodejs-code-completion</artifactId>
+    <artifactId>nodejscodecompletion</artifactId>
     <packaging>nbm</packaging>
-    <name>nodejs-code-completion</name>
+    <name>NodeJS Code Completion</name>
     <description>Code completion for node.js projects and files</description>
     <dependencies>
         <dependency>
             <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-javascript2-editor</artifactId>
-            <version>${netbeans-version}</version>
+            <version>${netbeans-dev-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-csl-api</artifactId>
+            <version>${netbeans-dev-version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -27,6 +32,26 @@
             <version>${netbeans-version}</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.contrib.yenta</groupId>
+            <artifactId>api</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>nodejs</artifactId>
+            <version>2.10</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -35,14 +60,24 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <version>3.10.1</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <verifyRuntime>warn</verifyRuntime>
+                    <moduleDependencies>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-modules-javascript2-editor</id>
+                            <type>impl</type>
+                            <!--<explicitValue>NetBeans-119-on-20130615</explicitValue>-->
+                        </dependency>
+                    </moduleDependencies>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -50,7 +85,6 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <!-- to have the jar plugin pickup the nbm generated manifest -->
                     <useDefaultManifestFile>true</useDefaultManifestFile>
                 </configuration>
             </plugin>

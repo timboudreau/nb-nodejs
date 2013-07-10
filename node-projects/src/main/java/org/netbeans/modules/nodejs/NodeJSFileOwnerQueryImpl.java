@@ -40,9 +40,12 @@ import org.openide.util.lookup.ServiceProvider;
 public class NodeJSFileOwnerQueryImpl implements FileOwnerQueryImplementation {
     @Override
     public Project getOwner ( URI uri ) {
-        File file = Utilities.toFile( uri );
-        FileObject fo = FileUtil.toFileObject( file );
-        return fo != null ? getOwner( fo ) : null;
+        if (uri.getScheme() != null && "file".equals( uri.getScheme() )) {
+            File file = Utilities.toFile( uri );
+            FileObject fo = FileUtil.toFileObject( file );
+            return fo != null ? getOwner( fo ) : null;
+        }
+        return null;
     }
 
     @Override

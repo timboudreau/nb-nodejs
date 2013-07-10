@@ -18,6 +18,20 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.code.completion;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.netbeans.api.lexer.Token;
+import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.csl.api.CodeCompletionContext;
+import org.netbeans.modules.csl.api.CompletionProposal;
+import org.netbeans.modules.csl.api.ElementHandle;
+import org.netbeans.modules.csl.spi.ParserResult;
+import org.netbeans.modules.javascript2.editor.api.lexer.JsTokenId;
+import org.netbeans.modules.javascript2.editor.api.lexer.LexUtilities;
+import org.netbeans.modules.javascript2.editor.spi.CompletionContext;
 import org.netbeans.modules.javascript2.editor.spi.CompletionProvider;
 
 /**
@@ -26,5 +40,103 @@ import org.netbeans.modules.javascript2.editor.spi.CompletionProvider;
  */
 @CompletionProvider.Registration(priority=10)
 public class NodeCompletion implements CompletionProvider {
+    private static final Logger LOGGER = Logger.getLogger(NodeCompletion.class.getName());
+    private int lastTsOffset = 0;
+
+    @Override
+    public List<CompletionProposal> complete(CodeCompletionContext ccContext, CompletionContext jsCompletionContext, String prefix) {
+        long start = System.currentTimeMillis();
+        List<CompletionProposal> result = new ArrayList<>();
+        ParserResult parserResult = ccContext.getParserResult();
+        int offset = ccContext.getCaretOffset();
+        lastTsOffset = ccContext.getParserResult().getSnapshot().getEmbeddedOffset(offset);
+        switch (jsCompletionContext) {
+            case STRING:
+            case GLOBAL:
+            case EXPRESSION:
+            case OBJECT_PROPERTY:
+                if (isInJQuerySelector(parserResult, lastTsOffset)) {
+//                    addSelectors(result, parserResult, prefix, lastTsOffset);
+                }
+                break;
+            case OBJECT_PROPERTY_NAME:
+//                completeObjectPropertyName(ccContext, result, prefix);
+                break;
+            default:
+                break;
+        }
+        long end = System.currentTimeMillis();
+        LOGGER.log(Level.FINE, "Counting jQuery CC took {0}ms ", (end - start));
+        return result;
+    }
+
+    @Override
+    public String getHelpDocumentation(ParserResult pr, ElementHandle eh) {
+        return null;
+    }
+    
+    public static boolean isInJQuerySelector(ParserResult parserResult, int offset) {
+        if (isJQuery(parserResult, offset)) {
+            TokenSequence<? extends JsTokenId> ts = LexUtilities.getTokenSequence(parserResult.getSnapshot().getTokenHierarchy(), offset, JsTokenId.javascriptLanguage());
+            if (ts == null) {
+                return false;
+            }
+            ts.move(offset);
+            if (!(ts.moveNext() && ts.movePrevious())) {
+                return false;
+            }
+            return ts.token().id() == JsTokenId.STRING || ts.token().id() == JsTokenId.STRING_BEGIN;
+//            boolean leftBracket = false;
+//            while (!isEndToken(ts.token().id()) && ts.token().id() != JsTokenId.BRACKET_RIGHT_PAREN && ts.movePrevious()) {
+//                if (ts.token().id() == JsTokenId.BRACKET_LEFT_PAREN) {
+//                    leftBracket = true;
+//                    break;
+//                }
+//            }
+//            if (!leftBracket) {
+//                return false;
+//            } else {
+//                ts.move(offset);
+//                if (!(ts.moveNext() && ts.movePrevious())) {
+//                    return false;
+//                }
+//            }
+//            while (!isEndToken(ts.token().id()) && ts.token().id() != JsTokenId.BRACKET_LEFT_PAREN && ts.moveNext()) {
+//                if (ts.token().id() == JsTokenId.BRACKET_RIGHT_PAREN) {
+//                    return true;
+//                }
+//            }
+        }
+        return false;
+    }
+    
+    public static boolean isJQuery(ParserResult parserResult, int offset) {
+        TokenSequence<? extends JsTokenId> ts = LexUtilities.getJsTokenSequence(parserResult.getSnapshot().getTokenHierarchy(), offset);
+        if (ts == null) {
+            return false;
+        }
+        ts.move(offset);
+        if (!ts.moveNext() && !ts.movePrevious()) {
+            return false;
+        }
+        
+        if (ts.token().id() == JsTokenId.EOL || ts.token().id() == JsTokenId.WHITESPACE) {
+            ts.movePrevious();
+        }
+        Token<? extends JsTokenId> lastToken = ts.token();
+        Token<? extends JsTokenId> token = lastToken;
+        JsTokenId tokenId = token.id();
+        while (tokenId != JsTokenId.EOL
+                && tokenId != JsTokenId.WHITESPACE
+                && ts.movePrevious()) {
+            lastToken = token;
+            token = ts.token();
+            tokenId = token.id();
+        }
+        return (lastToken.id() == JsTokenId.IDENTIFIER
+                && ("$".equals(lastToken.text().toString()) || "jQuery".equals(lastToken.text().toString()))
+                || (!ts.movePrevious()
+                && ("$".equals(token.text().toString()) || "jQuery".equals(token.text().toString()))));
+    }    
 
 }

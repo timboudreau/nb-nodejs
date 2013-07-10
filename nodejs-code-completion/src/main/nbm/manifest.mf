@@ -1,2 +1,3 @@
 Manifest-Version: 1.0
+OpenIDE-Module-Install: org/netbeans/modules/nodejs/code/completion/Installer.class
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/nodejs/code/completion/Bundle.properties
