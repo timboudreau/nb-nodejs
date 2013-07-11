@@ -84,6 +84,7 @@ public final class DefaultExecutable extends NodeJSExecutable {
             "/usr/local/bin/node",
             "/opt/bin/node",
             "/opt/local/bin/node",
+            "C:" + File.separatorChar + "Program Files" + File.separatorChar + "nodejs" + File.separatorChar + "node"
     };
     
     private String find(String... opts) {

@@ -41,7 +41,10 @@ public class Npm {
         "/usr/bin/npm",
         "/usr/local/bin/npm",
         "/opt/bin/npm",
-        "/opt/local/bin/npm"
+        "/opt/local/bin/npm",
+        "C:" + File.separatorChar + "Program Files" + File.separatorChar + "nodejs" + File.separatorChar + "npm",
+        System.getProperty("user.home") + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm",
+        "C:" + File.separatorChar + "Users" + File.separatorChar + System.getProperty("user.name") + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm"
     };
     private String npm;
 
