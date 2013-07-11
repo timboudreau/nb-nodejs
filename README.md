@@ -37,7 +37,7 @@ The plugin will function without Node installed, but is not very useful.
 
 Recent NetBeans builds have a rewritten Javascript editor with much better code completion
 which works with NodeJS.  Get a [daily build](http://bits.netbeans.org/download/trunk/nightly/latest/)
-or [7.3 beta](http://dlc.sun.com.edgesuite.net/netbeans/7.3/beta2/) or later for the best experience.
+or version [7.3](https://netbeans.org/downloads/index.html) or later for the best experience.
 
 Installation
 ------------
@@ -48,6 +48,15 @@ timboudreau.com</a>.  It will be named ``nodejs-$VERSION.nbm``.
 install it using Tools | Plugins, on the Downloaded tab, in the IDE.  
 Longer term, it will be available from the standard NetBeans update 
 center, so no separate download will be needed.
+
+
+Supported Platforms
+-------------------
+
+This plugin was originally written before Node supported MS Windows.  Windows is recently
+supported, and should work.  Please [file bugs](https://github.com/timboudreau/nb-nodejs/issues?state=open) if there are problems - your humble author is not
+a Windows user, but is happy to fix anything that doesn't work.
+
 
 Building
 --------
