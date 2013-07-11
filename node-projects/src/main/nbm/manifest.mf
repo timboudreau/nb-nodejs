@@ -1,6 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/nodejs/Bundle.properties
-OpenIDE-Module-Requires: org.openide.modules.os.Unix
 OpenIDE-Module-Java-Dependencies: Java > 1.7
 AutoUpdate-Show-In-Client: true
 OpenIDE-Module-Layer: org/netbeans/modules/nodejs/layer.xml
