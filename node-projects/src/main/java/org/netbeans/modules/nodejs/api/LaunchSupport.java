@@ -3,7 +3,8 @@ package org.netbeans.modules.nodejs.api;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import javax.swing.event.ChangeListener;
@@ -23,22 +24,23 @@ import org.openide.util.ChangeSupport;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.WeakSet;
 
 /**
+ * Makes it easy to wire up a node executable to the output window with stack
+ * trace linking to project or nodejs sources.
  *
  * @author Tim Boudreau
  */
 public abstract class LaunchSupport {
     private final NodeJSExecutable exe;
-    private final Set<Rerunner> runners = new WeakSet<>();
+    private final Map<Project, Rerunner> rerunners = new HashMap<>();
 
     public LaunchSupport ( NodeJSExecutable exe ) {
         this.exe = exe;
     }
 
     public Future<Integer> doRun ( final FileObject file, String args ) throws IOException {
-        for (Rerunner r : runners) {
+        for (Rerunner r : rerunners.values()) {
             if (file.equals( r.file )) {
                 r.stopOldProcessIfRunning();
             }
@@ -47,21 +49,21 @@ public abstract class LaunchSupport {
         String[] cmdLineArgs = getLaunchCommandLine( true );
         if (cmdLineArgs == null) {
             StatusDisplayer.getDefault().setStatusText(
-                    NbBundle.getMessage( DefaultExecutable.class, "NO_BINARY" ) );
+                    NbBundle.getMessage( DefaultExecutable.class, "NO_BINARY" ) ); //NOI18N
             Toolkit.getDefaultToolkit().beep();
             return null;
         }
         ExternalProcessBuilder b = new ExternalProcessBuilder( cmdLineArgs[0] );
-        for (int i = 0; i < cmdLineArgs.length; i++) {
-            b.addArgument( cmdLineArgs[i] );
+        for (int i = 1; i < cmdLineArgs.length; i++) {
+            b = b.addArgument( cmdLineArgs[i] );
         }
-        
-        b.addArgument( f.getAbsolutePath() )
+
+        b = b.addArgument( f.getAbsolutePath() )
                 .workingDirectory( f.getParentFile() )
                 .redirectErrorStream( true );
 
         if (args != null) {
-            for (String arg : args.split( " " )) {
+            for (String arg : args.split( " " )) { //NOI18N
                 b = b.addArgument( arg );
             }
         }
@@ -72,13 +74,13 @@ public abstract class LaunchSupport {
             displayName = pi == null ? p.getProjectDirectory().getName() : pi.getDisplayName();
             MainFileProvider prov = p.getLookup().lookup( MainFileProvider.class );
             if (prov != null && !file.equals( prov.getMainFile() )) {
-                displayName += "-" + file.getName();
+                displayName += "-" + file.getName(); //NOI18N
             }
         }
 
         Rerunner rerunner = new Rerunner( exe, file, b, displayName );
         synchronized ( this ) {
-            runners.add( rerunner );
+            rerunners.put( p, rerunner );
         }
         return rerunner.launch();
     }
@@ -86,18 +88,12 @@ public abstract class LaunchSupport {
     protected abstract String[] getLaunchCommandLine ( boolean showDialog );
 
     public void stopRunningProcesses ( Lookup.Provider p ) {
-        MainFileProvider mf = p.getLookup().lookup( MainFileProvider.class );
-        // XXX this will leave behind running processes for invoking run from
-        // the context menu of a non main js source - replace runners with a 
-        // Map of ProjectPath:Reference<Rerunner> or something like that
-        if (mf != null) {
-            FileObject f = mf.getMainFile();
-            if (f != null) {
-                for (Rerunner r : runners) {
-                    if (f.equals( r.file )) {
-                        r.stopOldProcessIfRunning();
-                    }
-                }
+        Project prj = p.getLookup().lookup( Project.class );
+        if (prj != null) {
+            Rerunner r = rerunners.get( prj );
+            if (r != null) {
+                r.stopOldProcessIfRunning();
+                rerunners.remove( prj );
             }
         }
     }
@@ -165,7 +161,7 @@ public abstract class LaunchSupport {
                 p = this.process;
             }
             if (p != null && (prePost % 2) != 0) {
-                StatusDisplayer.getDefault().setStatusText( 
+                StatusDisplayer.getDefault().setStatusText(
                         NbBundle.getMessage( Rerunner.class, "STOPPING", file.getName() ) ); //NOI18N
                 p.destroy();
                 try {
