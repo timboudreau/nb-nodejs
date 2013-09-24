@@ -18,34 +18,25 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
-import java.awt.Toolkit;
+import org.netbeans.modules.nodejs.api.LaunchSupport;
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.swing.event.ChangeListener;
-import org.netbeans.api.extexecution.ExecutionDescriptor;
-import org.netbeans.api.extexecution.ExecutionService;
-import org.netbeans.api.extexecution.ExternalProcessBuilder;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
-import org.netbeans.spi.project.ui.support.BuildExecutionSupport;
+import org.netbeans.modules.nodejs.api.MainFileProvider;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.ChangeSupport;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
-import org.openide.util.WeakSet;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -79,18 +70,18 @@ public final class DefaultExecutable extends NodeJSExecutable {
     private Preferences preferences () {
         return NbPreferences.forModule( NodeJSExecutable.class );
     }
-    
-    private static final String[] COMMON_LOCATIONS = new String[] {
-            "/usr/bin/node",
-            "/usr/local/bin/node",
-            "/opt/bin/node",
-            "/opt/local/bin/node",
-            "C:" + File.separatorChar + "Program Files" + File.separatorChar + "nodejs" + File.separatorChar + "node"
+
+    private static final String[] COMMON_LOCATIONS = new String[]{
+        "/usr/bin/node",
+        "/usr/local/bin/node",
+        "/opt/bin/node",
+        "/opt/local/bin/node",
+        "C:" + File.separatorChar + "Program Files" + File.separatorChar + "nodejs" + File.separatorChar + "node"
     };
-    
-    private String find(String... opts) {
+
+    private String find ( String... opts ) {
         for (String s : opts) {
-            File f = new File(s);
+            File f = new File( s );
             if (f.exists() && f.canExecute()) {
                 return f.getAbsolutePath();
             }
@@ -98,12 +89,11 @@ public final class DefaultExecutable extends NodeJSExecutable {
         return null;
     }
 
-    @Override
     public String getNodeExecutable ( boolean showDialog ) {
         Preferences p = preferences();
         String loc = p.get( NODE_EXE_KEY, null );
         if (loc == null) {
-            loc = find(COMMON_LOCATIONS);
+            loc = find( COMMON_LOCATIONS );
         }
         if (loc == null) {
             loc = lookForNodeExecutable( showDialog );
@@ -120,7 +110,6 @@ public final class DefaultExecutable extends NodeJSExecutable {
         preferences().putInt( PORT_KEY, val );
     }
 
-    @Override
     public void setNodeExecutable ( String location ) {
         if (location != null && "".equals( location.trim() )) {
             location = null;
@@ -129,191 +118,19 @@ public final class DefaultExecutable extends NodeJSExecutable {
     }
 
     public void stopRunningProcesses ( Lookup.Provider p ) {
-        FileObject f = p.getLookup().lookup( NodeJSProjectProperties.class ).getMainFile();
-        if (f != null) {
-            for (Rerunner r : runners) {
-                if (f.equals( r.file )) {
-                    r.stopOldProcessIfRunning();
-                }
-            }
-        }
+        ls.stopRunningProcesses(p);
     }
+
+    private final LaunchSupport ls = new LaunchSupport(this) {
+        @Override
+        protected String[] getLaunchCommandLine ( boolean showDialog ) {
+            return new String[] { DefaultExecutable.this.getNodeExecutable( showDialog ) };
+        }
+    };
 
     @Override
     protected Future<Integer> doRun ( final FileObject file, String args ) throws IOException {
-        for (Rerunner r : runners) {
-            if (file.equals( r.file )) {
-                r.stopOldProcessIfRunning();
-            }
-        }
-        File f = FileUtil.toFile( file );
-        String executable = getNodeExecutable( true );
-        if (executable == null) {
-            StatusDisplayer.getDefault().setStatusText(
-                    NbBundle.getMessage( DefaultExecutable.class, "NO_BINARY" ) );
-            Toolkit.getDefaultToolkit().beep();
-            return null;
-        }
-        ExternalProcessBuilder b = new ExternalProcessBuilder( executable )
-                .addArgument( f.getAbsolutePath() )
-                .workingDirectory( f.getParentFile() )
-                .redirectErrorStream( true );
-
-        if (args != null) {
-            for (String arg : args.split( " " )) {
-                b = b.addArgument( arg );
-            }
-        }
-        Project p = FileOwnerQuery.getOwner( file );
-        String displayName = file.getName();
-        if (p != null && p.getLookup().lookup( NodeJSProject.class ) != null) {
-            NodeJSProject info = p.getLookup().lookup( NodeJSProject.class );
-            displayName = info.getDisplayName();
-            if (!file.equals( info.getLookup().lookup( NodeJSProjectProperties.class ).getMainFile() )) {
-                displayName += "-" + file.getName();
-            }
-        }
-
-        Rerunner rerunner = new Rerunner( file, b, displayName );
-        synchronized ( this ) {
-            runners.add( rerunner );
-        }
-        return rerunner.launch();
-    }
-    private Set<Rerunner> runners = new WeakSet<Rerunner>();
-
-    static class Rerunner implements ExecutionDescriptor.RerunCondition, Runnable, Callable<Process>, BuildExecutionSupport.Item {
-        private final FileObject file;
-        private volatile int prePost;
-        private final ChangeSupport supp = new ChangeSupport( this );
-        private final Callable<Process> processCreator;
-        private final String displayName;
-
-        public Rerunner ( FileObject file, ExternalProcessBuilder b, String displayName ) {
-            this.file = file;
-            this.processCreator = b;
-            this.displayName = displayName;
-        }
-
-        public Future<Integer> launch () {
-            ExecutionDescriptor des = new ExecutionDescriptor().controllable( true )
-                    .showSuspended( true ).frontWindow( true ).outLineBased( true )
-                    .controllable( true ).errLineBased( true )
-                    .errConvertorFactory( new LineConverter() )
-                    .outLineBased( true )
-                    .outConvertorFactory( new LineConverter() )
-                    .rerunCondition( this )
-                    .preExecution( this )
-                    .postExecution( this )
-                    .optionsPath( "Advanced/Node" ); //NOI18N
-            ExecutionService service = ExecutionService.newService( this, des,
-                    displayName );
-            return service.run();
-        }
-
-        @Override
-        public void addChangeListener ( ChangeListener listener ) {
-            supp.addChangeListener( listener );
-        }
-
-        @Override
-        public void removeChangeListener ( ChangeListener listener ) {
-            supp.removeChangeListener( listener );
-        }
-
-        @Override
-        public boolean isRerunPossible () {
-            return file.isValid();
-        }
-
-        @Override
-        public synchronized void run () {
-            boolean isPre = (prePost++ % 2) == 0;
-            if (isPre) {
-                supp.fireChange();
-            }
-            if (!isPre) {
-                BuildExecutionSupport.registerFinishedItem( this );
-            }
-        }
-
-        public void stopOldProcessIfRunning () {
-            Process p;
-            synchronized ( this ) {
-                p = this.process;
-            }
-            if (p != null && (prePost % 2) != 0) {
-                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( Rerunner.class, "STOPPING", file.getName() ) );
-                p.destroy();
-                try {
-                    p.waitFor();
-                    //Give the OS a chance to release the socket
-                    Thread.sleep( 300 );
-                } catch ( InterruptedException ex ) {
-                    Exceptions.printStackTrace( ex );
-                }
-            }
-        }
-        Process process;
-
-        @Override
-        public Process call () throws Exception {
-            Process result = processCreator.call();
-            synchronized ( this ) {
-                process = result;
-            }
-            BuildExecutionSupport.registerRunningItem( this );
-            return result;
-        }
-
-        @Override
-        public String getDisplayName () {
-            return displayName;
-        }
-
-        @Override
-        public void repeatExecution () {
-        }
-
-        @Override
-        public boolean isRunning () {
-            Process p;
-            synchronized ( this ) {
-                p = this.process;
-            }
-            boolean running = p != null;
-            if (running) {
-                try {
-                    p.exitValue();
-                    running = false;
-                } catch ( IllegalThreadStateException e ) {
-                    // Only way to test if a process is running is to
-                    // try to get its exit code and see if it throws an
-                    // ITSE
-                }
-            }
-            return running;
-        }
-
-        @Override
-        public void stopRunning () {
-            stopOldProcessIfRunning();
-        }
-
-        @Override
-        public int hashCode () {
-            return file.hashCode();
-        }
-
-        @Override
-        public boolean equals ( Object o ) {
-            return o instanceof Rerunner && ((Rerunner) o).file.equals( file );
-        }
-
-        @Override
-        public String toString () {
-            return file.getPath();
-        }
+        return ls.doRun( file, args );
     }
 
     private String lookForNodeExecutable ( boolean showDialog ) {
@@ -344,8 +161,9 @@ public final class DefaultExecutable extends NodeJSExecutable {
     }
 
     static String runExternal ( String... cmdline ) {
-        return runExternal(null, cmdline);
+        return runExternal( null, cmdline );
     }
+
     static String runExternal ( File dir, String... cmdline ) {
         ProcessBuilder b = new ProcessBuilder( cmdline );
         if (dir != null) {

@@ -22,7 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import org.netbeans.api.actions.Savable;
-import org.netbeans.modules.nodejs.NodeJSExecutable;
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.openide.loaders.DataObject;
 
 import org.openide.awt.ActionRegistration;

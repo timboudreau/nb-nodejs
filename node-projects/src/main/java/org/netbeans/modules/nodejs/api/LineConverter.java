@@ -16,7 +16,7 @@
  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
-package org.netbeans.modules.nodejs;
+package org.netbeans.modules.nodejs.api;
 
 import java.awt.Toolkit;
 import java.io.File;
@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import org.netbeans.api.extexecution.ExecutionDescriptor.LineConvertorFactory;
 import org.netbeans.api.extexecution.print.ConvertedLine;
 import org.netbeans.api.extexecution.print.LineConvertor;
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.LineCookie;
 import org.openide.filesystems.FileObject;
@@ -47,6 +48,14 @@ import org.openide.windows.OutputListener;
  * @author Tim Boudreau
  */
 final class LineConverter implements LineConvertorFactory {
+    private final NodeJSExecutable platform;
+
+    // XXX for avalon, probably need to encapsulate ERR_PATTERN and SYNTAX_ERR_PATTERN
+    // and have the executable provide them
+    
+    LineConverter ( NodeJSExecutable platform ) {
+        this.platform = platform;
+    }
 
     @Override
     public LineConvertor newLineConvertor () {
@@ -86,7 +95,7 @@ final class LineConverter implements LineConvertorFactory {
             Pattern.compile( "(\\/.*?\\.js):(\\d+)" );
     //e.g. /home/tim/work/personal/captcha/captcha.js:38
 
-    private static class Link implements OutputListener {
+    private class Link implements OutputListener {
         private final String path;
         private final String clazz;
         private final int line;
@@ -107,13 +116,13 @@ final class LineConverter implements LineConvertorFactory {
         @Override
         public void outputLineAction ( OutputEvent ev ) {
             String pathLocal = this.path;
-            if (pathLocal.indexOf( '/' ) < 0) { //NOI18N
-                String sourcePath = DefaultExecutable.get().getSourcesLocation();
+            if (pathLocal.indexOf( File.separatorChar ) < 0) { //NOI18N
+                String sourcePath = platform.getSourcesLocation();
                 if (sourcePath != null) {
                     File f = new File( sourcePath );
                     f = new File( f, pathLocal );
                     if (!f.exists() && new File( f, "lib" ).exists()) { //NOI18N
-                        f = new File( f, "lib" );
+                        f = new File( f, "lib" ); //NOI18N
                         f = new File( f, pathLocal );
                     }
                     pathLocal = f.getAbsolutePath();

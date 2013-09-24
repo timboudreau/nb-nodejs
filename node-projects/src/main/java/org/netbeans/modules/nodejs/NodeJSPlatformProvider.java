@@ -1,5 +1,6 @@
 package org.netbeans.modules.nodejs;
 
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.api.project.Project;
 
 /**

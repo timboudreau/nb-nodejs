@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
@@ -43,6 +44,7 @@ import org.netbeans.api.project.Sources;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.api.validation.adapters.DialogBuilder;
 import org.netbeans.api.validation.adapters.DialogBuilder.DialogType;
+import org.netbeans.modules.nodejs.api.MainFileProvider;
 import org.netbeans.modules.nodejs.libraries.LibrariesPanel;
 import org.netbeans.modules.nodejs.node.NodeJSLogicalViewProvider;
 import org.netbeans.modules.nodejs.registry.FileChangeRegistry;
@@ -96,7 +98,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
         Comparable<NodeJSProject>, ProjectInformation,
         PrivilegedTemplates, RecommendedTemplates, CreateFromTemplateAttributesProvider,
         PropertyChangeListener, MoveOrRenameOperationImplementation,
-        DeleteOperationImplementation, CopyOperationImplementation {
+        DeleteOperationImplementation, CopyOperationImplementation, MainFileProvider {
     public static final String NBRUN = ".nbrun";
     private final FileObject dir;
     private final ProjectState state;
@@ -121,6 +123,11 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
         this.dir = dir;
         this.state = state;
         metadata.addPropertyChangeListener( this );
+    }
+
+    @Override
+    public FileObject getMainFile () {
+        return getLookup().lookup( NodeJSProjectProperties.class).getMainFile();
     }
     
     private final class PlatformProvider extends NodeJSPlatformProvider {

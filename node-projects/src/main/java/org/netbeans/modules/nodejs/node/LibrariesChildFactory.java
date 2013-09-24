@@ -40,7 +40,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.netbeans.api.queries.VisibilityQuery;
-import org.netbeans.modules.nodejs.DefaultExecutable;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
 import org.netbeans.modules.nodejs.Npm;

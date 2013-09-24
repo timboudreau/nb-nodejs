@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2012 Tim Boudreau
+ Copyright (C) 2013 Tim Boudreau
 
  Permission is hereby granted, free of charge, to any person obtaining a copy 
  of this software and associated documentation files (the "Software"), to 
@@ -18,7 +18,7 @@
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.netbeans.modules.nodejs;
+package org.netbeans.modules.nodejs.api;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -59,9 +59,6 @@ public abstract class NodeJSExecutable {
 
     protected abstract Future<Integer> doRun ( FileObject file, String args ) throws IOException;
 
-    public abstract void setNodeExecutable ( String location );
-
-    public abstract String getNodeExecutable ( boolean showDialog );
     public abstract String getSourcesLocation ();
     public abstract void stopRunningProcesses( Lookup.Provider owner );
     static final class DummyExectable extends NodeJSExecutable {
@@ -93,16 +90,6 @@ public abstract class NodeJSExecutable {
                     return 1;
                 }
             };
-        }
-
-        @Override
-        public void setNodeExecutable ( String location ) {
-            throw new UnsupportedOperationException( "Dummy implementation" );
-        }
-
-        @Override
-        public String getNodeExecutable ( boolean showDialog ) {
-            return null;
         }
 
         @Override
