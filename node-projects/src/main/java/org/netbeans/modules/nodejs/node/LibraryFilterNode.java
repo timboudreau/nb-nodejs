@@ -127,6 +127,7 @@ final class LibraryFilterNode extends FilterNode {
     private LibraryFilterNode ( Node original, final ProjectNodeKey key, final CountDownLatch latch ) {
         super( nodeFromKey( key ), isFileNode( original ) ? Children.LEAF
                 : Children.create( new LibraryNodeChildren( original.getLookup().lookup( DataObject.class ) ), true ) );
+        disableDelegation( DELEGATE_SET_NAME | DELEGATE_SET_SHORT_DESCRIPTION | DELEGATE_SET_DISPLAY_NAME | DELEGATE_SET_VALUE );
         this.key = key;
         jsonReader.post( new Runnable() {
             @Override
