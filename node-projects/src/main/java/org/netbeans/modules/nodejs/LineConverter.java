@@ -47,16 +47,6 @@ import org.openide.windows.OutputListener;
  * @author Tim Boudreau
  */
 final class LineConverter implements LineConvertorFactory {
-    private FileObject sourceRoot;
-
-    LineConverter () {
-        DefaultExecutable e = DefaultExecutable.get();
-        String s = e.getSourcesLocation();
-        if (s != null) {
-            File f = new File( s );
-            sourceRoot = FileUtil.toFileObject( f );
-        }
-    }
 
     @Override
     public LineConvertor newLineConvertor () {

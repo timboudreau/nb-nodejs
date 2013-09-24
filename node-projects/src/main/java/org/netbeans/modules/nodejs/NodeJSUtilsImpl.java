@@ -72,7 +72,7 @@ public class NodeJSUtilsImpl extends NodeJSUtils {
                 for (ProjectNodeKey key : all) {
                     if (name.equals( key.toString() )) {
                         if (key.isBuiltIn()) {
-                            return findBuiltIn( name );
+                            return findBuiltIn( prj, name );
                         } else {
                             File libdir = key.toCanonoicalFile();
                             if (libdir != null) {
@@ -96,7 +96,7 @@ public class NodeJSUtilsImpl extends NodeJSUtils {
             } else {
                 // A standalone script - we can import relative paths or 
                 // built in node modules only
-                return findBuiltIn( name );
+                return findBuiltIn( prj, name );
             }
             return null;
         } catch ( IOException ex ) {
@@ -105,8 +105,9 @@ public class NodeJSUtilsImpl extends NodeJSUtils {
         }
     }
 
-    private FileObject findBuiltIn ( String name ) {
-        String loc = DefaultExecutable.get().getSourcesLocation();
+    private FileObject findBuiltIn ( NodeJSProject prj, String name ) {
+        NodeJSExecutable exe = prj.getLookup().lookup( NodeJSPlatformProvider.class).get();
+        String loc = exe.getSourcesLocation();
         if (loc != null && !loc.isEmpty() && new File( loc ).isDirectory()) {
             File sourcesRoot = new File( loc );
             FileObject src = FileUtil.toFileObject( sourcesRoot );

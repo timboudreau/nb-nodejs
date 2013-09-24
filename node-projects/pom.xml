@@ -29,6 +29,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
     </parent>
     <packaging>nbm</packaging>
     <artifactId>nodejs</artifactId>
+    <version>2.12</version>
 
     <name>NodeJS Projects</name>
     <description>
@@ -230,5 +231,4 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
             </plugin>
         </plugins>
     </build>
-    <version>2.10</version>
 </project>

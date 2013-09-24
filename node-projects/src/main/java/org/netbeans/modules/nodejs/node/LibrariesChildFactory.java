@@ -277,7 +277,7 @@ public final class LibrariesChildFactory extends ChildFactory.Detachable<Project
         }
 
         libModules = (libModules.exists()) && (libModules.isDirectory()) ? libModules : null;
-        String src = DefaultExecutable.get().getSourcesLocation();
+        String src = project.exe().getSourcesLocation();
         File nodeSources = src == null ? null : new File( src );
         File libDir = nodeSources == null ? null : new File( nodeSources, "lib" );
         for (String lib : otherLibs.keySet()) {

@@ -62,7 +62,8 @@ public abstract class NodeJSExecutable {
     public abstract void setNodeExecutable ( String location );
 
     public abstract String getNodeExecutable ( boolean showDialog );
-
+    public abstract String getSourcesLocation ();
+    public abstract void stopRunningProcesses( Lookup.Provider owner );
     static final class DummyExectable extends NodeJSExecutable {
         @Override
         protected Future<Integer> doRun ( FileObject file, String args ) throws IOException {
@@ -102,6 +103,16 @@ public abstract class NodeJSExecutable {
         @Override
         public String getNodeExecutable ( boolean showDialog ) {
             return null;
+        }
+
+        @Override
+        public String getSourcesLocation () {
+            return null;
+        }
+
+        @Override
+        public void stopRunningProcesses ( Lookup.Provider owner ) {
+            
         }
     }
 }

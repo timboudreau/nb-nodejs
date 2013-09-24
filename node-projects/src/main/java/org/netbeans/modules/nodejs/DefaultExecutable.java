@@ -41,6 +41,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ChangeSupport;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
@@ -51,7 +52,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Tim Boudreau
  */
-@ServiceProvider (service = NodeJSExecutable.class)
+@ServiceProvider (service = NodeJSExecutable.class, position = Integer.MIN_VALUE)
 public final class DefaultExecutable extends NodeJSExecutable {
     private static final String NODE_EXE_KEY = "nodejs_binary";
     private static final String PORT_KEY = "port";
@@ -127,7 +128,7 @@ public final class DefaultExecutable extends NodeJSExecutable {
         preferences().put( NODE_EXE_KEY, location );
     }
 
-    public void stopRunningProcesses ( NodeJSProject p ) {
+    public void stopRunningProcesses ( Lookup.Provider p ) {
         FileObject f = p.getLookup().lookup( NodeJSProjectProperties.class ).getMainFile();
         if (f != null) {
             for (Rerunner r : runners) {

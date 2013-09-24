@@ -113,13 +113,23 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     private final FileChangeRegistry registry = new FileChangeRegistry( this );
     private final Lookup lookup = Lookups.fixed( this, logicalView,
             new NodeJSProjectProperties( this ), classpath, sources,
-            new NodeJsEncodingQuery(), registry, metadata );
+            new NodeJsEncodingQuery(), registry, metadata,
+            new PlatformProvider());
 
     @SuppressWarnings ("LeakingThisInConstructor")
     NodeJSProject ( FileObject dir, ProjectState state ) {
         this.dir = dir;
         this.state = state;
         metadata.addPropertyChangeListener( this );
+    }
+    
+    private final class PlatformProvider extends NodeJSPlatformProvider {
+
+        @Override
+        public NodeJSExecutable get () {
+            return NodeJSExecutable.getDefault();
+        }
+        
     }
 
     ProjectState state () {
@@ -435,7 +445,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             result.put( "project.license", license ); //NOI18N
             result.put( "license", license ); //NOI18N
         }
-        result.put( "port", "" + DefaultExecutable.get().getDefaultPort() ); //NOI18N
+        result.put( "port", "8080" /* XXX GET RID OF THIS */); //NOI18N
         return result;
     }
 
@@ -463,10 +473,15 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     public void removePropertyChangeListener ( PropertyChangeListener listener ) {
         supp.removePropertyChangeListener( listener );
     }
+    
+    public NodeJSExecutable exe() {
+        NodeJSPlatformProvider exe = getLookup().lookup(NodeJSPlatformProvider.class);
+        return exe.get();
+    }
 
     @Override
     public void notifyRenaming () throws IOException {
-        DefaultExecutable.get().stopRunningProcesses( this );
+        exe().stopRunningProcesses( this );
     }
 
     @Override
@@ -476,7 +491,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public void notifyMoving () throws IOException {
-        DefaultExecutable.get().stopRunningProcesses( this );
+        exe().stopRunningProcesses( this );
     }
 
     @Override
@@ -505,7 +520,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public void notifyDeleting () throws IOException {
-        DefaultExecutable.get().stopRunningProcesses( this );
+        exe().stopRunningProcesses( this );
     }
 
     @Override
