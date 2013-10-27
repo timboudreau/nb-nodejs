@@ -311,7 +311,7 @@ final class LibraryFilterNode extends FilterNode {
                 sb.append( "<font color='!controlDkShadow'>" ); //NOI18N
             }
         }
-        if (!key.isDirect() && key.getType() != ProjectNodeKeyTypes.BUILT_IN_LIBRARY) {
+        if (!key.isDirect() && key.getType() != ProjectNodeKeyTypes.BUILT_IN_LIBRARY && key.getFld() != null) {
             sb.append( " (&lt;-" ).append( //NOI18N
                     key.getFld().getParent().getParent().getName() ).append( ")" ); //NOI18N
         }
