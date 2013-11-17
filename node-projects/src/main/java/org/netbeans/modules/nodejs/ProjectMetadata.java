@@ -41,7 +41,7 @@ public interface ProjectMetadata {
     public static final String PROP_LICENSE_URL = "license.url";
     public static final String PROP_AUTHOR_NAME = "author.name";
     public static final String PROP_AUTHOR_EMAIL = "author.email";
-    public static final String PROP_BUG_URL = "bugs.web";
+    public static final String PROP_BUG_URL = "bugs.url";
     public static final String PROP_KEYWORDS = "keywords";
 
     public String getValue ( String key );

@@ -166,7 +166,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
     private Map<String, Object> load ( FileObject fo ) throws IOException {
         if (!fo.isValid()) {
             Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.WARNING, "Project root dir became invalid" );
-            return new LinkedHashMap<String, Object>();
+            return new LinkedHashMap<>();
         }
         lock.lock();
         boolean err = false;
@@ -186,7 +186,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             } catch ( FileStateInvalidException inv ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.INFO,
                         "Invalid package.json" );
-                return new LinkedHashMap<String, Object>();
+                return new LinkedHashMap<>();
             } catch ( IOException ex ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.INFO,
                         "Bad package.json in " + fo.getPath() + " - will try with permissive parser", ex );
@@ -195,7 +195,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
                 SimpleJSONParser p = new SimpleJSONParser( true ); //permissive mode - will parse as much as it can
                 if (!fo.isValid()) {
                     Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.WARNING, "Project root dir became invalid" );
-                    return new LinkedHashMap<String, Object>();
+                    return new LinkedHashMap<>();
                 }
                 in = fo.getInputStream();
                 try {
@@ -210,11 +210,11 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
                 }
             } catch ( FileStateInvalidException e ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.WARNING, "Project root dir became invalid" );
-                return new LinkedHashMap<String, Object>();
+                return new LinkedHashMap<>();
             } catch ( JsonException ex ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.INFO,
                         "Bad package.json in " + fo.getPath(), ex );
-                return new LinkedHashMap<String, Object>();
+                return new LinkedHashMap<>();
             }
         } finally {
             lock.unlock();
