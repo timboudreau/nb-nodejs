@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -54,6 +56,7 @@ public class StubsTest {
 
         copy( "package_1.json", "package.json", boo );
         copy( "boo.js", "boo.js", boo );
+        copy( "boo.js", "moo.js", boo );
 
         booDir = FileUtil.toFileObject( boo );
 
@@ -63,7 +66,8 @@ public class StubsTest {
 
     @After
     public void teardown () throws IOException {
-        prjFo.delete();
+        System.out.println( "PROJECT FO " + prjFo.getPath() );
+//        prjFo.delete();
     }
 
     private void copy ( String name ) throws IOException {
@@ -72,6 +76,7 @@ public class StubsTest {
 
     private void copy ( String name, String destName, File prjdir ) throws IOException {
         try (InputStream in = StubsTest.class.getResourceAsStream( name )) {
+            assertNotNull(in);
             File f = new File( prjdir, destName );
             assertTrue( f.getAbsolutePath(), f.createNewFile() );
             try (FileOutputStream out = new FileOutputStream( f )) {
@@ -126,6 +131,26 @@ public class StubsTest {
         assertEquals( "testproject", props.getDisplayName() );
 
         assertEquals( "joe@mail.example", props.getAuthorEmail() );
+
+        // #8 - Ensure the main file path is relative
+        props = booProject.getLookup().lookup( NodeJSProjectProperties.class );
+        
+        FileObject fo = props.getMainFile();
+        assertEquals("boo", fo.getName());
+
+        props.setMainFile( booProject.getProjectDirectory().getFileObject( "moo.js" ));
+
+        fo = props.getMainFile();
+        assertEquals("moo", fo.getName());
+        
+        FileObject booMetadata = booProject.getProjectDirectory().getFileObject("package.json");
+        try (InputStream in = booMetadata.getInputStream()) {
+            ObjectMapper m = new ObjectMapper();
+            Map<String,Object> map = m.readValue( in, Map.class);
+            String path = (String) map.get("main");
+            assertNotNull(path);
+            assertEquals("./boo.js", path);
+        }
     }
 
     private static class PS implements ProjectState {
