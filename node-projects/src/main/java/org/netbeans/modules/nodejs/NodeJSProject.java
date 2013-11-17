@@ -35,6 +35,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -89,6 +92,8 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.Lookups;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  *
@@ -193,7 +198,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             }
             final FileObject toRun = main;
             if (toRun != null && toRun.isValid()) {
-                RequestProcessor.getDefault().post( new Runnable() {
+                final Runnable runIt = new Runnable() {
                     @Override
                     public void run () {
                         try {
@@ -202,7 +207,48 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
                             throw new IllegalArgumentException( ex );
                         }
                     }
-                } );
+                };
+                Object o = metadata.getMap().get( "dependencies" ); //NOI18N
+                boolean needRunNPMInstall = false;
+                if (o instanceof Map<?,?>) {
+                    FileObject nodeModules = getProjectDirectory().getFileObject( NodeJSProjectFactory.NODE_MODULES_FOLDER );
+                    needRunNPMInstall = nodeModules == null;
+                    if (needRunNPMInstall) {
+                        String msg = NbBundle.getMessage(NodeJSProject.class, "DETAIL_RUN_NPM_INSTALL");
+                        String title = NbBundle.getMessage(NodeJSProject.class, "TITLE_RUN_NPM_INSTALL");
+                        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(msg, title, NotifyDescriptor.YES_NO_CANCEL_OPTION);
+                        Object dlgResult = DialogDisplayer.getDefault().notify( nd );
+                        needRunNPMInstall = NotifyDescriptor.YES_OPTION.equals(dlgResult);
+                        if (NotifyDescriptor.CANCEL_OPTION.equals(dlgResult)) {
+                            return;
+                        }
+                    }
+                }
+                if (needRunNPMInstall) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        @Override
+                        public void run () {
+                            try {
+                                Future<Integer> f = Npm.getDefault().runWithOutputWindow(FileUtil.toFile(getProjectDirectory()), "install");
+                                int exitCode = f.get();
+                                if (exitCode == 0) {
+                                    runIt.run();
+                                } else {
+                                    StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage(NodeJSProject.class, "NPM_INSTALL_FAILED"));
+                                }
+                            } catch ( IOException ex ) {
+                                Exceptions.printStackTrace( ex );
+                            } catch ( InterruptedException ex ) {
+                                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage(NodeJSProject.class, "RUN_CANCELLED"));
+                                Logger.getLogger( NodeJSProject.class.getName() ).log( Level.INFO, "Interrupted running NPM", ex );
+                            } catch ( ExecutionException ex ) {
+                                Exceptions.printStackTrace( ex );
+                            }
+                        }
+                    });
+                } else {
+                    RequestProcessor.getDefault().post( runIt );
+                }
             } else {
                 Toolkit.getDefaultToolkit().beep();
             }

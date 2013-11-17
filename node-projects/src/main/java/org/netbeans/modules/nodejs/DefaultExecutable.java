@@ -1,20 +1,20 @@
 /* Copyright (C) 2012 Tim Boudreau
 
- Permission is hereby granted, free of charge, to any person obtaining a copy 
- of this software and associated documentation files (the "Software"), to 
- deal in the Software without restriction, including without limitation the 
- rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- sell copies of the Software, and to permit persons to whom the Software is 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in all 
+ The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.util.concurrent.Future;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import org.netbeans.modules.nodejs.api.MainFileProvider;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.filesystems.FileObject;
@@ -118,13 +117,13 @@ public final class DefaultExecutable extends NodeJSExecutable {
     }
 
     public void stopRunningProcesses ( Lookup.Provider p ) {
-        ls.stopRunningProcesses(p);
+        ls.stopRunningProcesses( p );
     }
 
-    private final LaunchSupport ls = new LaunchSupport(this) {
+    private final LaunchSupport ls = new LaunchSupport( this ) {
         @Override
         protected String[] getLaunchCommandLine ( boolean showDialog ) {
-            return new String[] { DefaultExecutable.this.getNodeExecutable( showDialog ) };
+            return new String[]{DefaultExecutable.this.getNodeExecutable( showDialog )};
         }
     };
 
@@ -172,8 +171,7 @@ public final class DefaultExecutable extends NodeJSExecutable {
         try {
             Process p = b.start();
             try {
-                InputStream in = p.getInputStream();
-                try {
+                try (InputStream in = p.getInputStream()) {
                     p.waitFor();
                     if (p.exitValue() == 0) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -181,8 +179,6 @@ public final class DefaultExecutable extends NodeJSExecutable {
                         String result = new String( out.toByteArray() ).trim(); //trim off \n
                         return result.length() == 0 ? null : result;
                     }
-                } finally {
-                    in.close();
                 }
             } catch ( InterruptedException ex ) {
                 Exceptions.printStackTrace( ex );

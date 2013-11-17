@@ -1,6 +1,6 @@
 {
     "name": "${projectName}",
-    "description": "(pending)",
+    "description": "${description_escaped}",
     "version": "0.0.1",
     "main": "./${projectName}.js",
     "author": {

@@ -19,11 +19,10 @@
 package org.netbeans.modules.nodejs.node;
 
 import java.awt.event.ActionEvent;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -45,7 +44,6 @@ import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
 import org.netbeans.modules.nodejs.Npm;
 import org.netbeans.modules.nodejs.ProjectMetadataImpl;
-import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
 import org.netbeans.modules.nodejs.libraries.LibrariesPanel;
 import org.netbeans.modules.nodejs.ui2.RootNode;
 import org.openide.DialogDescriptor;
@@ -76,7 +74,7 @@ public class AddLibraryAction extends AbstractAction {
         LibrariesPanel pn = new LibrariesPanel( project );
         DialogDescriptor dd = new DialogDescriptor( pn, NbBundle.getMessage( NodeJSProject.class, "SEARCH_FOR_LIBRARIES" ) ); //NOI18N
         if (DialogDisplayer.getDefault().notify( dd ).equals( DialogDescriptor.OK_OPTION )) {
-            final Set<String> libraries = new HashSet<String>( pn.getLibraries() );
+            final Set<String> libraries = new HashSet<>( pn.getLibraries() );
             if (libraries.size() > 0) {
                 final String npmPath = Npm.getDefault().exe( );
                 final AtomicInteger jobs = new AtomicInteger();
@@ -118,7 +116,7 @@ public class AddLibraryAction extends AbstractAction {
                                             }
                                         } finally {
                                             List<LibraryAndVersion> l = libraries( project );
-                                            updateDependencies( project, l, libraryName );
+                                            updateDependencies( project, l);
                                         }
                                     }
                                 } ).charset( Charset.forName( "UTF-8" ) ).frontWindowOnError( true ); //NOI18N
@@ -134,14 +132,17 @@ public class AddLibraryAction extends AbstractAction {
         }
     }
 
-    private synchronized List<LibraryAndVersion> updateDependencies ( NodeJSProject prj, List<LibraryAndVersion> onDisk, String added ) {
-        System.out.println( "UPDATE DEPENDENCIES FOR " + added );
+    static synchronized List<LibraryAndVersion> updateDependencies ( NodeJSProject prj, List<LibraryAndVersion> onDisk, String... remove ) {
         List<LibraryAndVersion> l = new ArrayList<>();
         ProjectMetadataImpl metadata = prj.metadata();
+        Set<String> toRemove = new HashSet<>(Arrays.<String>asList(remove));
         if (metadata != null) {
             Map<String, Object> deps = metadata.getMap( "dependencies" );
             if (deps != null) {
                 for (Map.Entry<String, Object> e : deps.entrySet()) {
+                    if (toRemove.contains(e.getKey())) {
+                        continue;
+                    }
                     if (e.getValue() instanceof String) {
                         String ver = (String) e.getValue();
                         LibraryAndVersion dep = new LibraryAndVersion( e.getKey(), ver );
@@ -152,9 +153,9 @@ public class AddLibraryAction extends AbstractAction {
             for (LibraryAndVersion v : onDisk) {
                 if (!l.contains( v )) {
                     if (v.version != null) {
-                        if (!v.version.startsWith( ">" ) && !v.version.startsWith( "=" ) && !v.version.startsWith( "<" ) && !v.version.startsWith( "~" )) {
-                            v.version = ">=" + v.version;
-                        }
+//                        if (!v.version.startsWith( ">" ) && !v.version.startsWith( "=" ) && !v.version.startsWith( "<" ) && !v.version.startsWith( "~" )) { //NOI18N
+//                            v.version = ">=" + v.version;
+//                        }
                         l.add( v );
                     }
                 }
@@ -167,29 +168,7 @@ public class AddLibraryAction extends AbstractAction {
             Map m = metadata.getMap();
             m.put( "dependencies", map );
             try {
-                // XXX figure out why queueSave isn't working
-                String out = ObjectMapperProvider.newObjectMapper().writeValueAsString( m );
-                FileObject fo = project.getProjectDirectory().getFileObject( NodeJSProjectFactory.PACKAGE_JSON );
-                if (fo == null) {
-                    fo = project.getProjectDirectory().createData( NodeJSProjectFactory.PACKAGE_JSON );
-                }
-                OutputStream o = fo.getOutputStream();
-                try {
-                    FileUtil.copy( new ByteArrayInputStream( out.getBytes( "UTF-8" ) ), o );;
-                } finally {
-                    o.close();
-                }
-                //            if (!l.equals(metadata.getMap("dependencies"))) {
-                //                System.out.println("ADD MAP: " + map);
-                //                metadata.addMap("dependencies", map);
-                //                try {
-                //                    metadata.save();
-                //                    System.out.println("Saved metdata - dependencies: " + metadata.getMap("dependencies"));
-                //                } catch (IOException ex) {
-                //                    Logger.getLogger(AddLibraryAction.class.getName()).log(
-                //                            Level.INFO, "Failed to save metadata", ex);
-                //            }
-                //            }
+                metadata.save();
             } catch ( IOException ex ) {
                 Exceptions.printStackTrace( ex );
             }
@@ -199,7 +178,7 @@ public class AddLibraryAction extends AbstractAction {
         return l;
     }
 
-    public class LibraryAndVersion implements Comparable<LibraryAndVersion> {
+    public static final class LibraryAndVersion implements Comparable<LibraryAndVersion> {
         public String name;
         public String version;
 
@@ -235,7 +214,7 @@ public class AddLibraryAction extends AbstractAction {
         }
     }
 
-    private List<LibraryAndVersion> libraries ( NodeJSProject prj ) {
+    static List<LibraryAndVersion> libraries ( NodeJSProject prj ) {
         // This is really backwards, and we should have a model of libraries
         // represented by nodes, rather than a model of nodes from which we
         // derive libraries.  Ah, expediency.

@@ -42,9 +42,13 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import org.codehaus.jackson.type.TypeReference;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
+import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
 import org.netbeans.modules.nodejs.json.JsonPanel;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
+import org.netbeans.modules.nodejs.node.AddLibraryAction.LibraryAndVersion;
 import org.openide.awt.HtmlBrowser.URLDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -312,8 +316,12 @@ final class LibraryFilterNode extends FilterNode {
             }
         }
         if (!key.isDirect() && key.getType() != ProjectNodeKeyTypes.BUILT_IN_LIBRARY && key.getFld() != null) {
-            sb.append( " (&lt;-" ).append( //NOI18N
-                    key.getFld().getParent().getParent().getName() ).append( ")" ); //NOI18N
+            FileObject fld = key.getFld();
+            // Handle race condition after library update
+            if (fld != null && fld.getParent() != null && fld.getParent().getParent() != null) {
+                sb.append( " (&lt;-" ).append( //NOI18N
+                    fld.getParent().getParent().getName() ).append( ")" ); //NOI18N
+            }
         }
         return sb.toString();
     }
@@ -412,18 +420,45 @@ final class LibraryFilterNode extends FilterNode {
         if (key.isDirect() && key.getType() == ProjectNodeKeyTypes.LIBRARY) {
             l.add( 1, new AbstractAction() {
                 {
-                    putValue( NAME, NbBundle.getMessage( LibraryFilterNode.class, "REMOVE_DEPENDENCY", getDisplayName() ) );
+                    putValue( NAME, NbBundle.getMessage( LibraryFilterNode.class, 
+                            "REMOVE_DEPENDENCY", getDisplayName() ) ); //NOI18N
                 }
 
                 @Override
                 public void actionPerformed ( ActionEvent e ) {
-                    DataObject dob = getLookup().lookup( DataObject.class );
+                    final DataObject dob = getLookup().lookup( DataObject.class );
                     if (dob != null && dob.isValid()) {
-                        try {
-                            dob.delete();
-                        } catch ( IOException ex ) {
-                            Logger.getLogger( LibraryFilterNode.class.getName() ).log( Level.INFO, "Could not delete " + dob.getName(), ex );
-                        }
+                        Project p = FileOwnerQuery.getOwner( dob.getPrimaryFile().getParent() );
+                        final NodeJSProject prj = p == null ? null : p
+                                .getLookup()
+                                .lookup( NodeJSProject.class );
+                        System.out.println( "PROJECT IS " + prj );
+                        RequestProcessor.getDefault().post( new Runnable() {
+                            @Override
+                            public void run () {
+                                try {
+                                    String libName = dob.getName();
+                                    System.out.println( "Remove library " + libName );
+                                    dob.delete();
+                                    if (prj != null) {
+                                        List<AddLibraryAction.LibraryAndVersion> libs
+                                                = AddLibraryAction.libraries( prj );
+                                        for (Iterator<AddLibraryAction.LibraryAndVersion> it = libs.iterator(); it.hasNext();) {
+                                            LibraryAndVersion a = it.next();
+                                            System.out.println( "LIB " + a.name + " " + a.version );
+                                            if (libName.equals( a.name )) {
+                                                System.out.println( "  REMOVE " + a.name );
+                                                it.remove();
+                                            }
+                                        }
+                                        AddLibraryAction.updateDependencies( prj, libs, libName );
+                                    }
+                                } catch ( IOException ex ) {
+                                    Logger.getLogger( LibraryFilterNode.class.getName() ).log(
+                                            Level.INFO, "Could not delete " + dob.getName(), ex ); //NOI18N
+                                }
+                            }
+                        } );
                     } else {
                         Toolkit.getDefaultToolkit().beep();
                     }
