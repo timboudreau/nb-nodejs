@@ -63,6 +63,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
         set( descriptionField, props.getDescription() );
         set( bugTrackerField, props.getBugTrackerURL() );
         set( commandLineField, props.getRunArguments() );
+        set( authorURLField, props.getAuthorURL() );
         if ("null".equals( bugTrackerField.getText() )) {
             bugTrackerField.setText( "" );
         }
@@ -89,6 +90,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
         g.add( authorEmailField, new AllowNullValidator( StringValidators.EMAIL_ADDRESS ) );
         g.add( mainFileField, new FileRelativeValidator() );
         g.add( commandLineField, new WhitespaceValidator() );
+        g.add( authorURLField, new AllowNullValidator( StringValidators.URL_MUST_BE_VALID ) );
     }
 
     public void addNotify () {
@@ -162,6 +164,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
         props.setDescription( descriptionField.getText().trim() );
         props.setKeywords( keywordsField.getText().trim() );
         props.setRunArguments( commandLineField.getText().trim() );
+        props.setAuthorURL( authorURLField.getText().trim() );
         if (bugTrackerField.getText().trim().length() > 0) {
             try {
                 props.setBugTrackerURL( new URL( bugTrackerField.getText().trim() ) );
@@ -220,6 +223,8 @@ public class PropertiesPanel extends javax.swing.JPanel {
         commandLineField = new javax.swing.JTextField();
         commandLineLabel = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        authorURLLabel = new javax.swing.JLabel();
+        authorURLField = new javax.swing.JTextField();
 
         nameLabel.setLabelFor(nameField);
         nameLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.nameLabel.text")); // NOI18N
@@ -289,6 +294,11 @@ public class PropertiesPanel extends javax.swing.JPanel {
             }
         });
 
+        authorURLLabel.setLabelFor(authorURLField);
+        authorURLLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.authorURLLabel.text")); // NOI18N
+
+        authorURLField.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.authorURLField.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -307,22 +317,26 @@ public class PropertiesPanel extends javax.swing.JPanel {
                             .addComponent(licenseLabel)
                             .addComponent(mainFileLabel)
                             .addComponent(keywordsLabel)
-                            .addComponent(commandLineLabel))
+                            .addComponent(commandLineLabel)
+                            .addComponent(authorURLLabel))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
                             .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                             .addComponent(authorNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                             .addComponent(authorEmailField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                             .addComponent(bugTrackerField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                            .addComponent(licenseField, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(keywordsField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                             .addComponent(commandLineField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(mainFileField, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton1)
-                                .addGap(6, 6, 6)))))
+                                .addGap(6, 6, 6))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(licenseField, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(authorURLField))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -335,16 +349,20 @@ public class PropertiesPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(descriptionLabel)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(authorNameLabel)
                     .addComponent(authorNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(authorEmailLabel)
                     .addComponent(authorEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(authorURLLabel)
+                    .addComponent(authorURLField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bugTrackerField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bugTrackerLabel))
@@ -357,17 +375,17 @@ public class PropertiesPanel extends javax.swing.JPanel {
                     .addComponent(mainFileLabel)
                     .addComponent(mainFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(keywordsLabel)
                     .addComponent(keywordsField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(commandLineField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(commandLineLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addComponent(status)
-                .addContainerGap())
+                .addGap(13, 13, 13))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -383,6 +401,8 @@ private void browseMainFile(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b
     private javax.swing.JLabel authorEmailLabel;
     private javax.swing.JTextField authorNameField;
     private javax.swing.JLabel authorNameLabel;
+    private javax.swing.JTextField authorURLField;
+    private javax.swing.JLabel authorURLLabel;
     private javax.swing.JTextField bugTrackerField;
     private javax.swing.JLabel bugTrackerLabel;
     private javax.swing.JTextField commandLineField;

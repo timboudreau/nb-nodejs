@@ -31,15 +31,15 @@
                           <Component id="mainFileLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="keywordsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="commandLineLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="authorURLLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane1" pref="508" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="514" max="32767" attributes="0"/>
                           <Component id="nameField" alignment="0" pref="508" max="32767" attributes="0"/>
                           <Component id="authorNameField" alignment="0" pref="508" max="32767" attributes="0"/>
                           <Component id="authorEmailField" alignment="0" pref="508" max="32767" attributes="0"/>
                           <Component id="bugTrackerField" alignment="0" pref="508" max="32767" attributes="0"/>
-                          <Component id="licenseField" alignment="0" min="-2" pref="138" max="-2" attributes="0"/>
                           <Component id="keywordsField" alignment="0" pref="508" max="32767" attributes="0"/>
                           <Component id="commandLineField" alignment="0" pref="508" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
@@ -48,6 +48,11 @@
                               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                           </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="licenseField" min="-2" pref="138" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="authorURLField" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -66,19 +71,24 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="descriptionLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
+                  <Component id="jScrollPane1" min="-2" pref="72" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="authorNameLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="authorNameField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="authorEmailLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="authorEmailField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="authorURLLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="authorURLField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="bugTrackerField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="bugTrackerLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -94,19 +104,19 @@
                   <Component id="mainFileField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="keywordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="keywordsField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="commandLineField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="commandLineLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="46" max="32767" attributes="0"/>
+              <EmptySpace pref="9" max="32767" attributes="0"/>
               <Component id="status" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -314,6 +324,23 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="browseMainFile"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="authorURLLabel">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="authorURLField"/>
+        </Property>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.authorURLLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="authorURLField">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.authorURLField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

@@ -442,8 +442,8 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
                                 CharSequence seq = ObjectMapperProvider.newObjectMapper()
                                         .writeValueAsString( writeOut );
                                 try (OutputStream out = writeTo.getOutputStream()) {
-                                    ByteArrayInputStream in = new ByteArrayInputStream( seq.toString().getBytes( "UTF-8" ) );
-                                    FileUtil.copy( in, out );
+                                    out.write(seq.toString().getBytes( "UTF-8" ));
+                                    out.write( "\n".getBytes( "UTF-8" ) );
                                     task.cancel();
                                 } catch ( FileAlreadyLockedException e ) {
                                     Logger.getLogger( ProjectMetadataImpl.class.getName() ).log(
