@@ -141,6 +141,7 @@ public class StubsTest {
         props.setMainFile( booProject.getProjectDirectory().getFileObject( "moo.js" ));
 
         fo = props.getMainFile();
+        assertNotNull("Main file should be moo.js but was null", fo);
         assertEquals("moo", fo.getName());
 
         FileObject booMetadata = booProject.getProjectDirectory().getFileObject("package.json");

@@ -19,7 +19,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="status" alignment="0" pref="622" max="32767" attributes="0"/>
+                  <Component id="status" alignment="0" pref="638" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="nameLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -32,27 +32,29 @@
                           <Component id="keywordsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="commandLineLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="authorURLLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="versionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jScrollPane1" pref="514" max="32767" attributes="0"/>
-                          <Component id="nameField" alignment="0" pref="508" max="32767" attributes="0"/>
-                          <Component id="authorNameField" alignment="0" pref="508" max="32767" attributes="0"/>
-                          <Component id="authorEmailField" alignment="0" pref="508" max="32767" attributes="0"/>
-                          <Component id="bugTrackerField" alignment="0" pref="508" max="32767" attributes="0"/>
-                          <Component id="keywordsField" alignment="0" pref="508" max="32767" attributes="0"/>
-                          <Component id="commandLineField" alignment="0" pref="508" max="32767" attributes="0"/>
+                          <Component id="nameField" alignment="0" pref="514" max="32767" attributes="0"/>
+                          <Component id="authorNameField" alignment="0" pref="514" max="32767" attributes="0"/>
+                          <Component id="authorEmailField" alignment="0" pref="514" max="32767" attributes="0"/>
+                          <Component id="bugTrackerField" alignment="0" pref="514" max="32767" attributes="0"/>
+                          <Component id="keywordsField" alignment="0" pref="514" max="32767" attributes="0"/>
+                          <Component id="commandLineField" alignment="0" pref="514" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="mainFileField" pref="401" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="authorURLField" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Component id="licenseField" min="-2" pref="138" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="authorURLField" max="32767" attributes="0"/>
+                          <Component id="versionField" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -68,7 +70,12 @@
                   <Component id="nameLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="nameField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="versionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="versionField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="descriptionLabel" min="-2" max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="72" max="-2" attributes="0"/>
@@ -114,9 +121,9 @@
                   <Component id="commandLineField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="commandLineLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="9" max="32767" attributes="0"/>
+              <EmptySpace pref="14" max="32767" attributes="0"/>
               <Component id="status" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -292,6 +299,9 @@
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.keywords.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.keywordsField.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
         <Property name="name" type="java.lang.String" value="keywords" noResource="true"/>
       </Properties>
     </Component>
@@ -338,8 +348,27 @@
     <Component class="javax.swing.JTextField" name="authorURLField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.authorURLField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.author.url.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
+        <Property name="name" type="java.lang.String" value="author.url" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="versionLabel">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="versionField"/>
+        </Property>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.versionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="versionField">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.version.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="version" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>

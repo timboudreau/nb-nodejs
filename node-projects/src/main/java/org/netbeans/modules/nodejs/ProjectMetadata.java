@@ -33,17 +33,18 @@ import java.util.Map;
  @MIMEResolver.Registration(displayName = "JS_SYSTEM_SCRIPT", resource = "usrEnvNodeResolver.xml")
  */
 public interface ProjectMetadata {
-    public static final String PROP_MAIN_FILE = "main";
-    public static final String PROP_TEST_FILE = "test";
-    public static final String PROP_NAME = "name";
-    public static final String PROP_DESCRIPTION = "description";
-    public static final String PROP_LICENSE_KIND = "license.type";
-    public static final String PROP_LICENSE_URL = "license.url";
-    public static final String PROP_AUTHOR_NAME = "author.name";
-    public static final String PROP_AUTHOR_EMAIL = "author.email";
-    public static final String PROP_AUTHOR_URL = "author.url";
-    public static final String PROP_BUG_URL = "bugs.url";
-    public static final String PROP_KEYWORDS = "keywords";
+    public static final String PROP_MAIN_FILE = "main"; //NOi18N
+    public static final String PROP_TEST_FILE = "test"; //NOi18N
+    public static final String PROP_NAME = "name"; //NOi18N
+    public static final String PROP_DESCRIPTION = "description"; //NOi18N
+    public static final String PROP_LICENSE_KIND = "license.type"; //NOi18N
+    public static final String PROP_LICENSE_URL = "license.url"; //NOi18N
+    public static final String PROP_AUTHOR_NAME = "author.name"; //NOi18N
+    public static final String PROP_AUTHOR_EMAIL = "author.email"; //NOi18N
+    public static final String PROP_AUTHOR_URL = "author.url"; //NOi18N
+    public static final String PROP_BUG_URL = "bugs.url"; //NOi18N
+    public static final String PROP_KEYWORDS = "keywords"; //NOi18N
+    public static final String PROP_VERSION = "version"; //NOi18N
 
     public String getValue ( String key );
 
