@@ -153,9 +153,21 @@ public class NodeJSProjectProperties {
     public String getAuthorName () {
         return project.metadata().getValue( ProjectMetadata.PROP_AUTHOR_NAME );
     }
+    
+    public String getAuthorURL() {
+        return project.metadata().getValue( ProjectMetadata.PROP_AUTHOR_URL );
+    }
+
+    public void setAuthorURL(String authorURL) {
+        project.metadata().setValue( ProjectMetadata.PROP_AUTHOR_URL, authorURL );
+    }
 
     String getBugTrackerURL () {
         return project.metadata().getValue( ProjectMetadata.PROP_BUG_URL );
+    }
+
+    void save() throws IOException {
+        project.metadata().save();
     }
 
     public void setRunArguments ( String args ) {

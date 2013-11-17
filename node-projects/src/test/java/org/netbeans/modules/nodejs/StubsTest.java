@@ -134,7 +134,7 @@ public class StubsTest {
 
         // #8 - Ensure the main file path is relative
         props = booProject.getLookup().lookup( NodeJSProjectProperties.class );
-        
+
         FileObject fo = props.getMainFile();
         assertEquals("boo", fo.getName());
 
@@ -142,7 +142,7 @@ public class StubsTest {
 
         fo = props.getMainFile();
         assertEquals("moo", fo.getName());
-        
+
         FileObject booMetadata = booProject.getProjectDirectory().getFileObject("package.json");
         try (InputStream in = booMetadata.getInputStream()) {
             ObjectMapper m = new ObjectMapper();
@@ -150,6 +150,16 @@ public class StubsTest {
             String path = (String) map.get("main");
             assertNotNull(path);
             assertEquals("./boo.js", path);
+        }
+
+        props.setAuthor( "" );
+        props.setAuthorEmail( "" );
+        props.save();
+        try (InputStream in = booMetadata.getInputStream()) {
+            ObjectMapper m = new ObjectMapper();
+            Map<String,Object> map = m.readValue( in, Map.class);
+            assertFalse( "If author fields are clear, empty entries "
+                    + "should not remain in package.json", map.containsKey( "author" ));
         }
     }
 

@@ -41,6 +41,7 @@ public interface ProjectMetadata {
     public static final String PROP_LICENSE_URL = "license.url";
     public static final String PROP_AUTHOR_NAME = "author.name";
     public static final String PROP_AUTHOR_EMAIL = "author.email";
+    public static final String PROP_AUTHOR_URL = "author.url";
     public static final String PROP_BUG_URL = "bugs.url";
     public static final String PROP_KEYWORDS = "keywords";
 
@@ -55,4 +56,6 @@ public interface ProjectMetadata {
     public void addMap ( String key, Map<String, Object> m );
 
     public Map<String, Object> getMap ( String key );
+    
+    public void clearValue(String key);
 }
