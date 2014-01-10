@@ -19,7 +19,6 @@
 package org.netbeans.modules.nodejs;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.openide.DialogDescriptor;

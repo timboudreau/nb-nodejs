@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.ui2;
 
+import java.awt.Image;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -30,8 +31,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
+import org.netbeans.modules.nodejs.LibrariesResolver;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectProperties;
 import org.netbeans.modules.nodejs.PropertiesPanel;
@@ -48,7 +52,9 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.WeakListeners;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.AbstractLookup;
@@ -60,9 +66,10 @@ import org.openide.util.lookup.ProxyLookup;
  *
  * @author Tim Boudreau
  */
-public final class RootNode extends AbstractNode {
+public final class RootNode extends AbstractNode implements ChangeListener {
     public static final String LIBRARY_ICON = "org/netbeans/modules/nodejs/resources/libs.png"; //NOI18N
     public static final String LOGO_ICON = "org/netbeans/modules/nodejs/resources/logo.png"; //NOI18N
+    public static final String MISSING_LIBRARIES_BADGE = "org/netbeans/modules/nodejs/resources/warn.png"; //NOI18N
 
     public RootNode ( NodeJSProject project ) {
         this( project, new InstanceContent() );
@@ -91,13 +98,35 @@ public final class RootNode extends AbstractNode {
         return Children.create( new ProjectChildren( project ), true );
     }
 
+    private boolean listening;
+
+    @Override
+    public Image getIcon ( int type ) {
+        LibrariesResolver resolver = getLookup().lookup( Project.class ).getLookup().lookup( LibrariesResolver.class );
+        if (!listening) {
+            listening = true;
+            resolver.addChangeListener( WeakListeners.change( this, resolver ) );
+        }
+        Image result = super.getIcon( type );
+        if (resolver.hasMissingLibraries()) {
+            Image badge = ImageUtilities.loadImage( MISSING_LIBRARIES_BADGE );
+            result = ImageUtilities.mergeImages( result , badge, 7, 7);
+        }
+        return result;
+    }
+
+    @Override
+    public Image getOpenedIcon ( int type ) {
+        return getIcon( type );
+    }
+
     @Override
     public Action[] getActions ( boolean ignored ) {
         NodeJSProject project = getLookup().lookup( NodeJSProject.class );
-        final ResourceBundle bundle =
-                NbBundle.getBundle( RootNode.class );
+        final ResourceBundle bundle
+                = NbBundle.getBundle( RootNode.class );
 
-        List<Action> actions = new ArrayList<Action>();
+        List<Action> actions = new ArrayList<>();
 
         actions.add( CommonProjectActions.newFileAction() );
         actions.add( null );
@@ -129,7 +158,7 @@ public final class RootNode extends AbstractNode {
         actions.add( SystemAction.get( PasteAction.class ) );
         actions.add( null );
         actions.add( getFilesystemAction() );
-        actions.add( Lookups.forPath( "Project/NodeJS/Actions" ).lookup( Action.class ) ); //NOI18N
+        actions.addAll( Lookups.forPath( "Project/NodeJS/Actions" ).lookupAll( Action.class ) ); //NOI18N
         actions.add( new AbstractAction( NbBundle.getMessage( RootNode.class, "PROPERTIES" ) ) { //NOI18N
             @Override
             public void actionPerformed ( ActionEvent e ) {
@@ -137,6 +166,17 @@ public final class RootNode extends AbstractNode {
                 new PropertiesPanel( project.getLookup().lookup( NodeJSProjectProperties.class ) ).showDialog();
             }
         } );
+        final LibrariesResolver resolver = getLookup().lookup( Project.class ).getLookup().lookup( LibrariesResolver.class );
+        if (resolver.hasMissingLibraries()) {
+            actions.add(new AbstractAction(NbBundle.getMessage(RootNode.class, "RESOLVE_LIBRARIES")){
+
+                @Override
+                public void actionPerformed ( ActionEvent e ) {
+                    resolver.install();
+                }
+            });
+        }
+
         return actions.toArray( new Action[actions.size()] );
     }
 
@@ -166,5 +206,10 @@ public final class RootNode extends AbstractNode {
             Logger.getLogger( RootNode.class.getName() ).log( Level.INFO,
                     "Project dir disappeared: {0}", project ); //NOI18N
         }
+    }
+
+    @Override
+    public void stateChanged ( ChangeEvent e ) {
+        fireIconChange();
     }
 }

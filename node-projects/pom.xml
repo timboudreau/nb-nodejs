@@ -25,11 +25,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
     <parent>
         <artifactId>netbeans-nodejs</artifactId>
         <groupId>org.netbeans.modules</groupId>
-        <version>2.12</version>
+        <version>2.17</version>
     </parent>
     <packaging>nbm</packaging>
     <artifactId>nodejs</artifactId>
-    <version>2.12</version>
 
     <name>NodeJS Projects</name>
     <description>

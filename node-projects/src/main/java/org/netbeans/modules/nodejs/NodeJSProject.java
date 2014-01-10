@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import java.awt.EventQueue;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -38,6 +39,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.Sources;
@@ -83,12 +85,15 @@ import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
 import org.openide.nodes.FilterNode;
 import org.openide.nodes.Node;
+import org.openide.util.ChangeSupport;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.Lookups;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  *
@@ -116,7 +121,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     private final Lookup lookup = Lookups.fixed( this, logicalView,
             new NodeJSProjectProperties( this ), classpath, sources,
             new NodeJsEncodingQuery(), registry, metadata,
-            new PlatformProvider());
+            new PlatformProvider(), new LibrariesResolverImpl() );
 
     @SuppressWarnings ("LeakingThisInConstructor")
     NodeJSProject ( FileObject dir, ProjectState state ) {
@@ -125,18 +130,118 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
         metadata.addPropertyChangeListener( this );
     }
 
+    private class LibrariesResolverImpl implements LibrariesResolver, Runnable {
+        private final ChangeSupport supp = new ChangeSupport( this );
+        private final RequestProcessor.Task installTask = RequestProcessor.getDefault().create( this );
+        private final Checker checker = new Checker();
+        private final RequestProcessor.Task checkTask = RequestProcessor.getDefault().create( checker );
+        private Boolean hasMissing;
+
+        @Override
+        public void install () {
+            installTask.schedule( 100 );
+        }
+
+        private void setHasMissing ( boolean nue ) {
+            Boolean old;
+            synchronized ( this ) {
+                old = hasMissing;
+                hasMissing = nue;
+            }
+            System.out.println( "setHasMissing " + old + " -> " + nue );
+            if (old == null || !old.equals( nue )) {
+                EventQueue.invokeLater( new Runnable() {
+
+                    @Override
+                    public void run () {
+                        System.out.println( "Fire change on eq" );
+                        supp.fireChange();
+                    }
+
+                } );
+            }
+        }
+
+        private synchronized Boolean hasMissing () {
+            return hasMissing;
+        }
+
+        private class Checker implements Runnable {
+
+            @Override
+            public void run () {
+                Map<String, Object> deps = metadata.getMap( "dependencies" );
+                System.out.println( "GOT DEPS MAP " + deps );
+                if (deps == null || deps.isEmpty()) {
+                    System.out.println( "Bail 1" );
+                    setHasMissing( false );
+                    return;
+                }
+                FileObject node_modules = getProjectDirectory().getFileObject( "node_modules" );
+                if (node_modules == null) {
+                    System.out.println( "Bail 2" );
+                    setHasMissing( !deps.isEmpty() );
+                    return;
+                }
+                Set<String> names = new HashSet<>();
+                for (FileObject kid : node_modules.getChildren()) {
+                    if (kid.isFolder()) {
+                        names.add( kid.getNameExt() );
+                    }
+                }
+                System.out.println( "Folders found " + names );
+                Set<String> declared = new HashSet<>( deps.keySet() );
+                declared.removeAll( names );
+                System.out.println( "REMAINING " + declared );
+                setHasMissing( !declared.isEmpty() );
+            }
+        }
+
+        @Override
+        public void addChangeListener ( ChangeListener cl ) {
+            supp.addChangeListener( cl );
+        }
+
+        @Override
+        public void removeChangeListener ( ChangeListener cl ) {
+            supp.removeChangeListener( cl );
+        }
+
+        @Override
+        public boolean hasMissingLibraries () {
+            Boolean result = hasMissing();
+            if (result == null) {
+                checkTask.schedule( 10 );
+            }
+            System.out.println( "HasMissing " + result );
+            return result == null ? false : result;
+        }
+
+        @Override
+        public synchronized void run () {
+            System.out.println( "Run npm install" );
+            String result = Npm.getDefault().run( FileUtil.toFile( getProjectDirectory() ), "install" );
+            
+            InputOutput io = IOProvider.getDefault().getIO( getName() + " - npm install", true );
+            io.select();
+            io.getOut().print( result );
+            io.getOut().close();
+            checkTask.schedule( 250 );
+        }
+    }
+
     @Override
     public FileObject getMainFile () {
-        return getLookup().lookup( NodeJSProjectProperties.class).getMainFile();
+        return getLookup().lookup( NodeJSProjectProperties.class ).getMainFile();
     }
-    
+
     private final class PlatformProvider extends NodeJSPlatformProvider {
 
         @Override
         public NodeJSExecutable get () {
             return NodeJSExecutable.getDefault();
         }
-        
+
     }
 
     ProjectState state () {
@@ -425,18 +530,18 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     @Override
     public String[] getPrivilegedTemplates () {
         return new String[]{
-                    "Templates/javascript/Empty.js", //NOI18N
-                    "Templates/javascript/Module.js", //NOI18N
-                    "Templates/javascript/HelloWorld.js", //NOI18N
-                    "Templates/Other/javascript.js", //NOI18N
-                    "Templates/Other/file", //NOI18N
-                    "Templates/Web/Html.html", //NOI18N
-                    "Templates/Web/Xhtml.html", //NOI18N
-                    "Templates/Web/CascadingStyleSheet.css", //NOI18N
-                    "Templates/Other/json.json", //NOI18N
-                    "Templates/Other/Folder", //NOI18N
-                    "Templates/javscript/package.json" //NOI18N
-                };
+            "Templates/javascript/Empty.js", //NOI18N
+            "Templates/javascript/Module.js", //NOI18N
+            "Templates/javascript/HelloWorld.js", //NOI18N
+            "Templates/Other/javascript.js", //NOI18N
+            "Templates/Other/file", //NOI18N
+            "Templates/Web/Html.html", //NOI18N
+            "Templates/Web/Xhtml.html", //NOI18N
+            "Templates/Web/CascadingStyleSheet.css", //NOI18N
+            "Templates/Other/json.json", //NOI18N
+            "Templates/Other/Folder", //NOI18N
+            "Templates/javscript/package.json" //NOI18N
+        };
     }
 
     @Override
@@ -452,7 +557,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             result.put( "project.license", license ); //NOI18N
             result.put( "license", license ); //NOI18N
         }
-        result.put( "port", "8080" /* XXX GET RID OF THIS */); //NOI18N
+        result.put( "port", "8080" /* XXX GET RID OF THIS */ ); //NOI18N
         return result;
     }
 
@@ -480,9 +585,9 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     public void removePropertyChangeListener ( PropertyChangeListener listener ) {
         supp.removePropertyChangeListener( listener );
     }
-    
-    public NodeJSExecutable exe() {
-        NodeJSPlatformProvider exe = getLookup().lookup(NodeJSPlatformProvider.class);
+
+    public NodeJSExecutable exe () {
+        NodeJSPlatformProvider exe = getLookup().lookup( NodeJSPlatformProvider.class );
         return exe.get();
     }
 
