@@ -61,7 +61,6 @@ public class StubsTest {
 
         copy( "package_1.json", "package.json", boo );
         copy( "boo.js", "boo.js", boo );
-        copy( "boo.js", "moo.js", boo );
 
         booDir = FileUtil.toFileObject( boo );
 
@@ -72,7 +71,7 @@ public class StubsTest {
     @After
     public void teardown () throws IOException {
         System.out.println( "PROJECT FO " + prjFo.getPath() );
-//        prjFo.delete();
+        prjFo.delete();
     }
 
     private void copy ( String name ) throws IOException {

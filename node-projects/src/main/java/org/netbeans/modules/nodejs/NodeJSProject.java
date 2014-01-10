@@ -1,4 +1,4 @@
-/* Copyright (C) 2014 Tim Boudreau
+/* Copyright (C) 2012 Tim Boudreau
 
  Permission is hereby granted, free of charge, to any person obtaining a copy 
  of this software and associated documentation files (the "Software"), to 
@@ -596,18 +596,18 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     @Override
     public String[] getPrivilegedTemplates () {
         return new String[]{
-            "Templates/javascript/Empty.js", //NOI18N
-            "Templates/javascript/Module.js", //NOI18N
-            "Templates/javascript/HelloWorld.js", //NOI18N
-            "Templates/Other/javascript.js", //NOI18N
-            "Templates/Other/file", //NOI18N
-            "Templates/Web/Html.html", //NOI18N
-            "Templates/Web/Xhtml.html", //NOI18N
-            "Templates/Web/CascadingStyleSheet.css", //NOI18N
-            "Templates/Other/json.json", //NOI18N
-            "Templates/Other/Folder", //NOI18N
-            "Templates/javscript/package.json" //NOI18N
-        };
+                    "Templates/javascript/Empty.js", //NOI18N
+                    "Templates/javascript/Module.js", //NOI18N
+                    "Templates/javascript/HelloWorld.js", //NOI18N
+                    "Templates/Other/javascript.js", //NOI18N
+                    "Templates/Other/file", //NOI18N
+                    "Templates/Web/Html.html", //NOI18N
+                    "Templates/Web/Xhtml.html", //NOI18N
+                    "Templates/Web/CascadingStyleSheet.css", //NOI18N
+                    "Templates/Other/json.json", //NOI18N
+                    "Templates/Other/Folder", //NOI18N
+                    "Templates/javscript/package.json" //NOI18N
+                };
     }
 
     @Override
@@ -623,7 +623,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             result.put( "project.license", license ); //NOI18N
             result.put( "license", license ); //NOI18N
         }
-        result.put( "port", "8080" /* XXX GET RID OF THIS */ ); //NOI18N
+        result.put( "port", "8080" /* XXX GET RID OF THIS */); //NOI18N
         return result;
     }
 
@@ -651,9 +651,9 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     public void removePropertyChangeListener ( PropertyChangeListener listener ) {
         supp.removePropertyChangeListener( listener );
     }
-
-    public NodeJSExecutable exe () {
-        NodeJSPlatformProvider exe = getLookup().lookup( NodeJSPlatformProvider.class );
+    
+    public NodeJSExecutable exe() {
+        NodeJSPlatformProvider exe = getLookup().lookup(NodeJSPlatformProvider.class);
         return exe.get();
     }
 
