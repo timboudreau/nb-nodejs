@@ -1,20 +1,20 @@
 /* Copyright (C) 2012 Tim Boudreau
 
- Permission is hereby granted, free of charge, to any person obtaining a copy 
- of this software and associated documentation files (the "Software"), to 
- deal in the Software without restriction, including without limitation the 
- rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- sell copies of the Software, and to permit persons to whom the Software is 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in all 
+ The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.ui2;
 
@@ -98,11 +98,18 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         return Children.create( new ProjectChildren( project ), true );
     }
 
+    @Override
+    public String getShortDescription () {
+        NodeJSProjectProperties props = getLookup().lookup( NodeJSProjectProperties.class );
+        String desc = props.getDescription();
+        return desc == null ? super.getShortDescription() : desc;
+    }
+
     private boolean listening;
 
     @Override
     public Image getIcon ( int type ) {
-        LibrariesResolver resolver = getLookup().lookup( Project.class ).getLookup().lookup( LibrariesResolver.class );
+        LibrariesResolver resolver = getLookup().lookup( LibrariesResolver.class );
         if (!listening) {
             listening = true;
             resolver.addChangeListener( WeakListeners.change( this, resolver ) );
@@ -110,7 +117,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         Image result = super.getIcon( type );
         if (resolver.hasMissingLibraries()) {
             Image badge = ImageUtilities.loadImage( MISSING_LIBRARIES_BADGE );
-            result = ImageUtilities.mergeImages( result , badge, 7, 7);
+            result = ImageUtilities.mergeImages( result , badge, 9, 9);
         }
         return result;
     }
@@ -168,7 +175,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         } );
         final LibrariesResolver resolver = getLookup().lookup( Project.class ).getLookup().lookup( LibrariesResolver.class );
         if (resolver.hasMissingLibraries()) {
-            actions.add(new AbstractAction(NbBundle.getMessage(RootNode.class, "RESOLVE_LIBRARIES")){
+            actions.add(new AbstractAction(NbBundle.getMessage(RootNode.class, "RESOLVE_LIBRARIES")){ //NOI18N
 
                 @Override
                 public void actionPerformed ( ActionEvent e ) {

@@ -28,6 +28,7 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.modules.nodejs.DefaultExecutable;
 import org.netbeans.modules.nodejs.options.NodePanel;
+import static org.netbeans.modules.nodejs.wizard.ProjectWizardKeys.WIZARD_PROP_DESCRIPTION_ESCAPED;
 import org.netbeans.modules.projecttemplates.GeneratedProject;
 import org.netbeans.modules.projecttemplates.ProjectCreator;
 import org.netbeans.spi.project.ui.templates.support.Templates;
@@ -78,11 +79,17 @@ public class ProjectWizardIterator implements WizardDescriptor.ProgressInstantia
         templateProperties.put( "author", NodePanel.getAuthor() );
         templateProperties.put( "email", NodePanel.getEmail() );
         templateProperties.put( "login", NodePanel.getLogin() );
-        if (Boolean.TRUE.equals( wiz.getProperty( ProjectWizardKeys.WIZARD_PROP_GENERATE_PACKAGE_JSON ) )) {
-            FileObject packageTemplate = FileUtil.getConfigFile( "Templates/javascript/package.json" ); //NOI18N
-            if (packageTemplate != null) {
-                gen.add( null, "package.json", packageTemplate, false ); //NOI18N
-            }
+        String desc = templateProperties.get( ProjectWizardKeys.WIZARD_PROP_DESCRIPTION );
+        if (desc == null) {
+            templateProperties.put( ProjectWizardKeys.WIZARD_PROP_DESCRIPTION,
+                    NbBundle.getMessage( ProjectWizardIterator.class, 
+                            "PLACEHOLDER_PROJECT_DESCRIPTION" ) ); //NOI18N
+            templateProperties.put( ProjectWizardKeys.WIZARD_PROP_DESCRIPTION_ESCAPED,
+                    NbBundle.getMessage( ProjectWizardIterator.class, 
+                            "PLACEHOLDER_PROJECT_DESCRIPTION" ) ); //NOI18N
+        } else {
+            templateProperties.put( WIZARD_PROP_DESCRIPTION_ESCAPED, 
+                    desc.replace( "\n", "\\n" ).replace( "\"", "\\\"" ) ); //NOI18N
         }
 
         GeneratedProject proj = gen.createProject( h, name, template, templateProperties );

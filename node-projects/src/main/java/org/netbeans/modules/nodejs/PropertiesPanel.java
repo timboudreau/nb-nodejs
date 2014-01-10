@@ -22,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
@@ -38,7 +40,6 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -49,9 +50,6 @@ public class PropertiesPanel extends javax.swing.JPanel {
     private final SwingValidationGroup g;
     private final NodeJSProjectProperties props;
 
-    /**
-     * Creates new form PropertiesPanel
-     */
     public PropertiesPanel ( NodeJSProjectProperties props ) {
         this.props = props;
         g = SwingValidationGroup.create();
@@ -63,6 +61,8 @@ public class PropertiesPanel extends javax.swing.JPanel {
         set( descriptionField, props.getDescription() );
         set( bugTrackerField, props.getBugTrackerURL() );
         set( commandLineField, props.getRunArguments() );
+        set( authorURLField, props.getAuthorURL() );
+        set( versionField, props.getVersion() );
         if ("null".equals( bugTrackerField.getText() )) {
             bugTrackerField.setText( "" );
         }
@@ -80,7 +80,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
         for (Iterator<String> it = l.iterator(); it.hasNext();) {
             sb.append( it.next() );
             if (it.hasNext()) {
-                sb.append( ", " );
+                sb.append( ", " ); //NOi18N
             }
         }
         set( keywordsField, sb.toString() );
@@ -89,8 +89,11 @@ public class PropertiesPanel extends javax.swing.JPanel {
         g.add( authorEmailField, new AllowNullValidator( StringValidators.EMAIL_ADDRESS ) );
         g.add( mainFileField, new FileRelativeValidator() );
         g.add( commandLineField, new WhitespaceValidator() );
+        g.add( authorURLField, new AllowNullValidator( StringValidators.URL_MUST_BE_VALID ) );
+        g.add( versionField, new VersionValidator() );
     }
 
+    @Override
     public void addNotify () {
         super.addNotify();
         g.performValidation();
@@ -108,7 +111,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
 
         @Override
         public void validate ( Problems prblms, String string, String t ) {
-            if (t == null || "".equals( t.trim() )) {
+            if (t == null || "".equals( t.trim() )) { //NOI18N
                 return;
             }
             other.validate( prblms, string, t );
@@ -122,20 +125,21 @@ public class PropertiesPanel extends javax.swing.JPanel {
 
         @Override
         public void validate ( Problems prblms, String string, String model ) {
-            if (model == null || "".equals( model.trim() )) {
+            if (model == null || "".equals( model.trim() )) { //NOI18N
                 return;
             }
             FileObject root = props.project().getProjectDirectory();
             FileObject fo = root.getFileObject( model );
             boolean result = fo != null;
             if (!result) {
-                prblms.add( NbBundle.getMessage( PropertiesPanel.class, "MAIN_FILE_DOES_NOT_EXIST", model ) );
+                prblms.add( NbBundle.getMessage( PropertiesPanel.class, 
+                        "MAIN_FILE_DOES_NOT_EXIST", model ) ); //NOI18N
             }
         }
     }
 
     private static final class WhitespaceValidator extends AbstractValidator<String> {
-        private static final Pattern WHITESPACE = Pattern.compile( ".*\\s.*" );
+        private static final Pattern WHITESPACE = Pattern.compile( ".*\\s.*" ); //NOI18N
 
         WhitespaceValidator () {
             super( String.class );
@@ -144,7 +148,31 @@ public class PropertiesPanel extends javax.swing.JPanel {
         @Override
         public void validate ( Problems prblms, String string, String model ) {
             if (model != null && WHITESPACE.matcher( model ).matches()) {
-                prblms.add( NbBundle.getMessage( WhitespaceValidator.class, "INFO_MAIN_CLASS_WHITESPACE" ), Severity.INFO );
+                prblms.add( NbBundle.getMessage( WhitespaceValidator.class, 
+                        "INFO_MAIN_CLASS_WHITESPACE" ), Severity.INFO ); //NOI18N
+            }
+        }
+    }
+    
+    private static final class VersionValidator extends AbstractValidator<String> {
+        
+        VersionValidator() {
+            super( String.class );
+        }
+
+        @Override
+        public void validate ( Problems prblms, String string, String model ) {
+            if (model == null || model.trim().isEmpty()) {
+                return;
+            }
+            String[] parts = model.trim().split("\\.");
+            for (String part : parts) {
+                try {
+                    Integer.parseInt(part);
+                } catch (NumberFormatException e) {
+                    prblms.add( NbBundle.getMessage( WhitespaceValidator.class, 
+                            "INFO_VERSION_INVALID", part ), Severity.INFO ); //NOI18N
+                }
             }
         }
     }
@@ -162,11 +190,14 @@ public class PropertiesPanel extends javax.swing.JPanel {
         props.setDescription( descriptionField.getText().trim() );
         props.setKeywords( keywordsField.getText().trim() );
         props.setRunArguments( commandLineField.getText().trim() );
+        props.setAuthorURL( authorURLField.getText().trim() );
+        props.setVersion( versionField.getText().trim() );
         if (bugTrackerField.getText().trim().length() > 0) {
             try {
                 props.setBugTrackerURL( new URL( bugTrackerField.getText().trim() ) );
             } catch ( MalformedURLException ex ) {
-                Exceptions.printStackTrace( ex );
+                Logger.getLogger( PropertiesPanel.class.getName() ).log( Level.INFO, 
+                        "Bad bug url " + bugTrackerField.getText(), ex); //NOI18N
             }
         } else {
             props.setBugTrackerURL( null );
@@ -220,6 +251,10 @@ public class PropertiesPanel extends javax.swing.JPanel {
         commandLineField = new javax.swing.JTextField();
         commandLineLabel = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        authorURLLabel = new javax.swing.JLabel();
+        authorURLField = new javax.swing.JTextField();
+        versionLabel = new javax.swing.JLabel();
+        versionField = new javax.swing.JTextField();
 
         nameLabel.setLabelFor(nameField);
         nameLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.nameLabel.text")); // NOI18N
@@ -274,6 +309,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
         keywordsLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.keywordsLabel.text")); // NOI18N
 
         keywordsField.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.keywords.text")); // NOI18N
+        keywordsField.setToolTipText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.keywordsField.toolTipText")); // NOI18N
         keywordsField.setName("keywords"); // NOI18N
 
         commandLineField.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.commandLineField.text")); // NOI18N
@@ -289,6 +325,18 @@ public class PropertiesPanel extends javax.swing.JPanel {
             }
         });
 
+        authorURLLabel.setLabelFor(authorURLField);
+        authorURLLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.authorURLLabel.text")); // NOI18N
+
+        authorURLField.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.author.url.text")); // NOI18N
+        authorURLField.setName("author.url"); // NOI18N
+
+        versionLabel.setLabelFor(versionField);
+        versionLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.versionLabel.text")); // NOI18N
+
+        versionField.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.version.text")); // NOI18N
+        versionField.setName("version"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -296,7 +344,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(status, javax.swing.GroupLayout.DEFAULT_SIZE, 622, Short.MAX_VALUE)
+                    .addComponent(status, javax.swing.GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(nameLabel)
@@ -307,22 +355,28 @@ public class PropertiesPanel extends javax.swing.JPanel {
                             .addComponent(licenseLabel)
                             .addComponent(mainFileLabel)
                             .addComponent(keywordsLabel)
-                            .addComponent(commandLineLabel))
+                            .addComponent(commandLineLabel)
+                            .addComponent(authorURLLabel)
+                            .addComponent(versionLabel))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                            .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                            .addComponent(authorNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                            .addComponent(authorEmailField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                            .addComponent(bugTrackerField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                            .addComponent(licenseField, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(keywordsField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-                            .addComponent(commandLineField, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .addComponent(authorNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .addComponent(authorEmailField, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .addComponent(bugTrackerField, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .addComponent(keywordsField, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
+                            .addComponent(commandLineField, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(mainFileField, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton1)
-                                .addGap(6, 6, 6)))))
+                                .addGap(6, 6, 6))
+                            .addComponent(authorURLField)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(licenseField, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(versionField))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -332,19 +386,27 @@ public class PropertiesPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(nameLabel)
                     .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(versionLabel)
+                    .addComponent(versionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(descriptionLabel)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(authorNameLabel)
                     .addComponent(authorNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(authorEmailLabel)
                     .addComponent(authorEmailField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(authorURLLabel)
+                    .addComponent(authorURLField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bugTrackerField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bugTrackerLabel))
@@ -357,15 +419,15 @@ public class PropertiesPanel extends javax.swing.JPanel {
                     .addComponent(mainFileLabel)
                     .addComponent(mainFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(keywordsLabel)
                     .addComponent(keywordsField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(commandLineField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(commandLineLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addComponent(status)
                 .addContainerGap())
         );
@@ -383,6 +445,8 @@ private void browseMainFile(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b
     private javax.swing.JLabel authorEmailLabel;
     private javax.swing.JTextField authorNameField;
     private javax.swing.JLabel authorNameLabel;
+    private javax.swing.JTextField authorURLField;
+    private javax.swing.JLabel authorURLLabel;
     private javax.swing.JTextField bugTrackerField;
     private javax.swing.JLabel bugTrackerLabel;
     private javax.swing.JTextField commandLineField;
@@ -400,5 +464,7 @@ private void browseMainFile(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JLabel status;
+    private javax.swing.JTextField versionField;
+    private javax.swing.JLabel versionLabel;
     // End of variables declaration//GEN-END:variables
 }

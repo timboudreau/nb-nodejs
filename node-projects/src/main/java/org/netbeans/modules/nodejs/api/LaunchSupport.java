@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.ExecutionService;
@@ -40,13 +42,17 @@ public abstract class LaunchSupport {
     }
 
     public Future<Integer> doRun ( final FileObject file, String args ) throws IOException {
+        String[] cmdLineArgs = getLaunchCommandLine( true );
+        return runWithOutputWindow( cmdLineArgs, file, args );
+    }
+
+    public Future<Integer> runWithOutputWindow ( String[] cmdLineArgs, final FileObject file, String args ) throws IOException {
         for (Rerunner r : rerunners.values()) {
             if (file.equals( r.file )) {
                 r.stopOldProcessIfRunning();
             }
         }
         File f = FileUtil.toFile( file );
-        String[] cmdLineArgs = getLaunchCommandLine( true );
         if (cmdLineArgs == null) {
             StatusDisplayer.getDefault().setStatusText(
                     NbBundle.getMessage( DefaultExecutable.class, "NO_BINARY" ) ); //NOI18N
@@ -154,7 +160,8 @@ public abstract class LaunchSupport {
                 BuildExecutionSupport.registerFinishedItem( this );
             }
         }
-
+        
+        public static final int PROCESS_QUIET_MILLISECONDS = 150;
         public void stopOldProcessIfRunning () {
             Process p;
             synchronized ( this ) {
@@ -167,9 +174,10 @@ public abstract class LaunchSupport {
                 try {
                     p.waitFor();
                     //Give the OS a chance to release the socket
-                    Thread.sleep( 300 );
+                    Thread.sleep( PROCESS_QUIET_MILLISECONDS );
                 } catch ( InterruptedException ex ) {
-                    Exceptions.printStackTrace( ex );
+                    Logger.getLogger( Rerunner.class.getName() ).log( Level.INFO, 
+                            "Exception in quiet period before rerun" ); //NOI18N
                 }
             }
         }

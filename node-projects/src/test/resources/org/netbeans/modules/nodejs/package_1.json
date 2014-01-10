@@ -9,8 +9,7 @@
     },
     "author" : {
         "name" : "Moe Blow",
-        "email" : "moe@mail.example",
-        "url" : "http://stuff.example"
+        "email" : "moe@mail.example"
     },
     "license" : "MIT/X11",
     "engine" : { "node" : ">=0.5.0" }

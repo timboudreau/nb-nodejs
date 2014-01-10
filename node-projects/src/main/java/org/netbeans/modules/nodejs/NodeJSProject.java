@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 Tim Boudreau
+/* Copyright (C) 2014 Tim Boudreau
 
  Permission is hereby granted, free of charge, to any person obtaining a copy 
  of this software and associated documentation files (the "Software"), to 
@@ -36,10 +36,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.event.ChangeListener;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.Sources;
@@ -91,6 +96,7 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.WeakListeners;
 import org.openide.util.lookup.Lookups;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
@@ -130,7 +136,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
         metadata.addPropertyChangeListener( this );
     }
 
-    private class LibrariesResolverImpl implements LibrariesResolver, Runnable {
+    private class LibrariesResolverImpl implements LibrariesResolver, Runnable, FileChangeRegistry.FileObserver, PropertyChangeListener {
         private final ChangeSupport supp = new ChangeSupport( this );
         private final RequestProcessor.Task installTask = RequestProcessor.getDefault().create( this );
         private final Checker checker = new Checker();
@@ -142,19 +148,27 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             installTask.schedule( 100 );
         }
 
+        void init () {
+            FileChangeRegistry reg = getLookup().lookup( FileChangeRegistry.class );
+            reg.registerInterest( NodeJSProjectFactory.NODE_MODULES_FOLDER, this );
+            ProjectMetadata md = getLookup().lookup( ProjectMetadata.class );
+            md.addPropertyChangeListener( WeakListeners.propertyChange( this, md ));
+        }
+
         private void setHasMissing ( boolean nue ) {
             Boolean old;
             synchronized ( this ) {
                 old = hasMissing;
                 hasMissing = nue;
             }
-            System.out.println( "setHasMissing " + old + " -> " + nue );
+            if (old == null) {
+                init();
+            }
             if (old == null || !old.equals( nue )) {
                 EventQueue.invokeLater( new Runnable() {
 
                     @Override
                     public void run () {
-                        System.out.println( "Fire change on eq" );
                         supp.fireChange();
                     }
 
@@ -166,20 +180,29 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             return hasMissing;
         }
 
+        @Override
+        public void onEvent ( FileChangeRegistry.EventType type, String path ) {
+            checkTask.schedule( 2000 );
+        }
+
+        @Override
+        public void propertyChange ( PropertyChangeEvent evt ) {
+            if (null == evt.getPropertyName() || "dependencies".equals(evt.getPropertyName())) {
+                checkTask.schedule( 2000 );
+            }
+        }
+
         private class Checker implements Runnable {
 
             @Override
             public void run () {
-                Map<String, Object> deps = metadata.getMap( "dependencies" );
-                System.out.println( "GOT DEPS MAP " + deps );
+                Map<String, Object> deps = metadata.getMap( "dependencies" ); //NOI18N
                 if (deps == null || deps.isEmpty()) {
-                    System.out.println( "Bail 1" );
                     setHasMissing( false );
                     return;
                 }
-                FileObject node_modules = getProjectDirectory().getFileObject( "node_modules" );
+                FileObject node_modules = getProjectDirectory().getFileObject( NodeJSProjectFactory.NODE_MODULES_FOLDER );
                 if (node_modules == null) {
-                    System.out.println( "Bail 2" );
                     setHasMissing( !deps.isEmpty() );
                     return;
                 }
@@ -189,10 +212,8 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
                         names.add( kid.getNameExt() );
                     }
                 }
-                System.out.println( "Folders found " + names );
                 Set<String> declared = new HashSet<>( deps.keySet() );
                 declared.removeAll( names );
-                System.out.println( "REMAINING " + declared );
                 setHasMissing( !declared.isEmpty() );
             }
         }
@@ -213,20 +234,24 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             if (result == null) {
                 checkTask.schedule( 10 );
             }
-            System.out.println( "HasMissing " + result );
             return result == null ? false : result;
         }
 
         @Override
         public synchronized void run () {
-            System.out.println( "Run npm install" );
-            String result = Npm.getDefault().run( FileUtil.toFile( getProjectDirectory() ), "install" );
-            
-            InputOutput io = IOProvider.getDefault().getIO( getName() + " - npm install", true );
-            io.select();
-            io.getOut().print( result );
-            io.getOut().close();
-            checkTask.schedule( 250 );
+            ProgressHandle handle = ProgressHandleFactory.createHandle( 
+                    NbBundle.getMessage( NodeJSProject.class, "RUNNING_NPM_INSTALL", getName() ) ); //NOI18N
+            handle.start();
+            try {
+                String result = Npm.getDefault().run( FileUtil.toFile( getProjectDirectory() ), "install" ); //NOI18N
+                InputOutput io = IOProvider.getDefault().getIO( getName() + " - npm install", true ); //NOI18N
+                io.select();
+                io.getOut().print( result );
+                io.getOut().close();
+                checkTask.schedule( 3000 );
+            } finally {
+                handle.finish();
+            }
         }
     }
 
@@ -298,7 +323,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             }
             final FileObject toRun = main;
             if (toRun != null && toRun.isValid()) {
-                RequestProcessor.getDefault().post( new Runnable() {
+                final Runnable runIt = new Runnable() {
                     @Override
                     public void run () {
                         try {
@@ -307,7 +332,48 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
                             throw new IllegalArgumentException( ex );
                         }
                     }
-                } );
+                };
+                Object o = metadata.getMap().get( "dependencies" ); //NOI18N
+                boolean needRunNPMInstall = false;
+                if (o instanceof Map<?, ?>) {
+                    FileObject nodeModules = getProjectDirectory().getFileObject( NodeJSProjectFactory.NODE_MODULES_FOLDER );
+                    needRunNPMInstall = nodeModules == null;
+                    if (needRunNPMInstall) {
+                        String msg = NbBundle.getMessage( NodeJSProject.class, "DETAIL_RUN_NPM_INSTALL" );
+                        String title = NbBundle.getMessage( NodeJSProject.class, "TITLE_RUN_NPM_INSTALL" );
+                        NotifyDescriptor nd = new NotifyDescriptor.Confirmation( msg, title, NotifyDescriptor.YES_NO_CANCEL_OPTION );
+                        Object dlgResult = DialogDisplayer.getDefault().notify( nd );
+                        needRunNPMInstall = NotifyDescriptor.YES_OPTION.equals( dlgResult );
+                        if (NotifyDescriptor.CANCEL_OPTION.equals( dlgResult )) {
+                            return;
+                        }
+                    }
+                }
+                if (needRunNPMInstall) {
+                    RequestProcessor.getDefault().post( new Runnable() {
+                        @Override
+                        public void run () {
+                            try {
+                                Future<Integer> f = Npm.getDefault().runWithOutputWindow( FileUtil.toFile( getProjectDirectory() ), "install" );
+                                int exitCode = f.get();
+                                if (exitCode == 0) {
+                                    runIt.run();
+                                } else {
+                                    StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "NPM_INSTALL_FAILED" ) );
+                                }
+                            } catch ( IOException ex ) {
+                                Exceptions.printStackTrace( ex );
+                            } catch ( InterruptedException ex ) {
+                                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "RUN_CANCELLED" ) );
+                                Logger.getLogger( NodeJSProject.class.getName() ).log( Level.INFO, "Interrupted running NPM", ex );
+                            } catch ( ExecutionException ex ) {
+                                Exceptions.printStackTrace( ex );
+                            }
+                        }
+                    } );
+                } else {
+                    RequestProcessor.getDefault().post( runIt );
+                }
             } else {
                 Toolkit.getDefaultToolkit().beep();
             }

@@ -51,6 +51,14 @@
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
             </file>
         </folder>
+        <folder name="Other">
+            <file name="README.md" url="templates/README.md">
+                <attr name="position" intvalue="31"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.nodejs.Bundle#README.md"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+            </file>
+        </folder>
     </folder>
     <folder name="Project">
         <folder name="NodeJS">

@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 Tim Boudreau
+/* Copyright (C) 2014 Tim Boudreau
 
  Permission is hereby granted, free of charge, to any person obtaining a copy 
  of this software and associated documentation files (the "Software"), to 
@@ -40,8 +40,8 @@ import org.openide.util.RequestProcessor;
 public final class FileChangeRegistry {
     private final Project project;
     private final FileChangeAdapter adapter = new A();
-    private final Set<Entry> entries = new HashSet<Entry>();
-    private final Set<Event> pendingEvents = new HashSet<Event>();
+    private final Set<Entry> entries = new HashSet<>();
+    private final Set<Event> pendingEvents = new HashSet<>();
     private final RequestProcessor processor;
     private final RequestProcessor.Task task;
     private final int delay;
@@ -83,47 +83,37 @@ public final class FileChangeRegistry {
 
         @Override
         public void run () {
-            Set<Entry> toRemove = new HashSet<Entry>();
+            Set<Entry> toRemove = new HashSet<>();
             Set<Entry> entries;
             synchronized ( lock ) {
-                entries = new HashSet<Entry>( FileChangeRegistry.this.entries );
+                entries = new HashSet<>( FileChangeRegistry.this.entries );
             }
             while ( drainPendingEvents( deliver ) ) {
                 delivering = true;
                 for (Event evt : deliver) {
-                    System.out.println( "Deliver " + evt + " to " + entries.size() + " entries" );
                     for (Iterator<Entry> it = entries.iterator(); it.hasNext();) {
                         Entry en = it.next();
                         if (en.get() == null) {
-                            System.out.println( "Remove " + en );
                             toRemove.add( en );
                         } else if (en.matches( evt )) {
                             try {
-                                System.out.println( " Deliver to " + en + " " );
                                 String eventPath = evt.path;
                                 String entryPath = en.relativePath;
-                                System.out.println( "EventPath for " + en + " " + eventPath );
-                                System.out.println( "EntryPath for " + en + " " + entryPath );
                                 String deliverPath;
                                 if (eventPath.equals( entryPath )) {
-                                    System.out.println( "a" );
                                     deliverPath = null;
                                 } else {
                                     if (eventPath.startsWith( entryPath )) {
-                                        System.out.println( "b" );
                                         deliverPath = eventPath.substring( entryPath.length(), eventPath.length() );
                                     } else {
-                                        System.out.println( "c" );
                                         deliverPath = eventPath;
                                     }
                                 }
                                 if (deliverPath != null && !deliverPath.isEmpty() && deliverPath.charAt( 0 ) == '/') {
                                     deliverPath = deliverPath.substring( 1 );
                                 }
-                                System.out.println( "DeliverPath for " + en + " " + deliverPath );
                                 boolean delivered = en.deliver( evt, deliverPath );
                                 if (!delivered) {
-                                    System.out.println( "Remove " + en );
                                     toRemove.add( en );
                                 }
                             } catch ( Exception e ) {
@@ -168,19 +158,15 @@ public final class FileChangeRegistry {
     private void startListening () {
         if (listening.compareAndSet( false, true )) {
             hold = project.getProjectDirectory();
-            System.out.println( "Start listening on " + hold.getPath() );
             if (hold.isValid()) {
                 hold.addRecursiveListener( adapter );
                 hold.addFileChangeListener( adapter );
-                System.out.println( "listener attached" );
             }
         }
     }
 
     private void stopListening () {
         if (listening.compareAndSet( true, false )) {
-            System.out.println( "Stop listening on " + hold.getPath() );
-            Thread.dumpStack();
             if (hold != null && hold.isValid()) {
                 hold.removeRecursiveListener( adapter );
                 hold.removeFileChangeListener( adapter );
@@ -224,7 +210,6 @@ public final class FileChangeRegistry {
     private final class A extends FileChangeAdapter {
         @Override
         public void fileFolderCreated ( FileEvent fe ) {
-            System.out.println( "fileFolderCreated " + fe.getFile().getPath() );
             FileObject fo = project.getProjectDirectory();
             String evtPath = FileUtil.getRelativePath( fo, fe.getFile() );
             fe.runWhenDeliveryOver( new R( EventType.NEW_CHILD, evtPath ) );
@@ -232,7 +217,6 @@ public final class FileChangeRegistry {
 
         @Override
         public void fileDataCreated ( FileEvent fe ) {
-            System.out.println( "fileDataCreated " + fe.getFile().getPath() );
             FileObject fo = project.getProjectDirectory();
             String evtPath = FileUtil.getRelativePath( fo, fe.getFile() );
             fe.runWhenDeliveryOver( new R( EventType.NEW_CHILD, evtPath ) );
@@ -240,7 +224,6 @@ public final class FileChangeRegistry {
 
         @Override
         public void fileChanged ( FileEvent fe ) {
-            System.out.println( "fileChanged " + fe.getFile().getPath() );
             FileObject fo = project.getProjectDirectory();
             String evtPath = FileUtil.getRelativePath( fo, fe.getFile() );
             fe.runWhenDeliveryOver( new R( EventType.CHANGE, evtPath ) );
@@ -248,7 +231,6 @@ public final class FileChangeRegistry {
 
         @Override
         public void fileDeleted ( FileEvent fe ) {
-            System.out.println( "fileDeleted " + fe.getFile().getPath() );
             FileObject fo = project.getProjectDirectory();
             String evtPath = FileUtil.getRelativePath( fo, fe.getFile() );
             fe.runWhenDeliveryOver( new R( EventType.DELETED, evtPath ) );
@@ -257,18 +239,16 @@ public final class FileChangeRegistry {
         @Override
         public void fileRenamed ( FileRenameEvent fe ) {
             //Check if the root has been renamed, and if so, reattach
-            System.out.println( "fileRenamed " + fe.getFile().getPath() + " from " + fe.getName() + "." + fe.getExt() );
             String originalName = fe.getName() + "." + fe.getExt();
             FileObject fo = fe.getFile();
             String pth = FileUtil.getRelativePath( project.getProjectDirectory(), fo.getParent() );
 
             String origPath = pth + '/' + originalName; //NOI18N
             String newPath = pth + '/' + fo.getNameExt(); //NOI18N
-            System.out.println( "Origpath " + origPath + " newPath " + newPath );
-            Set<Entry> newEntries = new HashSet<Entry>();
+            Set<Entry> newEntries = new HashSet<>();
             Set<Entry> entries;
             synchronized ( lock ) {
-                entries = new HashSet<Entry>( FileChangeRegistry.this.entries );
+                entries = new HashSet<>( FileChangeRegistry.this.entries );
             }
             for (Iterator<Entry> it = entries.iterator(); it.hasNext();) {
                 Entry e = it.next();
@@ -279,14 +259,12 @@ public final class FileChangeRegistry {
                     String curr = e.relativePath;
                     if (curr.equals( origPath )) {
                         Entry nue = new Entry( obs, newPath );
-                        System.out.println( "Replace " + e + " with " + nue );
                         newEntries.add( nue );
                         it.remove();
                     } else if (curr.startsWith( origPath )) {
                         String ss = curr.substring( origPath.length(), curr.length() );
                         Entry nue = new Entry( obs, newPath + "/" + ss );
                         newEntries.add( nue );
-                        System.out.println( "Replace " + e + " with " + nue );
                         it.remove();
                     }
                 }
@@ -318,7 +296,7 @@ public final class FileChangeRegistry {
         private final String relativePath;
 
         public Entry ( FileObserver obs, String relativePath ) {
-            this.obs = new WeakReference<FileObserver>( obs );
+            this.obs = new WeakReference<>( obs );
             this.relativePath = relativePath;
         }
 

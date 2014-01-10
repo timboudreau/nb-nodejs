@@ -9,6 +9,6 @@ http.createServer(function (req, res) {
         'Content-Type': 'text/plain; charset=UTF-8'
     });
     
-    res.end('Hello World.\n');
+    res.end('Hello from ${projectName}.\n');
     
 }).listen(${port}, "");

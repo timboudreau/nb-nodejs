@@ -21,7 +21,6 @@ package org.netbeans.modules.nodejs;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,8 +37,8 @@ import java.util.logging.Logger;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectManager;
+import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
 import org.netbeans.modules.nodejs.json.SimpleJSONParser;
 import org.netbeans.modules.nodejs.json.SimpleJSONParser.JsonException;
@@ -76,9 +75,10 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         this.project = project;
     }
 
+    @Override
     public String getValue ( String key ) {
         if (key.indexOf( '.' ) > 0) {
-            List<String> keys = new ArrayList<String>( Arrays.asList( key.split( "\\." ) ) );
+            List<String> keys = new ArrayList<>( Arrays.asList( key.split( "\\." ) ) );
             Object result = getValue( getMap(), keys );
             synchronized ( this ) {
                 if (map.isEmpty()) {
@@ -92,9 +92,9 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
     }
 
     public List<?> getValues ( String key ) {
-        Object result = null;
+        Object result;
         if (key.indexOf( '.' ) > 0) {
-            List<String> keys = new ArrayList<String>( Arrays.asList( key.split( "\\." ) ) );
+            List<String> keys = new ArrayList<>( Arrays.asList( key.split( "\\." ) ) );
             result = getValue( getMap(), keys );
         } else {
             result = getMap().get( key );
@@ -143,6 +143,24 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         return o.toString();
     }
 
+    @Override
+    public void clearValue ( String key ) {
+        if (key.indexOf( "." ) >= 0) {
+            List<String> keys = new ArrayList<>( Arrays.asList( key.split( "\\." ) ) );
+            String last = keys.get( keys.size() - 1 );
+            keys.remove( keys.size() - 1 );
+            Map<?, ?> result = (Map<?, ?>) getValue( getMap(), keys );
+            if (result != null) {
+                if (result.containsKey( last )) {
+                    Object o = result.remove( last );
+                    if (o != null) {
+                        queueSave();
+                    }
+                }
+            }
+        }
+    }
+
     @SuppressWarnings ("unchecked")
     private Object getValue ( Map<String, Object> m, List<String> keys ) {
         String next = keys.remove( 0 );
@@ -166,7 +184,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
     private Map<String, Object> load ( FileObject fo ) throws IOException {
         if (!fo.isValid()) {
             Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.WARNING, "Project root dir became invalid" );
-            return new LinkedHashMap<String, Object>();
+            return new LinkedHashMap<>();
         }
         lock.lock();
         boolean err = false;
@@ -186,7 +204,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             } catch ( FileStateInvalidException inv ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.INFO,
                         "Invalid package.json" );
-                return new LinkedHashMap<String, Object>();
+                return new LinkedHashMap<>();
             } catch ( IOException ex ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.INFO,
                         "Bad package.json in " + fo.getPath() + " - will try with permissive parser", ex );
@@ -195,7 +213,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
                 SimpleJSONParser p = new SimpleJSONParser( true ); //permissive mode - will parse as much as it can
                 if (!fo.isValid()) {
                     Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.WARNING, "Project root dir became invalid" );
-                    return new LinkedHashMap<String, Object>();
+                    return new LinkedHashMap<>();
                 }
                 in = fo.getInputStream();
                 try {
@@ -210,16 +228,16 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
                 }
             } catch ( FileStateInvalidException e ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.WARNING, "Project root dir became invalid" );
-                return new LinkedHashMap<String, Object>();
+                return new LinkedHashMap<>();
             } catch ( JsonException ex ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.INFO,
                         "Bad package.json in " + fo.getPath(), ex );
-                return new LinkedHashMap<String, Object>();
+                return new LinkedHashMap<>();
             }
         } finally {
             lock.unlock();
             if (err) {
-                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( ProjectMetadataImpl.class, "ERROR_PARSING_PACKAGE_JSON", project.getLookup().lookup( ProjectInformation.class ).getDisplayName() ), 3 );
+                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( ProjectMetadataImpl.class, "ERROR_PARSING_PACKAGE_JSON", ProjectUtils.getInformation( project).getDisplayName() ), 3 );
             }
         }
     }
@@ -234,7 +252,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         if (result == null) {
             final FileObject fo = project.getProjectDirectory().getFileObject( NodeJSProjectFactory.PACKAGE_JSON );
             if (fo == null) {
-                return new LinkedHashMap<String, Object>();
+                return new LinkedHashMap<>();
             }
             if (!listening) {
                 listening = true;
@@ -248,7 +266,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             } catch ( IOException ioe ) {
                 Logger.getLogger( ProjectMetadataImpl.class.getName() ).log( Level.WARNING,
                         "Problems loading " + fo.getPath(), ioe );
-                result = new LinkedHashMap<String, Object>();
+                result = new LinkedHashMap<>();
             }
         }
         return result;
@@ -267,7 +285,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
     public void setValue ( String key, List<String> values ) {
         Object oldValue;
         if (key.indexOf( '.' ) > 0) {
-            List<String> keys = new ArrayList<String>( Arrays.asList( key.split( "\\." ) ) );
+            List<String> keys = new ArrayList<>( Arrays.asList( key.split( "\\." ) ) );
             oldValue = setValues( getMap(), keys, values );
         } else {
             oldValue = getMap().put( key, values );
@@ -278,10 +296,11 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         }
     }
 
+    @Override
     public void setValue ( String key, String value ) {
         Object oldValue;
         if (key.indexOf( '.' ) > 0) {
-            List<String> keys = new ArrayList<String>( Arrays.asList( key.split( "\\." ) ) );
+            List<String> keys = new ArrayList<>( Arrays.asList( key.split( "\\." ) ) );
             oldValue = setValue( getMap(), keys, value );
         } else {
             oldValue = getMap().put( key, value );
@@ -318,7 +337,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             }
             if (nue == null) {
                 //if the value was a string, we clobber it here - careful
-                nue = new LinkedHashMap<String, Object>();
+                nue = new LinkedHashMap<>();
                 queueSave();
             }
             if (value == null) {
@@ -341,7 +360,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         } else {
             Map<String, Object> nue = (Map<String, Object>) m.get( nextKey );
             if (nue == null) {
-                nue = new LinkedHashMap<String, Object>();
+                nue = new LinkedHashMap<>();
                 queueSave();
             }
             if (values == null) {
@@ -353,6 +372,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         }
     }
 
+    @Override
     public String toString () {
         try {
             return ObjectMapperProvider.newObjectMapper().writeValueAsString( map );
@@ -361,13 +381,35 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             return SimpleJSONParser.out( getMap() ).toString();
         }
     }
+    
+    private static Map<String,Object> copyPruningEmptyValues(Map<String,Object> map) {
+        Map<String,Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String,Object> e : map.entrySet()) {
+            Object o = e.getValue();
+            // Prune empty values
+            if (o == null || o instanceof String && ((String) o).trim().isEmpty()) {
+                continue;
+            }
+            if (o instanceof Map<?,?>) {
+                Map<String,Object> m = (Map<String,Object>) o;
+                Map<String,Object> copy = copyPruningEmptyValues(m);
+                if (!copy.isEmpty()) {
+                    result.put( e.getKey(), copy);
+                }
+            } else {
+                result.put(e.getKey(), e.getValue());
+            }
+        }
+        return result;
+    }
 
+    @Override
     public void save () throws IOException {
         assert !EventQueue.isDispatchThread();
         if (this.map != null) {
             if (hasErrors) {
-                NotifyDescriptor nd = new NotifyDescriptor.Confirmation( NbBundle.getMessage( ProjectMetadataImpl.class, "OVERWRITE_BAD_JSON", project.getLookup().lookup( ProjectInformation.class ).getDisplayName() ) );
-                if (!DialogDisplayer.getDefault().notify( nd ).equals( nd.OK_OPTION )) {
+                NotifyDescriptor nd = new NotifyDescriptor.Confirmation( NbBundle.getMessage( ProjectMetadataImpl.class, "OVERWRITE_BAD_JSON", ProjectUtils.getInformation( project).getDisplayName() ) );
+                if (!DialogDisplayer.getDefault().notify( nd ).equals( NotifyDescriptor.OK_OPTION )) {
                     synchronized ( this ) {
                         map = null;
                     }
@@ -395,20 +437,19 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
                         ProjectManager.mutex().writeAccess( new Mutex.ExceptionAction<Void>() {
                             @Override
                             public Void run () throws Exception {
-                                CharSequence seq = ObjectMapperProvider.newObjectMapper().writeValueAsString( map );
-                                OutputStream out = writeTo.getOutputStream();
-                                try {
-                                    ByteArrayInputStream in = new ByteArrayInputStream( seq.toString().getBytes( "UTF-8" ) );
-                                    FileUtil.copy( in, out );
+                                Map<String,Object> writeOut = copyPruningEmptyValues(map);
+                                CharSequence seq = ObjectMapperProvider.newObjectMapper()
+                                        .writeValueAsString( writeOut );
+                                try (OutputStream out = writeTo.getOutputStream()) {
+                                    out.write(seq.toString().getBytes( "UTF-8" ));
+                                    out.write( "\n".getBytes( "UTF-8" ) );
                                     task.cancel();
-                                    System.out.println( "Saved project metadata" );
                                 } catch ( FileAlreadyLockedException e ) {
                                     Logger.getLogger( ProjectMetadataImpl.class.getName() ).log(
                                             Level.INFO, "Could not save properties for {0} - queue for later",
                                             project.getProjectDirectory().getPath() );
                                     queueSave();
                                 } finally {
-                                    out.close();
                                     synchronized ( ProjectMetadataImpl.this ) { //tests
                                         ProjectMetadataImpl.this.notifyAll();
                                     }
@@ -445,7 +486,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             into.putAll( m );
             supp.firePropertyChange( null, null, null );
         } else {
-            assert map != into : "Cannot add map to itself";
+            assert m != into : "Cannot add map to itself";
             into.put( key, m );
             supp.firePropertyChange( key, null, null );
         }
@@ -466,6 +507,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
     }
 
     class R implements Runnable {
+        @Override
         public void run () {
             try {
                 save();
@@ -480,6 +522,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         task.schedule( 1000 );
     }
 
+    @Override
     public void addPropertyChangeListener ( PropertyChangeListener pcl ) {
         supp.addPropertyChangeListener( WeakListeners.propertyChange( pcl, supp ) );
     }

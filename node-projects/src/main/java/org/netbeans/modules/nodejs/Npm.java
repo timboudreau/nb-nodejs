@@ -19,12 +19,20 @@
 package org.netbeans.modules.nodejs;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Future;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import org.netbeans.modules.nodejs.api.LaunchSupport;
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileChooserBuilder;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -42,8 +50,8 @@ public class Npm {
         "/opt/bin/npm",
         "/opt/local/bin/npm",
         "C:" + File.separatorChar + "Program Files" + File.separatorChar + "nodejs" + File.separatorChar + "npm",
-        System.getProperty("user.home") + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm",
-        "C:" + File.separatorChar + "Users" + File.separatorChar + System.getProperty("user.name") + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm"
+        System.getProperty( "user.home" ) + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm",
+        "C:" + File.separatorChar + "Users" + File.separatorChar + System.getProperty( "user.name" ) + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm"
     };
     private String npm;
 
@@ -73,6 +81,19 @@ public class Npm {
             result = "npm";
         }
         return result;
+    }
+
+    public Future<Integer> runWithOutputWindow ( File workingDir, String... cmd ) throws IOException {
+        LaunchSupport supp = new LaunchSupport( NodeJSExecutable.getDefault() ) {
+            @Override
+            protected String[] getLaunchCommandLine ( boolean showDialog ) {
+                return new String[]{exe()};
+            }
+        };
+        List<String> l = new LinkedList<>();
+        l.add( exe() );
+        l.addAll( Arrays.asList( cmd ) );
+        return supp.runWithOutputWindow( l.toArray( new String[l.size()] ), FileUtil.toFileObject( FileUtil.normalizeFile( workingDir ) ), "");
     }
 
     public String run ( File workingDir, String... cmd ) {

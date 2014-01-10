@@ -1,6 +1,6 @@
 {
     "name": "${projectName}",
-    "description": "(pending)",
+    "description": "${description_escaped}",
     "version": "0.0.1",
     "main": "./${projectName}.js",
     "author": {
@@ -16,6 +16,6 @@
         "url": "git://github.com/${login}/${projectName}.git"
     },
     "bugs": {
-        "web": "http://github.com/${login}/${projectName}/issues"
+        "url": "http://github.com/${login}/${projectName}/issues"
     }
 }

@@ -131,21 +131,15 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
             if (port != null) {
                 portField.setText( port );
             }
-            Boolean gen = (Boolean) settings.getProperty( ProjectWizardKeys.WIZARD_PROP_GENERATE_PACKAGE_JSON );
-            if (gen == null) {
-                packageJsonBox.setSelected( true );
-            } else {
-                packageJsonBox.setSelected( gen );
-            }
         }
 
         @Override
         public void storeSettings ( WizardDescriptor settings ) {
             settings.putProperty( ProjectWizardKeys.WIZARD_PROP_PROJECT_NAME, nameField.getText() );
             settings.putProperty( ProjectWizardKeys.WIZARD_PROP_PORT, portField.getText() );
+            settings.putProperty( ProjectWizardKeys.WIZARD_PROP_DESCRIPTION, descriptionField.getText() );
             settings.putProperty( ProjectWizardKeys.WIZARD_PROP_PROJECT_DIR, getProposedProjectDir() );
             saveFolder( getProposedProjectDir() );
-            settings.putProperty( ProjectWizardKeys.WIZARD_PROP_GENERATE_PACKAGE_JSON, packageJsonBox.isSelected() );
         }
     };
     private final ChangeSupport changeSupport = new ChangeSupport( pnl );
@@ -220,7 +214,6 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
         nameField.setName( nameLabel.getText() );
         portField.setName( portLabel.getText() );
         createInField.setName( createInLabel.getText() );
-        packageJsonBox.setVisible( false ); //we now use package.json as primary metadata
     }
 
     static final class ParentMustExistValidator extends AbstractValidator<String> {
@@ -262,7 +255,9 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
         browseButton = new javax.swing.JButton();
         licenseLabel = new javax.swing.JLabel();
         licenseCombo = new javax.swing.JComboBox();
-        packageJsonBox = new javax.swing.JCheckBox();
+        descriptionLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        descriptionField = new javax.swing.JTextArea();
 
         nameLabel.setLabelFor(nameField);
         nameLabel.setText(org.openide.util.NbBundle.getMessage(ProjectWizardPanel.class, "ProjectWizardPanel.nameLabel.text")); // NOI18N
@@ -282,7 +277,7 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
             }
         });
 
-        portField.setText("" + DefaultExecutable.get().getDefaultPort());
+        portField.setText("" + org.netbeans.modules.nodejs.DefaultExecutable.get().getDefaultPort());
 
         createInLabel.setLabelFor(createInLabel);
         createInLabel.setText(org.openide.util.NbBundle.getMessage(ProjectWizardPanel.class, "ProjectWizardPanel.createInLabel.text")); // NOI18N
@@ -306,18 +301,22 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
 
         licenseCombo.setModel(createLicensesModel());
 
-        packageJsonBox.setSelected(true);
-        packageJsonBox.setText(org.openide.util.NbBundle.getMessage(ProjectWizardPanel.class, "ProjectWizardPanel.packageJsonBox.text")); // NOI18N
+        descriptionLabel.setLabelFor(descriptionField);
+        descriptionLabel.setText(org.openide.util.NbBundle.getMessage(ProjectWizardPanel.class, "ProjectWizardPanel.descriptionLabel.text")); // NOI18N
+
+        descriptionField.setColumns(20);
+        descriptionField.setRows(5);
+        jScrollPane1.setViewportView(descriptionField);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(packageJsonBox)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(nameLabel)
                             .addComponent(portLabel)
@@ -327,11 +326,14 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(portField, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(createInField, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                                .addComponent(createInField, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(browseButton))
-                            .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
-                            .addComponent(licenseCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                            .addComponent(licenseCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(descriptionLabel)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -354,9 +356,11 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(licenseCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(licenseLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(packageJsonBox)
-                .addContainerGap(164, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(descriptionLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -382,11 +386,13 @@ public class ProjectWizardPanel extends JPanel implements DocumentListener {
     private javax.swing.JButton browseButton;
     private javax.swing.JTextField createInField;
     private javax.swing.JLabel createInLabel;
+    private javax.swing.JTextArea descriptionField;
+    private javax.swing.JLabel descriptionLabel;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox licenseCombo;
     private javax.swing.JLabel licenseLabel;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
-    private javax.swing.JCheckBox packageJsonBox;
     private javax.swing.JTextField portField;
     private javax.swing.JLabel portLabel;
     // End of variables declaration//GEN-END:variables
