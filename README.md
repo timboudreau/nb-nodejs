@@ -71,6 +71,12 @@ The plugin is built using [Maven](http://mojo.codehaus.org/nbm-maven/nbm-maven-p
     cd node-projects
     mvn install nbm:nbm
 
+Projects In This Repository
+---------------------------
+
+The main NodeJS plugin is the [node-projects](node-projects) plugin.  There is also the skeleton of a Node platform
+for the Java/Nashorn-based AvatarJS project, which is still embryonic, and pending projects to develop code completion.
+
 License
 -------
 Sources are licensed under the [MIT license](http://en.wikipedia.org/wiki/MIT_License), 
