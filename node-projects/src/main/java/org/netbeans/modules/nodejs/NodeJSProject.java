@@ -19,7 +19,6 @@
 package org.netbeans.modules.nodejs;
 
 import java.awt.EventQueue;
-import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
@@ -52,6 +51,7 @@ import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.api.validation.adapters.DialogBuilder;
 import org.netbeans.api.validation.adapters.DialogBuilder.DialogType;
 import org.netbeans.modules.nodejs.api.MainFileProvider;
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.libraries.LibrariesPanel;
 import org.netbeans.modules.nodejs.node.NodeJSLogicalViewProvider;
 import org.netbeans.modules.nodejs.registry.FileChangeRegistry;
@@ -110,12 +110,12 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
         PrivilegedTemplates, RecommendedTemplates, CreateFromTemplateAttributesProvider,
         PropertyChangeListener, MoveOrRenameOperationImplementation,
         DeleteOperationImplementation, CopyOperationImplementation, MainFileProvider {
-    public static final String NBRUN = ".nbrun";
+    public static final String NBRUN = ".nbrun"; //NOI18N
     private final FileObject dir;
     private final ProjectState state;
     public static final String MAIN_FILE_COMMAND = "set_main_file"; //NOI18N
     public static final String PROPERTIES_COMMAND = "project_properties"; //NOI18N
-    public static final String LIBRARIES_COMMAND = "libs";
+    public static final String LIBRARIES_COMMAND = "libs"; //NOI18N
     public static final String CLOSE_COMMAND = "close"; //NOI18N
     static final Logger LOGGER = Logger.getLogger( NodeJSProject.class.getName() );
     private final ProjectMetadataImpl metadata = new ProjectMetadataImpl( this );
@@ -128,6 +128,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             new NodeJSProjectProperties( this ), classpath, sources,
             new NodeJsEncodingQuery(), registry, metadata,
             new PlatformProvider(), new LibrariesResolverImpl() );
+    private static final RequestProcessor NODE_JS_PROJECT_THREAD_POOL = new RequestProcessor("NodeJS", 3); //NOI18N
 
     @SuppressWarnings ("LeakingThisInConstructor")
     NodeJSProject ( FileObject dir, ProjectState state ) {
@@ -138,9 +139,9 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     private class LibrariesResolverImpl implements LibrariesResolver, Runnable, FileChangeRegistry.FileObserver, PropertyChangeListener {
         private final ChangeSupport supp = new ChangeSupport( this );
-        private final RequestProcessor.Task installTask = RequestProcessor.getDefault().create( this );
+        private final RequestProcessor.Task installTask = NODE_JS_PROJECT_THREAD_POOL.create( this );
         private final Checker checker = new Checker();
-        private final RequestProcessor.Task checkTask = RequestProcessor.getDefault().create( checker );
+        private final RequestProcessor.Task checkTask = NODE_JS_PROJECT_THREAD_POOL.create( checker );
         private Boolean hasMissing;
 
         @Override
@@ -339,8 +340,8 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
                     FileObject nodeModules = getProjectDirectory().getFileObject( NodeJSProjectFactory.NODE_MODULES_FOLDER );
                     needRunNPMInstall = nodeModules == null;
                     if (needRunNPMInstall) {
-                        String msg = NbBundle.getMessage( NodeJSProject.class, "DETAIL_RUN_NPM_INSTALL" );
-                        String title = NbBundle.getMessage( NodeJSProject.class, "TITLE_RUN_NPM_INSTALL" );
+                        String msg = NbBundle.getMessage( NodeJSProject.class, "DETAIL_RUN_NPM_INSTALL" ); //NOI18N
+                        String title = NbBundle.getMessage( NodeJSProject.class, "TITLE_RUN_NPM_INSTALL" ); //NOI18N
                         NotifyDescriptor nd = new NotifyDescriptor.Confirmation( msg, title, NotifyDescriptor.YES_NO_CANCEL_OPTION );
                         Object dlgResult = DialogDisplayer.getDefault().notify( nd );
                         needRunNPMInstall = NotifyDescriptor.YES_OPTION.equals( dlgResult );
@@ -350,29 +351,29 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
                     }
                 }
                 if (needRunNPMInstall) {
-                    RequestProcessor.getDefault().post( new Runnable() {
+                    NODE_JS_PROJECT_THREAD_POOL.post( new Runnable() {
                         @Override
                         public void run () {
                             try {
-                                Future<Integer> f = Npm.getDefault().runWithOutputWindow( FileUtil.toFile( getProjectDirectory() ), "install" );
+                                Future<Integer> f = Npm.getDefault().runWithOutputWindow( FileUtil.toFile( getProjectDirectory() ), "install" ); //NOI18N
                                 int exitCode = f.get();
                                 if (exitCode == 0) {
                                     runIt.run();
                                 } else {
-                                    StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "NPM_INSTALL_FAILED" ) );
+                                    StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "NPM_INSTALL_FAILED" ) ); //NOI18N
                                 }
                             } catch ( IOException ex ) {
                                 Exceptions.printStackTrace( ex );
                             } catch ( InterruptedException ex ) {
-                                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "RUN_CANCELLED" ) );
-                                Logger.getLogger( NodeJSProject.class.getName() ).log( Level.INFO, "Interrupted running NPM", ex );
+                                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "RUN_CANCELLED" ) ); //NOI18N
+                                Logger.getLogger( NodeJSProject.class.getName() ).log( Level.INFO, "Interrupted running NPM", ex ); //NOI18N
                             } catch ( ExecutionException ex ) {
                                 Exceptions.printStackTrace( ex );
                             }
                         }
                     } );
                 } else {
-                    RequestProcessor.getDefault().post( runIt );
+                    NODE_JS_PROJECT_THREAD_POOL.post( runIt );
                 }
             } else {
                 Toolkit.getDefaultToolkit().beep();
