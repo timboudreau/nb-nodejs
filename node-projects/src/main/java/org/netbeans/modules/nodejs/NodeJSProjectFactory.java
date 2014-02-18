@@ -126,9 +126,13 @@ public class NodeJSProjectFactory implements ProjectFactory2 {
         }
         Iterator<NodeJSProject> i;
         synchronized ( this ) {
-            i = new HashSet<NodeJSProject>( cache ).iterator();
+            i = new HashSet<>( cache ).iterator();
         }
         fo = resolve( fo );
+        if (fo == null) {
+            // load in progress?
+            return null;
+        }
         NodeJSProject result = null;
         while ( i.hasNext() ) {
             NodeJSProject p = i.next();

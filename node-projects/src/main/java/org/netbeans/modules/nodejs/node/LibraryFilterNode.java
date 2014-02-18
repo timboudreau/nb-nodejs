@@ -302,6 +302,9 @@ final class LibraryFilterNode extends FilterNode {
         }
         if (isFileNode( getOriginal() )) {
             DataObject dob = getOriginal().getLookup().lookup( DataObject.class );
+            if (dob == null) {
+                return null;
+            }
             sb.append( dob.getName() );
         } else {
             sb.append( getDisplayName() );
