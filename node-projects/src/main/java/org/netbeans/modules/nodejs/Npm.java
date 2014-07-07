@@ -50,6 +50,7 @@ public class Npm {
         "/opt/bin/npm",
         "/opt/local/bin/npm",
         "C:" + File.separatorChar + "Program Files" + File.separatorChar + "nodejs" + File.separatorChar + "npm",
+        "C:" + File.separatorChar + "Program Files" + File.separatorChar + "nodejs" + File.separatorChar + "npm.cmd",
         System.getProperty( "user.home" ) + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm",
         "C:" + File.separatorChar + "Users" + File.separatorChar + System.getProperty( "user.name" ) + File.separatorChar + "AppData" + File.separatorChar + "Roaming" + File.separatorChar + "npm"
     };
