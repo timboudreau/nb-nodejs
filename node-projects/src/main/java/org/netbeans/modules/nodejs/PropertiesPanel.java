@@ -29,6 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.validation.adapters.DialogDescriptorAdapter;
+import org.netbeans.modules.nodejs.forks.EmailAddressValidator;
+import org.netbeans.modules.nodejs.forks.UrlValidator;
 import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problems;
@@ -84,12 +86,12 @@ public class PropertiesPanel extends javax.swing.JPanel {
             }
         }
         set( keywordsField, sb.toString() );
-        g.add( bugTrackerField, new AllowNullValidator( StringValidators.URL_MUST_BE_VALID ) );
+        g.add( bugTrackerField, new AllowNullValidator( new UrlValidator() ) );
         g.add( nameField, StringValidators.REQUIRE_NON_EMPTY_STRING );
-        g.add( authorEmailField, new AllowNullValidator( StringValidators.EMAIL_ADDRESS ) );
+        g.add( authorEmailField, new AllowNullValidator( new EmailAddressValidator() ) );
         g.add( mainFileField, new FileRelativeValidator() );
         g.add( commandLineField, new WhitespaceValidator() );
-        g.add( authorURLField, new AllowNullValidator( StringValidators.URL_MUST_BE_VALID ) );
+        g.add( authorURLField, new AllowNullValidator( new UrlValidator() ) );
         g.add( versionField, new VersionValidator() );
     }
 

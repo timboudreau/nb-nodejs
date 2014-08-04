@@ -43,7 +43,7 @@ public class StubsTest {
 
     @Before
     public void setup () throws Exception {
-        File tmp = new File( System.getProperty( "java.io.tmpdir" ) );
+        File tmp = new File( System.getProperty( "java.io.tmpdir" ) ).getCanonicalFile();
         prjdir = new File( tmp, "test-" + System.currentTimeMillis() );
         assertTrue( prjdir.getAbsolutePath(), prjdir.mkdirs() );
         for (String name : new String[]{"index.js", "other.js", "package.json"}) {

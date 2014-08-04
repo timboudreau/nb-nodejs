@@ -25,8 +25,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.project.Project;
+import org.netbeans.modules.nodejs.forks.EmailAddressValidator;
 import org.netbeans.validation.api.Problems;
-import org.netbeans.validation.api.builtin.stringvalidation.StringValidators;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
@@ -106,7 +106,7 @@ public class NodeJSProjectProperties {
     public void setAuthorEmail ( String email ) {
         if (email != null && !"".equals( email )) { //NOi18N
             Problems p = new Problems();
-            StringValidators.EMAIL_ADDRESS.validate( p, "email", email ); //NOI18N
+            new EmailAddressValidator().validate( p, "email", email ); //NOI18N
             if (p.hasFatal()) {
                 throw new IllegalArgumentException( p.getLeadProblem().getMessage() );
             }

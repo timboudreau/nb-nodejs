@@ -33,6 +33,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.nodejs.DefaultExecutable;
 import org.netbeans.modules.nodejs.Npm;
+import org.netbeans.modules.nodejs.forks.EmailAddressValidator;
 import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problem;
@@ -64,7 +65,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
         g.add( binaryField, ValidatorUtils.merge( StringValidators.REQUIRE_NON_EMPTY_STRING, ValidatorUtils.merge( StringValidators.FILE_MUST_EXIST, StringValidators.FILE_MUST_BE_FILE ) ) );
         g.add( sourcesField, new FileOrArchiveValidator() );
         g.add( authorField, StringValidators.REQUIRE_NON_EMPTY_STRING );
-        g.add( emailField, new AllowNullValidator( StringValidators.EMAIL_ADDRESS ) );
+        g.add( emailField, new AllowNullValidator( new EmailAddressValidator() ) );
         UiUtil.prepareComponents( this );
         portField.getDocument().addDocumentListener( this );
         binaryField.getDocument().addDocumentListener( this );
