@@ -16,10 +16,11 @@
  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
-package org.netbeans.modules.nodejs;
+package org.netbeans.modules.nodejs.api;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,6 +58,10 @@ public interface ProjectMetadata {
     public void addMap ( String key, Map<String, Object> m );
 
     public Map<String, Object> getMap ( String key );
-    
-    public void clearValue(String key);
+
+    public void clearValue ( String key );
+
+    public void addList ( String key, List<?> l );
+
+    public <T> T setValueAs ( String key, T obj );
 }

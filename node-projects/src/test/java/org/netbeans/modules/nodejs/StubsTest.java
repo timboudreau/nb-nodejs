@@ -1,5 +1,6 @@
 package org.netbeans.modules.nodejs;
 
+import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

@@ -15,6 +15,20 @@
             <groupId>org.netbeans.modules</groupId>
             <artifactId>nodejs</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.netbeans.modules</groupId>
+                    <artifactId>org-netbeans-modules-simple-project-templates</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.netbeans.external</groupId>
+                    <artifactId>ValidationAPI</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.netbeans.modules</groupId>
+                    <artifactId>org-netbeans-modules-swing-validation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -30,12 +44,23 @@
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-projectapi</artifactId>
+            <version>${netbeans-version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-filesystems</artifactId>
             <version>${netbeans-version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-modules</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-nodes</artifactId>
             <version>${netbeans-version}</version>
         </dependency>
         <dependency>
@@ -47,6 +72,18 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
             <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-awt</artifactId>
+            <version>${netbeans-version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-dialogs</artifactId>
+            <version>${netbeans-version}</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
@@ -64,9 +101,6 @@
                     <licensefile>license.txt</licensefile>
                     <homepageurl>https://github.com/timboudreau/nb-nodejs</homepageurl>
                     <author>Tim Boudreau</author>
-                    <publicPackages>
-                        <publicPackage>org.netbeans.modules.nodejs.api</publicPackage>
-                    </publicPackages>
                 </configuration>
                 <executions>
                     <execution>
@@ -88,5 +122,4 @@
             </plugin>
         </plugins>
     </build>
-    
 </project>

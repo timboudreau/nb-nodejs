@@ -21,8 +21,10 @@ package org.netbeans.modules.nodejs;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -83,18 +85,22 @@ public class Npm {
         }
         return result;
     }
-
+    
     public Future<Integer> runWithOutputWindow ( File workingDir, String... cmd ) throws IOException {
+        return runWithOutputWindow (workingDir, Collections.<String,String>emptyMap(), cmd);
+    }
+
+    public Future<Integer> runWithOutputWindow ( File workingDir, Map<String,String> env, String... cmd ) throws IOException {
         LaunchSupport supp = new LaunchSupport( NodeJSExecutable.getDefault() ) {
             @Override
-            protected String[] getLaunchCommandLine ( boolean showDialog ) {
+            protected String[] getLaunchCommandLine ( boolean showDialog, Map<String,String> env ) {
                 return new String[]{exe()};
             }
         };
         List<String> l = new LinkedList<>();
         l.add( exe() );
         l.addAll( Arrays.asList( cmd ) );
-        return supp.runWithOutputWindow( l.toArray( new String[l.size()] ), FileUtil.toFileObject( FileUtil.normalizeFile( workingDir ) ), "");
+        return supp.runWithOutputWindow( l.toArray( new String[l.size()] ), FileUtil.toFileObject( FileUtil.normalizeFile( workingDir ) ), env, "");
     }
 
     public String run ( File workingDir, String... cmd ) {

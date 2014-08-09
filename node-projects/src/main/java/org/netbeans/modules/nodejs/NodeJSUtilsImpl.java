@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import org.netbeans.modules.nodejs.api.NodeJSPlatformProvider;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import java.io.File;
 import java.io.IOException;

@@ -18,6 +18,8 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import org.netbeans.modules.nodejs.api.NodeJSPlatformProvider;
+import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Toolkit;

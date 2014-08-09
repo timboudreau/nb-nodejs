@@ -24,6 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -122,7 +124,7 @@ public final class DefaultExecutable extends NodeJSExecutable {
 
     private final LaunchSupport ls = new LaunchSupport( this ) {
         @Override
-        protected String[] getLaunchCommandLine ( boolean showDialog ) {
+        protected String[] getLaunchCommandLine ( boolean showDialog, Map<String,String> env ) {
             return new String[]{DefaultExecutable.this.getNodeExecutable( showDialog )};
         }
     };
@@ -164,7 +166,20 @@ public final class DefaultExecutable extends NodeJSExecutable {
     }
 
     static String runExternal ( File dir, String... cmdline ) {
+        return runExternal(dir, Collections.<String,String>emptyMap(), cmdline);
+    }
+
+    static String runExternal ( File dir, Map<String,String> env, String... cmdline ) {
         ProcessBuilder b = new ProcessBuilder( cmdline );
+        if (env != null && !env.isEmpty()) {
+            Map<String,String> realEnv = b.environment();
+            for (Map.Entry<String,String> e : env.entrySet()) {
+                String val = e.getValue();
+                if (val != null) {
+                    
+                }
+            }
+        }
         if (dir != null) {
             b.directory( dir );
         }

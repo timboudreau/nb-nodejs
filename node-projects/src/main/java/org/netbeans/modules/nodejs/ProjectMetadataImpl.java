@@ -18,12 +18,14 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,11 +33,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
@@ -237,7 +241,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         } finally {
             lock.unlock();
             if (err) {
-                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( ProjectMetadataImpl.class, "ERROR_PARSING_PACKAGE_JSON", ProjectUtils.getInformation( project).getDisplayName() ), 3 );
+                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( ProjectMetadataImpl.class, "ERROR_PARSING_PACKAGE_JSON", ProjectUtils.getInformation( project ).getDisplayName() ), 3 );
             }
         }
     }
@@ -372,6 +376,26 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         }
     }
 
+    public <T> T setValueAs ( String key, T obj ) {
+        ObjectMapper mapper = ObjectMapperProvider.newObjectMapper();
+        if (obj instanceof List || obj.getClass().isArray()) {
+            try {
+                List<?> l = mapper.readValue( mapper.writeValueAsBytes( obj ), List.class );
+                addList( key, l );
+            } catch ( IOException ex ) {
+                Exceptions.printStackTrace( ex );
+            }
+        } else {
+            try {
+                Map<String, Object> m = mapper.readValue( mapper.writeValueAsBytes( obj ), Map.class );
+                addMap( key, m );
+            } catch ( IOException ex ) {
+                Exceptions.printStackTrace( ex );
+            }
+        }
+        return obj;
+    }
+
     @Override
     public String toString () {
         try {
@@ -381,23 +405,23 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             return SimpleJSONParser.out( getMap() ).toString();
         }
     }
-    
-    private static Map<String,Object> copyPruningEmptyValues(Map<String,Object> map) {
-        Map<String,Object> result = new LinkedHashMap<>();
-        for (Map.Entry<String,Object> e : map.entrySet()) {
+
+    private static Map<String, Object> copyPruningEmptyValues ( Map<String, Object> map ) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> e : map.entrySet()) {
             Object o = e.getValue();
             // Prune empty values
             if (o == null || o instanceof String && ((String) o).trim().isEmpty()) {
                 continue;
             }
-            if (o instanceof Map<?,?>) {
-                Map<String,Object> m = (Map<String,Object>) o;
-                Map<String,Object> copy = copyPruningEmptyValues(m);
+            if (o instanceof Map<?, ?>) {
+                Map<String, Object> m = (Map<String, Object>) o;
+                Map<String, Object> copy = copyPruningEmptyValues( m );
                 if (!copy.isEmpty()) {
-                    result.put( e.getKey(), copy);
+                    result.put( e.getKey(), copy );
                 }
             } else {
-                result.put(e.getKey(), e.getValue());
+                result.put( e.getKey(), e.getValue() );
             }
         }
         return result;
@@ -408,7 +432,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
         assert !EventQueue.isDispatchThread();
         if (this.map != null) {
             if (hasErrors) {
-                NotifyDescriptor nd = new NotifyDescriptor.Confirmation( NbBundle.getMessage( ProjectMetadataImpl.class, "OVERWRITE_BAD_JSON", ProjectUtils.getInformation( project).getDisplayName() ) );
+                NotifyDescriptor nd = new NotifyDescriptor.Confirmation( NbBundle.getMessage( ProjectMetadataImpl.class, "OVERWRITE_BAD_JSON", ProjectUtils.getInformation( project ).getDisplayName() ) );
                 if (!DialogDisplayer.getDefault().notify( nd ).equals( NotifyDescriptor.OK_OPTION )) {
                     synchronized ( this ) {
                         map = null;
@@ -437,11 +461,11 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
                         ProjectManager.mutex().writeAccess( new Mutex.ExceptionAction<Void>() {
                             @Override
                             public Void run () throws Exception {
-                                Map<String,Object> writeOut = copyPruningEmptyValues(map);
+                                Map<String, Object> writeOut = copyPruningEmptyValues( map );
                                 CharSequence seq = ObjectMapperProvider.newObjectMapper()
                                         .writeValueAsString( writeOut );
                                 try (OutputStream out = writeTo.getOutputStream()) {
-                                    out.write(seq.toString().getBytes( "UTF-8" ));
+                                    out.write( seq.toString().getBytes( "UTF-8" ) );
                                     out.write( "\n".getBytes( "UTF-8" ) );
                                     task.cancel();
                                 } catch ( FileAlreadyLockedException e ) {
@@ -490,8 +514,18 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             into.put( key, m );
             supp.firePropertyChange( key, null, null );
         }
-        System.out.println( "METADATA NOW: " + into );
         queueSave();
+    }
+
+    @Override
+    public void addList ( String key, List<?> l ) {
+        Map into = getMap();
+        Object old = into.get( key );
+        into.put( key, l );
+        if (!Objects.equals( old, l )) {
+            supp.firePropertyChange( key, null, null );
+            queueSave();
+        }
     }
 
     @Override

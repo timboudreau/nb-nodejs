@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 Tim Boudreau
+/* Copyright (C) 2014 Tim Boudreau
 
  Permission is hereby granted, free of charge, to any person obtaining a copy 
  of this software and associated documentation files (the "Software"), to 
@@ -20,11 +20,17 @@ package org.netbeans.modules.avatar.platform;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.prefs.Preferences;
 import org.netbeans.api.java.platform.JavaPlatformManager;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
 import org.netbeans.modules.nodejs.api.LaunchSupport;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
+import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -33,6 +39,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
+import org.openide.util.Utilities;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -40,7 +47,7 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Tim Boudreau
  */
-@ServiceProvider(service=NodeJSExecutable.class, position = 10)
+@ServiceProvider(service = NodeJSExecutable.class, position = 10)
 public class AvatarPlatform extends NodeJSExecutable {
 
     public static final String AVATAR_JAR_RELATIVE_PATH = "avatar.jar"; //NOI18N
@@ -55,7 +62,7 @@ public class AvatarPlatform extends NodeJSExecutable {
                 return new File(val);
             }
         }
-        return InstalledFileLocator.getDefault().locate(AVATAR_JAR_RELATIVE_PATH, 
+        return InstalledFileLocator.getDefault().locate(AVATAR_JAR_RELATIVE_PATH,
                 AvatarPlatform.class.getPackage().getName(), false); //NOI18N
     }
 
@@ -66,21 +73,49 @@ public class AvatarPlatform extends NodeJSExecutable {
         return java == null ? "java" : FileUtil.toFile(java).getAbsolutePath(); //NOI18N
     }
 
+
     // LaunchSupport handles using the external execution API correctly for
     // running node, handling output line clicks and so forth
     private final LaunchSupport supp = new LaunchSupport(this) {
         private static final String LOOK_FOR_AVATAR = "LOOK_FOR_AVATAR"; //NOI18N
+
+        @Override
+        protected void populateEnv(Map<String, String> env, FileObject toRun, String args) {
+            // Look for a subsection in packate.json named "java", and see if there
+            // is an array of dependencies ala Maven - see https://github.com/timboudreau/jnpm
+            // for the spec for this.
+            // If yes, populate the CLASSPATH environment variable with them - these
+            // are Java libraries that need to be on the classpath because they are
+            // used by the Node project
+            Project project = FileOwnerQuery.getOwner(toRun);
+            if (project != null) { // could be a standalone js file
+                List<JavaDependency> deps = new LinkedList<>();
+                JavaDependency.find(project, deps);
+                // If we have some deps, populate $CLASSPATH
+                if (!deps.isEmpty()) {
+                    StringBuilder cp = new StringBuilder();
+                    for (JavaDependency dep : deps) {
+                        if (cp.length() > 0) {
+                            cp.append(File.pathSeparator);
+                        }
+                        cp.append(dep);
+                    }
+                    env.put("CLASSPATH", cp.toString());
+                }
+            }
+        }
+
         @Override
         @Messages(LOOK_FOR_AVATAR + "=Locate avatar.jar") //NOI18N
-        protected String[] getLaunchCommandLine(boolean showDialog) {
+        protected String[] getLaunchCommandLine(boolean showDialog, Map<String, String> env) {
             String java = javaCommandLine();
             File avatarJar = findAvatarJar();
             if (avatarJar == null) {
                 if (showDialog) {
                     avatarJar = new FileChooserBuilder(AvatarPlatform.class)
                             .setFilesOnly(true)
-                            .setTitle(NbBundle.getMessage(AvatarPlatform.class, 
-                                    LOOK_FOR_AVATAR)) //NOI18N
+                            .setTitle(NbBundle.getMessage(AvatarPlatform.class,
+                                            LOOK_FOR_AVATAR)) //NOI18N
                             .showOpenDialog();
                 }
                 if (avatarJar == null || !avatarJar.exists()) {
@@ -88,7 +123,16 @@ public class AvatarPlatform extends NodeJSExecutable {
                 } else {
                     Preferences p = NbPreferences.forModule(AvatarPlatform.class);
                     p.put(PREFS_KEY_AVATAR_JAR, avatarJar.getAbsolutePath());
-                    
+
+                }
+            } else {
+                File dir = avatarJar.getParentFile();
+                if (Utilities.isMac()) {
+                    env.put("DYLD_LIBRARY_PATH", dir.getAbsolutePath());
+                } else if (Utilities.isWindows()) {
+                    env.put("PATH", dir.getAbsolutePath());
+                } else { // Linux, Solaris
+                    env.put("LD_LIBRARY_PATH", dir.getAbsolutePath());
                 }
             }
             return new String[]{

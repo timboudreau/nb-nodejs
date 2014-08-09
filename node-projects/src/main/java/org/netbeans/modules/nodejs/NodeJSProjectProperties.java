@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

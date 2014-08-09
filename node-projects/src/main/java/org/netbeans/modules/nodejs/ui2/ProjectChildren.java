@@ -22,6 +22,7 @@ import java.awt.Image;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -32,9 +33,13 @@ import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
+import org.netbeans.modules.nodejs.api.NodeJSProjectChildNodeFactory;
 import org.netbeans.modules.nodejs.node.AddLibraryAction;
 import org.netbeans.modules.nodejs.node.LibrariesChildFactory;
 import org.netbeans.modules.nodejs.node.NodeJSLogicalViewProvider;
+import static org.netbeans.modules.nodejs.ui2.Key.IMPORTANT_FILES;
+import static org.netbeans.modules.nodejs.ui2.Key.LIBRARIES;
+import static org.netbeans.modules.nodejs.ui2.KeyType.SOURCES;
 import org.netbeans.spi.project.ui.LogicalViewProvider;
 import org.openide.filesystems.FileChangeAdapter;
 import org.openide.filesystems.FileEvent;
@@ -105,6 +110,8 @@ final class ProjectChildren extends ChildFactory.Detachable<Key<?>> {
         }
         toPopulate.add( Key.IMPORTANT_FILES );
         toPopulate.add( Key.LIBRARIES );
+        ChildNodeRegistry reg = Lookup.getDefault().lookup( ChildNodeRegistry.class );
+        reg.populateKeys( project, toPopulate );
         Collections.sort( toPopulate );
         return true;
     }
@@ -112,22 +119,31 @@ final class ProjectChildren extends ChildFactory.Detachable<Key<?>> {
     @Override
     protected Node createNodeForKey ( Key<?> key ) {
         ChildFactory<?> kids;
-        switch ( key.type() ) {
-            case IMPORTANT_FILES:
-                kids = new ImportantFilesChildFactory( project );
-                break;
-            case LIBRARIES:
-                kids = new LibrariesChildFactory( project );
-                break;
-            case SOURCES:
-                try {
-                    return createSourceNode( key );
-                } catch ( DataObjectNotFoundException ex ) {
-                    Logger.getLogger( ProjectChildren.class.getName() ).log(
-                            Level.FINE, "Data object disappeared", ex );
-                }
-            default:
-                throw new AssertionError( key );
+        if (key.type() instanceof KeyType) {
+            KeyType kt = (KeyType) key.type();
+            switch ( kt ) {
+                case IMPORTANT_FILES:
+                    kids = new ImportantFilesChildFactory( project );
+                    break;
+                case LIBRARIES:
+                    kids = new LibrariesChildFactory( project );
+                    break;
+                case SOURCES:
+                    try {
+                        return createSourceNode( key );
+                    } catch ( DataObjectNotFoundException ex ) {
+                        Logger.getLogger( ProjectChildren.class.getName() ).log(
+                                Level.FINE, "Data object disappeared", ex );
+                        return Node.EMPTY;
+                    }
+                default:
+                    throw new AssertionError( kt );
+            }
+        } else if (key.get() instanceof NodeJSProjectChildNodeFactory) {
+            NodeJSProjectChildNodeFactory val = (NodeJSProjectChildNodeFactory) key.get();
+            kids = val.createChildren( project );
+        } else {
+            throw new IllegalArgumentException( "Unknown key type " + key + " " + key.get().getClass().getName() ); //NOI18N
         }
         return new GenericNode( key, kids, project );
     }
@@ -194,6 +210,11 @@ final class ProjectChildren extends ChildFactory.Detachable<Key<?>> {
                 assert project != null;
                 NodeJSLogicalViewProvider l = project.getLookup().lookup( NodeJSLogicalViewProvider.class );
                 return new Action[]{new AddLibraryAction( NbBundle.getBundle( GenericNode.class ), project, l.getView() )};
+            } else if (key.get() instanceof NodeJSProjectChildNodeFactory) {
+                List<Action> l = new LinkedList<>();
+                NodeJSProjectChildNodeFactory f = (NodeJSProjectChildNodeFactory) key.get();
+                f.getActions( getLookup().lookup( Project.class ), l );
+                return l.toArray( new Action[l.size()] );
             }
             return new Action[0];
         }

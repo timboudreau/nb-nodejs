@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 Tim Boudreau
+/* Copyright (C) 2014 Tim Boudreau
 
  Permission is hereby granted, free of charge, to any person obtaining a copy 
  of this software and associated documentation files (the "Software"), to 
@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.ui2;
 
+import org.netbeans.modules.nodejs.api.KeyTypes;
 import java.awt.Image;
 import org.openide.filesystems.FileObject;
 
@@ -26,18 +27,18 @@ import org.openide.filesystems.FileObject;
  * @author Tim Boudreau
  */
 public class Key<T> implements Comparable<Key<?>> {
-    private final KeyType type;
+    private final KeyTypes type;
     private final T obj;
-    public static final Key<KeyType> IMPORTANT_FILES = new Key<KeyType>(
+    public static final Key<KeyType> IMPORTANT_FILES = new Key<>(
             KeyType.IMPORTANT_FILES, KeyType.IMPORTANT_FILES );
-    public static final Key<KeyType> LIBRARIES = new Key<KeyType>(
+    public static final Key<KeyType> LIBRARIES = new Key<>(
             KeyType.LIBRARIES, KeyType.LIBRARIES );
 
     Key ( FileObject obj ) {
         this( KeyType.SOURCES, (T) obj );
     }
 
-    private Key ( KeyType type, T obj ) {
+    Key ( KeyTypes type, T obj ) {
         this.type = type;
         this.obj = obj;
     }
@@ -55,7 +56,7 @@ public class Key<T> implements Comparable<Key<?>> {
         return type.getIcon();
     }
 
-    public KeyType type () {
+    public KeyTypes type () {
         return type;
     }
 
@@ -88,19 +89,13 @@ public class Key<T> implements Comparable<Key<?>> {
     @Override
     public int compareTo ( Key<?> o ) {
         if (o.type == type) {
-            switch ( type ) {
-                case SOURCES:
-                    return compareFileObjects( (FileObject) get(), (FileObject) o.get() );
-                case LIBRARIES:
-                    return 0;
-                case IMPORTANT_FILES:
-                    return 0;
-                default:
-                    throw new AssertionError();
+            if (type == KeyType.SOURCES) {
+                return compareFileObjects( (FileObject) get(), (FileObject) o.get() );
+            } else if (type == LIBRARIES || type == IMPORTANT_FILES) {
+                return 0;
             }
-        } else {
-            return Integer.valueOf( type.ordinal() ).compareTo( o.type.ordinal() );
         }
+        return Integer.valueOf( type.ordinal() ).compareTo( o.type.ordinal() );
     }
 
     private int compareFileObjects ( FileObject a, FileObject b ) {

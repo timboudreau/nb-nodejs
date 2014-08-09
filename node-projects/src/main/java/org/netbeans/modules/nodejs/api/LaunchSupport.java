@@ -42,11 +42,17 @@ public abstract class LaunchSupport {
     }
 
     public Future<Integer> doRun ( final FileObject file, String args ) throws IOException {
-        String[] cmdLineArgs = getLaunchCommandLine( true );
-        return runWithOutputWindow( cmdLineArgs, file, args );
+        Map<String, String> envToPopulate = new HashMap<>();
+        populateEnv( envToPopulate, file, args );
+        String[] cmdLineArgs = getLaunchCommandLine( true, envToPopulate );
+        return runWithOutputWindow( cmdLineArgs, file, envToPopulate, args );
     }
 
-    public Future<Integer> runWithOutputWindow ( String[] cmdLineArgs, final FileObject file, String args ) throws IOException {
+    protected void populateEnv ( Map<String, String> env, FileObject toRun, String args ) {
+
+    }
+
+    public Future<Integer> runWithOutputWindow ( String[] cmdLineArgs, final FileObject file, Map<String, String> env, String args ) throws IOException {
         for (Rerunner r : rerunners.values()) {
             if (file.equals( r.file )) {
                 r.stopOldProcessIfRunning();
@@ -60,6 +66,16 @@ public abstract class LaunchSupport {
             return null;
         }
         ExternalProcessBuilder b = new ExternalProcessBuilder( cmdLineArgs[0] );
+        for (Map.Entry<String, String> e : env.entrySet()) {
+            String value = e.getValue();
+            String orig = System.getenv( e.getKey() );
+            if (orig != null) {
+                char separator = File.pathSeparatorChar;
+                b = b.addEnvironmentVariable( e.getKey(), orig + separator + value );
+            } else {
+                b = b.addEnvironmentVariable( e.getKey(), value );
+            }
+        }
         for (int i = 1; i < cmdLineArgs.length; i++) {
             b = b.addArgument( cmdLineArgs[i] );
         }
@@ -91,7 +107,7 @@ public abstract class LaunchSupport {
         return rerunner.launch();
     }
 
-    protected abstract String[] getLaunchCommandLine ( boolean showDialog );
+    protected abstract String[] getLaunchCommandLine ( boolean showDialog, Map<String, String> env );
 
     public void stopRunningProcesses ( Lookup.Provider p ) {
         Project prj = p.getLookup().lookup( Project.class );
@@ -160,8 +176,9 @@ public abstract class LaunchSupport {
                 BuildExecutionSupport.registerFinishedItem( this );
             }
         }
-        
+
         public static final int PROCESS_QUIET_MILLISECONDS = 150;
+
         public void stopOldProcessIfRunning () {
             Process p;
             synchronized ( this ) {
@@ -176,7 +193,7 @@ public abstract class LaunchSupport {
                     //Give the OS a chance to release the socket
                     Thread.sleep( PROCESS_QUIET_MILLISECONDS );
                 } catch ( InterruptedException ex ) {
-                    Logger.getLogger( Rerunner.class.getName() ).log( Level.INFO, 
+                    Logger.getLogger( Rerunner.class.getName() ).log( Level.INFO,
                             "Exception in quiet period before rerun" ); //NOI18N
                 }
             }
