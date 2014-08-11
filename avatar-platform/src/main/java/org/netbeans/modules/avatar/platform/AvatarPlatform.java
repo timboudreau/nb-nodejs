@@ -28,6 +28,7 @@ import java.util.prefs.Preferences;
 import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
+import org.netbeans.modules.avatar.platform.api.BundledAvatarPlatform;
 import org.netbeans.modules.nodejs.api.LaunchSupport;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.api.ProjectMetadata;
@@ -52,8 +53,20 @@ public class AvatarPlatform extends NodeJSExecutable {
 
     public static final String AVATAR_JAR_RELATIVE_PATH = "avatar.jar"; //NOI18N
     public static final String PREFS_KEY_AVATAR_JAR = "avatar-jar"; //NOI18N
+    private BundledAvatarPlatform bundled;
+    
+    public AvatarPlatform() {
+        bundled = null;
+    }
+    
+    public AvatarPlatform(BundledAvatarPlatform p) {
+        this.bundled = p;
+    }
 
     private File findAvatarJar() {
+        if (bundled != null && bundled.jar() != null) {
+            return new File(bundled.jar());
+        }
         Preferences p = NbPreferences.forModule(AvatarPlatform.class);
         String val = p.get(PREFS_KEY_AVATAR_JAR, null);
         if (val != null) {
@@ -135,6 +148,7 @@ public class AvatarPlatform extends NodeJSExecutable {
                     env.put("LD_LIBRARY_PATH", dir.getAbsolutePath());
                 }
             }
+            System.out.println("ENV IS " + env);
             return new String[]{
                 java,
                 "-jar", //NOI18N
@@ -150,11 +164,28 @@ public class AvatarPlatform extends NodeJSExecutable {
 
     @Override
     public String getSourcesLocation() {
-        return null; //PENDING - can we provide sources?
+        return bundled == null ? bundled.sources() : null; //PENDING - can we provide sources?
     }
 
     @Override
     public void stopRunningProcesses(Lookup.Provider owner) {
         supp.stopRunningProcesses(owner);
+    }
+    
+    public String toString() {
+        return name() + " in " + findAvatarJar();
+    }
+    
+    static String jarToName(File avatarJar) {
+        return "avatar~" + (avatarJar == null ? "missing" : avatarJar.getAbsolutePath().replace('/', '-'));
+    }
+    
+    public String name() {
+        return jarToName(findAvatarJar());
+    }
+    
+    public String path() {
+        File result = findAvatarJar();
+        return result == null ? "" : result.getAbsolutePath();
     }
 }

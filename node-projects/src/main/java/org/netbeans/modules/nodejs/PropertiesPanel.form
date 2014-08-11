@@ -33,6 +33,7 @@
                           <Component id="commandLineLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="authorURLLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="versionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="platformsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -50,11 +51,12 @@
                               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                           </Group>
                           <Component id="authorURLField" max="32767" attributes="0"/>
+                          <Component id="versionField" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Component id="licenseField" min="-2" pref="138" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="versionField" max="32767" attributes="0"/>
+                          <Component id="platformsBox" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -121,7 +123,12 @@
                   <Component id="commandLineField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="commandLineLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="14" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="platformsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="platformsBox" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="24" max="32767" attributes="0"/>
               <Component id="status" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -370,6 +377,26 @@
         </Property>
         <Property name="name" type="java.lang.String" value="version" noResource="true"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="platformsLabel">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="platformsBox"/>
+        </Property>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/nodejs/Bundle.properties" key="PropertiesPanel.platformsLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="platformsBox">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="createPlatformsModel()" type="code"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="platformChanged"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

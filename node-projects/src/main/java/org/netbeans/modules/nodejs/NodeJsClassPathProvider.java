@@ -76,6 +76,7 @@ public final class NodeJsClassPathProvider implements ClassPathProvider {
 
     private static FileObject getNodeJsSources () {
         if (nodeStubsFO == null) {
+//            NodeJSPlatformProvider prov = project.getLo
             //XXX fixme - do a per-project implementation
             String loc = DefaultExecutable.get().getSourcesLocation();
             if (loc != null) {

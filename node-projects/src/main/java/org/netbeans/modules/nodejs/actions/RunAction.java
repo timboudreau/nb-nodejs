@@ -22,13 +22,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import org.netbeans.api.actions.Savable;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
+import org.netbeans.modules.nodejs.api.NodeJSPlatformProvider;
 import org.openide.loaders.DataObject;
 
 import org.openide.awt.ActionRegistration;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionID;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.RequestProcessor;
@@ -59,7 +63,19 @@ public final class RunAction implements ActionListener, Runnable {
             if (save != null) {
                 save.save();
             }
-            NodeJSExecutable.getDefault().run( context.getPrimaryFile(), null );
+            FileObject fo = context.getPrimaryFile();
+            Project p = FileOwnerQuery.getOwner( fo );
+            NodeJSExecutable exe = null;
+            if (p != null) {
+                NodeJSPlatformProvider pp = p.getLookup().lookup( NodeJSPlatformProvider.class );
+                if (pp != null) {
+                    exe = pp.get();
+                }
+            }
+            if (exe == null) {
+                exe = NodeJSExecutable.getDefault();
+            }
+            exe.run( context.getPrimaryFile(), null );
         } catch ( IOException ex ) {
             Exceptions.printStackTrace( ex );
         }

@@ -56,6 +56,26 @@ public final class DefaultExecutable extends NodeJSExecutable {
         instance = this;
     }
 
+    @Override
+    public String name () {
+        return "default";
+    }
+
+    @Override
+    public boolean isValid () {
+        String path = getNodeExecutable( false );
+        return new File( path ).exists();
+    }
+    
+    public String toString() {
+        return "System NodeJS";
+    }
+    
+    public String path() {
+        String result = this.getNodeExecutable( false );
+        return result == null ? "" : result;
+    }
+
     public static DefaultExecutable get () {
         if (instance == null) {
             NodeJSExecutable e = NodeJSExecutable.getDefault();
@@ -124,7 +144,7 @@ public final class DefaultExecutable extends NodeJSExecutable {
 
     private final LaunchSupport ls = new LaunchSupport( this ) {
         @Override
-        protected String[] getLaunchCommandLine ( boolean showDialog, Map<String,String> env ) {
+        protected String[] getLaunchCommandLine ( boolean showDialog, Map<String, String> env ) {
             return new String[]{DefaultExecutable.this.getNodeExecutable( showDialog )};
         }
     };
@@ -166,17 +186,17 @@ public final class DefaultExecutable extends NodeJSExecutable {
     }
 
     static String runExternal ( File dir, String... cmdline ) {
-        return runExternal(dir, Collections.<String,String>emptyMap(), cmdline);
+        return runExternal( dir, Collections.<String, String>emptyMap(), cmdline );
     }
 
-    static String runExternal ( File dir, Map<String,String> env, String... cmdline ) {
+    static String runExternal ( File dir, Map<String, String> env, String... cmdline ) {
         ProcessBuilder b = new ProcessBuilder( cmdline );
         if (env != null && !env.isEmpty()) {
-            Map<String,String> realEnv = b.environment();
-            for (Map.Entry<String,String> e : env.entrySet()) {
+            Map<String, String> realEnv = b.environment();
+            for (Map.Entry<String, String> e : env.entrySet()) {
                 String val = e.getValue();
                 if (val != null) {
-                    
+
                 }
             }
         }

@@ -20,17 +20,24 @@ package org.netbeans.modules.nodejs;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.validation.adapters.DialogDescriptorAdapter;
+import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.forks.EmailAddressValidator;
 import org.netbeans.modules.nodejs.forks.UrlValidator;
+import org.netbeans.modules.nodejs.platform.NodeJSPlatforms;
 import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problems;
@@ -101,6 +108,22 @@ public class PropertiesPanel extends javax.swing.JPanel {
         g.performValidation();
     }
 
+    private ComboBoxModel createPlatformsModel () {
+        DefaultComboBoxModel<NodeJSExecutable> result = new DefaultComboBoxModel<>();
+        String name = props.getPlatformName();
+        Set<NodeJSExecutable> seen = new HashSet<>();
+        for (NodeJSExecutable exe : NodeJSPlatforms.all()) {
+            if (!seen.contains( exe )) {
+                result.addElement( exe );
+                seen.add( exe );
+            }
+            if (Objects.equals( name, exe.name() )) {
+                result.setSelectedItem( exe );
+            }
+        }
+        return result;
+    }
+
     private static final class AllowNullValidator extends AbstractValidator<String> {
         //Some validators do not allow nulls - they should and a newer version
         //of the lib fixes this
@@ -134,7 +157,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
             FileObject fo = root.getFileObject( model );
             boolean result = fo != null;
             if (!result) {
-                prblms.add( NbBundle.getMessage( PropertiesPanel.class, 
+                prblms.add( NbBundle.getMessage( PropertiesPanel.class,
                         "MAIN_FILE_DOES_NOT_EXIST", model ) ); //NOI18N
             }
         }
@@ -150,15 +173,15 @@ public class PropertiesPanel extends javax.swing.JPanel {
         @Override
         public void validate ( Problems prblms, String string, String model ) {
             if (model != null && WHITESPACE.matcher( model ).matches()) {
-                prblms.add( NbBundle.getMessage( WhitespaceValidator.class, 
+                prblms.add( NbBundle.getMessage( WhitespaceValidator.class,
                         "INFO_MAIN_CLASS_WHITESPACE" ), Severity.INFO ); //NOI18N
             }
         }
     }
-    
+
     private static final class VersionValidator extends AbstractValidator<String> {
-        
-        VersionValidator() {
+
+        VersionValidator () {
             super( String.class );
         }
 
@@ -167,12 +190,12 @@ public class PropertiesPanel extends javax.swing.JPanel {
             if (model == null || model.trim().isEmpty()) {
                 return;
             }
-            String[] parts = model.trim().split("\\.");
+            String[] parts = model.trim().split( "\\." );
             for (String part : parts) {
                 try {
-                    Integer.parseInt(part);
-                } catch (NumberFormatException e) {
-                    prblms.add( NbBundle.getMessage( WhitespaceValidator.class, 
+                    Integer.parseInt( part );
+                } catch ( NumberFormatException e ) {
+                    prblms.add( NbBundle.getMessage( WhitespaceValidator.class,
                             "INFO_VERSION_INVALID", part ), Severity.INFO ); //NOI18N
                 }
             }
@@ -198,8 +221,8 @@ public class PropertiesPanel extends javax.swing.JPanel {
             try {
                 props.setBugTrackerURL( new URL( bugTrackerField.getText().trim() ) );
             } catch ( MalformedURLException ex ) {
-                Logger.getLogger( PropertiesPanel.class.getName() ).log( Level.INFO, 
-                        "Bad bug url " + bugTrackerField.getText(), ex); //NOI18N
+                Logger.getLogger( PropertiesPanel.class.getName() ).log( Level.INFO,
+                        "Bad bug url " + bugTrackerField.getText(), ex ); //NOI18N
             }
         } else {
             props.setBugTrackerURL( null );
@@ -257,6 +280,8 @@ public class PropertiesPanel extends javax.swing.JPanel {
         authorURLField = new javax.swing.JTextField();
         versionLabel = new javax.swing.JLabel();
         versionField = new javax.swing.JTextField();
+        platformsLabel = new javax.swing.JLabel();
+        platformsBox = new javax.swing.JComboBox();
 
         nameLabel.setLabelFor(nameField);
         nameLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.nameLabel.text")); // NOI18N
@@ -339,6 +364,16 @@ public class PropertiesPanel extends javax.swing.JPanel {
         versionField.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.version.text")); // NOI18N
         versionField.setName("version"); // NOI18N
 
+        platformsLabel.setLabelFor(platformsBox);
+        platformsLabel.setText(org.openide.util.NbBundle.getMessage(PropertiesPanel.class, "PropertiesPanel.platformsLabel.text")); // NOI18N
+
+        platformsBox.setModel(createPlatformsModel());
+        platformsBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                platformChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -359,7 +394,8 @@ public class PropertiesPanel extends javax.swing.JPanel {
                             .addComponent(keywordsLabel)
                             .addComponent(commandLineLabel)
                             .addComponent(authorURLLabel)
-                            .addComponent(versionLabel))
+                            .addComponent(versionLabel)
+                            .addComponent(platformsLabel))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
@@ -375,10 +411,11 @@ public class PropertiesPanel extends javax.swing.JPanel {
                                 .addComponent(jButton1)
                                 .addGap(6, 6, 6))
                             .addComponent(authorURLField)
+                            .addComponent(versionField)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(licenseField, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(versionField))))
+                            .addComponent(platformsBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -429,7 +466,11 @@ public class PropertiesPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(commandLineField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(commandLineLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(platformsLabel)
+                    .addComponent(platformsBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(status)
                 .addContainerGap())
         );
@@ -442,6 +483,14 @@ private void browseMainFile(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b
         mainFileField.setText( path );
     }
 }//GEN-LAST:event_browseMainFile
+
+    private void platformChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_platformChanged
+        if (platformsBox.getSelectedItem() instanceof NodeJSExecutable) {
+            NodeJSExecutable platform = (NodeJSExecutable) platformsBox.getSelectedItem();
+            props.setPlatformName( platform.name() );
+        }
+    }//GEN-LAST:event_platformChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField authorEmailField;
     private javax.swing.JLabel authorEmailLabel;
@@ -465,6 +514,8 @@ private void browseMainFile(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b
     private javax.swing.JLabel mainFileLabel;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
+    private javax.swing.JComboBox platformsBox;
+    private javax.swing.JLabel platformsLabel;
     private javax.swing.JLabel status;
     private javax.swing.JTextField versionField;
     private javax.swing.JLabel versionLabel;

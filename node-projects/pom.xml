@@ -117,7 +117,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
-            <version>${netbeans-version}</version>
+            <version>RELEASE731</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -147,7 +147,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>${netbeans-version}</version>
+            <version>RELEASE731</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -207,7 +207,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
                     <keystore>~/ssh/timboudreau.com.keystore</keystore>
                     <keystorealias>tim</keystorealias>
                     <keystorepassword>SECRET</keystorepassword>
-                    <licensefile>license.txt</licensefile>
+                    <licenseName>MIT License</licenseName>
+                    <licenseFile>../license.txt</licenseFile>
                     <homepageurl>https://github.com/timboudreau/nb-nodejs</homepageurl>
                     <author>Tim Boudreau</author>
                     <publicPackages>

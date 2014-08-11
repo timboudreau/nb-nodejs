@@ -98,9 +98,13 @@
                     <keystore>~/ssh/timboudreau.com.keystore</keystore>
                     <keystorealias>tim</keystorealias>
                     <keystorepassword>SECRET</keystorepassword>
-                    <licensefile>license.txt</licensefile>
+                    <licenseName>MIT License</licenseName>
+                    <licenseFile>../license.txt</licenseFile>
                     <homepageurl>https://github.com/timboudreau/nb-nodejs</homepageurl>
                     <author>Tim Boudreau</author>
+                    <publicPackages>
+                        <publicPackage>org.netbeans.modules.avatar.platform.api</publicPackage>
+                    </publicPackages>
                 </configuration>
                 <executions>
                     <execution>

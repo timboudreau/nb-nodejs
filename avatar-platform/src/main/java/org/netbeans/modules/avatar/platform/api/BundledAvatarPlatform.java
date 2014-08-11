@@ -16,32 +16,29 @@
  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
-package org.netbeans.modules.nodejs.api;
+package org.netbeans.modules.avatar.platform.api;
 
-import org.netbeans.modules.nodejs.api.NodeJSExecutable;
-import org.netbeans.api.project.Project;
+import java.util.Collection;
+import org.openide.util.Lookup;
 
 /**
+ * Modules which bundle an Avatar runtime can put this in the default lookup
  *
  * @author Tim Boudreau
  */
-public abstract class NodeJSPlatformProvider {
-    public abstract NodeJSExecutable get ();
+public abstract class BundledAvatarPlatform {
 
-    public static NodeJSExecutable get ( Project project ) {
-        NodeJSPlatformProvider prov = project == null ? null : project.getLookup().lookup( NodeJSPlatformProvider.class );
-        if (prov == null) {
-            prov = DEFAULT;
-        }
-        return prov.get();
+    public abstract String name();
+
+    public abstract String displayName();
+
+    public abstract String jar();
+
+    public String sources() {
+        return null;
     }
 
-    private static NodeJSPlatformProvider DEFAULT = new NodeJSPlatformProvider() {
-
-        @Override
-        public NodeJSExecutable get () {
-            return NodeJSExecutable.getDefault();
-        }
-
-    };
+    public static Collection<? extends BundledAvatarPlatform> all() {
+        return Lookup.getDefault().lookupAll(BundledAvatarPlatform.class);
+    }
 }

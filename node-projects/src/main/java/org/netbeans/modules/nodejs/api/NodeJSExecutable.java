@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.openide.LifecycleManager;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
@@ -38,6 +39,21 @@ import org.openide.util.NbBundle;
  * @author Tim Boudreau
  */
 public abstract class NodeJSExecutable {
+
+    public String name () {
+        return getClass().getSimpleName();
+    }
+
+    public boolean isValid () {
+        return true;
+    }
+    
+    public abstract String path();
+    
+    public ExecutionDescriptor.LineConvertorFactory newLineConverter() {
+        return new LineConverter(this.getSourcesLocation());
+    }
+
     public static NodeJSExecutable getDefault () {
         NodeJSExecutable exe = Lookup.getDefault().lookup( NodeJSExecutable.class );
         if (exe == null) {
@@ -60,7 +76,9 @@ public abstract class NodeJSExecutable {
     protected abstract Future<Integer> doRun ( FileObject file, String args ) throws IOException;
 
     public abstract String getSourcesLocation ();
-    public abstract void stopRunningProcesses( Lookup.Provider owner );
+
+    public abstract void stopRunningProcesses ( Lookup.Provider owner );
+
     static final class DummyExectable extends NodeJSExecutable {
         @Override
         protected Future<Integer> doRun ( FileObject file, String args ) throws IOException {
@@ -99,7 +117,12 @@ public abstract class NodeJSExecutable {
 
         @Override
         public void stopRunningProcesses ( Lookup.Provider owner ) {
-            
+
+        }
+
+        @Override
+        public String path () {
+            return "";
         }
     }
 }

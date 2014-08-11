@@ -47,14 +47,14 @@ import org.openide.windows.OutputListener;
  *
  * @author Tim Boudreau
  */
-final class LineConverter implements LineConvertorFactory {
-    private final NodeJSExecutable platform;
+public final class LineConverter implements LineConvertorFactory {
+    private final String sources;
 
     // XXX for avalon, probably need to encapsulate ERR_PATTERN and SYNTAX_ERR_PATTERN
     // and have the executable provide them
     
-    LineConverter ( NodeJSExecutable platform ) {
-        this.platform = platform;
+    LineConverter ( String sources ) {
+        this.sources = sources;
     }
 
     @Override
@@ -117,7 +117,7 @@ final class LineConverter implements LineConvertorFactory {
         public void outputLineAction ( OutputEvent ev ) {
             String pathLocal = this.path;
             if (pathLocal.indexOf( File.separatorChar ) < 0) { //NOI18N
-                String sourcePath = platform.getSourcesLocation();
+                String sourcePath = sources;
                 if (sourcePath != null) {
                     File f = new File( sourcePath );
                     f = new File( f, pathLocal );

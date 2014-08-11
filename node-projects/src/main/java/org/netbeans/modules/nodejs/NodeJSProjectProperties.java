@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.nodejs.forks.EmailAddressValidator;
 import org.netbeans.validation.api.Problems;
@@ -40,9 +41,11 @@ import org.openide.util.Parameters;
  */
 public class NodeJSProjectProperties {
     private final NodeJSProject project;
+    private final NbInfo nbinfo;
 
     NodeJSProjectProperties ( NodeJSProject project ) {
         this.project = project;
+        this.nbinfo = new NbInfo( project );
     }
 
     Project project () {
@@ -140,7 +143,7 @@ public class NodeJSProjectProperties {
         Parameters.notNull( "fileObject", fileObject ); //NOI18N
         FileObject root = project.getProjectDirectory();
         String path = FileUtil.getRelativePath( root, fileObject );
-        if (!path.startsWith("./")) { //NOi18N
+        if (!path.startsWith( "./" )) { //NOi18N
             path = "./" + path; //NOi18N
         }
         project.metadata().setValue( ProjectMetadata.PROP_MAIN_FILE, path );
@@ -170,11 +173,11 @@ public class NodeJSProjectProperties {
         return project.metadata().getValue( ProjectMetadata.PROP_AUTHOR_NAME );
     }
 
-    public String getAuthorURL() {
+    public String getAuthorURL () {
         return project.metadata().getValue( ProjectMetadata.PROP_AUTHOR_URL );
     }
 
-    public void setAuthorURL(String authorURL) {
+    public void setAuthorURL ( String authorURL ) {
         project.metadata().setValue( ProjectMetadata.PROP_AUTHOR_URL, authorURL );
     }
 
@@ -182,38 +185,48 @@ public class NodeJSProjectProperties {
         return project.metadata().getValue( ProjectMetadata.PROP_BUG_URL );
     }
 
-    void save() throws IOException {
+    void save () throws IOException {
         project.metadata().save();
     }
 
     public void setRunArguments ( String args ) {
-        //Run arguments are very likely to be machine-specific and have no
-        //business in package.json
-        try {
-            FileObject fo = project.getProjectDirectory().getFileObject( ".nbrun" ); //NOi18N
-            if (fo != null && (args == null || args.trim().length() == 0)) {
-                fo.delete();
-                return;
-            } else if (fo == null) {
-                fo = project.getProjectDirectory().createData( ".nbrun" ); //NOi18N
-            }
-            try (OutputStream out = fo.getOutputStream(); PrintStream ps = new PrintStream( out )) {
-                ps.println( args );
-            }
-        } catch ( IOException ex ) {
-            Exceptions.printStackTrace( ex );
-        }
+        nbinfo.setRunArguments( args );
     }
 
     public String getRunArguments () {
-        FileObject fo = project.getProjectDirectory().getFileObject( ".nbrun" ); //NOi18N
-        if (fo != null) {
-            try {
-                return fo.asText().trim();
-            } catch ( IOException ex ) {
-                Exceptions.printStackTrace( ex );
+        String result = nbinfo.getRunArguments();
+        if (result == null && !nbinfo.hasFile()) {
+            // Legacy projects
+            FileObject fo = project.getProjectDirectory().getFileObject( ".nbrun" ); //NOi18N
+            if (fo != null) {
+                try {
+                    result = fo.asText().trim();
+                    nbinfo.setRunArguments( result );
+                } catch ( IOException ex ) {
+                    Exceptions.printStackTrace( ex );
+                } finally {
+                    try {
+                        fo.delete();
+                    } catch ( IOException ex ) {
+                        Exceptions.printStackTrace( ex );
+                    }
+                }
             }
         }
-        return null;
+        return result;
+    }
+
+    public String getPlatformName () {
+        String result = nbinfo.getPlatformName();
+        if (result == null) {
+            result = "default";
+        }
+        return result;
+    }
+
+    public void setPlatformName ( String name ) {
+        if (!Objects.equals( name, getPlatformName() )) {
+            nbinfo.setPlatformName( name );
+        }
     }
 }

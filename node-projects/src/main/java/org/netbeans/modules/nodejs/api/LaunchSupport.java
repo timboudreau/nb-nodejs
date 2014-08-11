@@ -136,12 +136,13 @@ public abstract class LaunchSupport {
         }
 
         public Future<Integer> launch () {
+            ExecutionDescriptor.LineConvertorFactory converter = exe.newLineConverter();
             ExecutionDescriptor des = new ExecutionDescriptor().controllable( true )
                     .showSuspended( true ).frontWindow( true ).outLineBased( true )
                     .controllable( true ).errLineBased( true )
-                    .errConvertorFactory( new LineConverter( exe ) )
+                    .errConvertorFactory( converter )
                     .outLineBased( true )
-                    .outConvertorFactory( new LineConverter( exe ) )
+                    .outConvertorFactory( converter )
                     .rerunCondition( this )
                     .preExecution( this )
                     .postExecution( this )

@@ -56,6 +56,7 @@ import org.netbeans.modules.nodejs.api.MainFileProvider;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.libraries.LibrariesPanel;
 import org.netbeans.modules.nodejs.node.NodeJSLogicalViewProvider;
+import org.netbeans.modules.nodejs.platform.NodeJSPlatforms;
 import org.netbeans.modules.nodejs.registry.FileChangeRegistry;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.CopyOperationImplementation;
@@ -126,11 +127,12 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     private final Sources sources = new NodeJSProjectSources( this );
     private final NodeJSLogicalViewProvider logicalView = new NodeJSLogicalViewProvider( this );
     private final FileChangeRegistry registry = new FileChangeRegistry( this );
+    static final RequestProcessor NODE_JS_PROJECT_THREAD_POOL = new RequestProcessor( "NodeJS", 3 ); //NOI18N
     private final Lookup lookup = Lookups.fixed( this, logicalView,
             new NodeJSProjectProperties( this ), classpath, sources,
             new NodeJsEncodingQuery(), registry, metadata,
-            new PlatformProvider(), new LibrariesResolverImpl() );
-    private static final RequestProcessor NODE_JS_PROJECT_THREAD_POOL = new RequestProcessor("NodeJS", 3); //NOI18N
+            new PlatformProvider(), new LibrariesResolverImpl(),
+            NODE_JS_PROJECT_THREAD_POOL );
 
     @SuppressWarnings ("LeakingThisInConstructor")
     NodeJSProject ( FileObject dir, ProjectState state ) {
@@ -155,7 +157,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             FileChangeRegistry reg = getLookup().lookup( FileChangeRegistry.class );
             reg.registerInterest( NodeJSProjectFactory.NODE_MODULES_FOLDER, this );
             ProjectMetadata md = getLookup().lookup( ProjectMetadata.class );
-            md.addPropertyChangeListener( WeakListeners.propertyChange( this, md ));
+            md.addPropertyChangeListener( WeakListeners.propertyChange( this, md ) );
         }
 
         private void setHasMissing ( boolean nue ) {
@@ -190,7 +192,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
         @Override
         public void propertyChange ( PropertyChangeEvent evt ) {
-            if (null == evt.getPropertyName() || "dependencies".equals(evt.getPropertyName())) {
+            if (null == evt.getPropertyName() || "dependencies".equals( evt.getPropertyName() )) {
                 checkTask.schedule( 2000 );
             }
         }
@@ -242,7 +244,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
         @Override
         public synchronized void run () {
-            ProgressHandle handle = ProgressHandleFactory.createHandle( 
+            ProgressHandle handle = ProgressHandleFactory.createHandle(
                     NbBundle.getMessage( NodeJSProject.class, "RUNNING_NPM_INSTALL", getName() ) ); //NOI18N
             handle.start();
             try {
@@ -267,9 +269,16 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
         @Override
         public NodeJSExecutable get () {
-            return NodeJSExecutable.getDefault();
+            NodeJSProjectProperties props = NodeJSProject.this.getLookup().lookup( NodeJSProjectProperties.class );
+            String name = props.getPlatformName();
+            NodeJSExecutable result = null;
+            if (name != null) {
+                result = NodeJSPlatforms.find( name, true );
+            } else {
+                result = NodeJSExecutable.getDefault();
+            }
+            return result;
         }
-
     }
 
     ProjectState state () {
@@ -311,7 +320,8 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     @Override
     public void invokeAction ( String string, Lookup lkp ) throws IllegalArgumentException {
         if (COMMAND_RUN.equals( string )) {
-            final NodeJSExecutable exe = NodeJSExecutable.getDefault();
+            NodeJSPlatformProvider platformP = getLookup().lookup( NodeJSPlatformProvider.class );
+            final NodeJSExecutable exe = platformP.get();
             FileObject main = getLookup().lookup( NodeJSProjectProperties.class ).getMainFile();
             if (main == null) {
                 main = showSelectMainFileDialog();
@@ -599,18 +609,18 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     @Override
     public String[] getPrivilegedTemplates () {
         return new String[]{
-                    "Templates/javascript/Empty.js", //NOI18N
-                    "Templates/javascript/Module.js", //NOI18N
-                    "Templates/javascript/HelloWorld.js", //NOI18N
-                    "Templates/Other/javascript.js", //NOI18N
-                    "Templates/Other/file", //NOI18N
-                    "Templates/Web/Html.html", //NOI18N
-                    "Templates/Web/Xhtml.html", //NOI18N
-                    "Templates/Web/CascadingStyleSheet.css", //NOI18N
-                    "Templates/Other/json.json", //NOI18N
-                    "Templates/Other/Folder", //NOI18N
-                    "Templates/javscript/package.json" //NOI18N
-                };
+            "Templates/javascript/Empty.js", //NOI18N
+            "Templates/javascript/Module.js", //NOI18N
+            "Templates/javascript/HelloWorld.js", //NOI18N
+            "Templates/Other/javascript.js", //NOI18N
+            "Templates/Other/file", //NOI18N
+            "Templates/Web/Html.html", //NOI18N
+            "Templates/Web/Xhtml.html", //NOI18N
+            "Templates/Web/CascadingStyleSheet.css", //NOI18N
+            "Templates/Other/json.json", //NOI18N
+            "Templates/Other/Folder", //NOI18N
+            "Templates/javscript/package.json" //NOI18N
+        };
     }
 
     @Override
@@ -626,7 +636,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             result.put( "project.license", license ); //NOI18N
             result.put( "license", license ); //NOI18N
         }
-        result.put( "port", "8080" /* XXX GET RID OF THIS */); //NOI18N
+        result.put( "port", "8080" /* XXX GET RID OF THIS */ ); //NOI18N
         return result;
     }
 
@@ -654,9 +664,9 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     public void removePropertyChangeListener ( PropertyChangeListener listener ) {
         supp.removePropertyChangeListener( listener );
     }
-    
-    public NodeJSExecutable exe() {
-        NodeJSPlatformProvider exe = getLookup().lookup(NodeJSPlatformProvider.class);
+
+    public NodeJSExecutable exe () {
+        NodeJSPlatformProvider exe = getLookup().lookup( NodeJSPlatformProvider.class );
         return exe.get();
     }
 

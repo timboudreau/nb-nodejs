@@ -18,30 +18,42 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.api;
 
+import java.util.Collection;
+import java.util.List;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
-import org.netbeans.api.project.Project;
+import org.openide.util.Lookup;
 
 /**
  *
- * @author Tim Boudreau
+ * @author tim
  */
-public abstract class NodeJSPlatformProvider {
-    public abstract NodeJSExecutable get ();
+public abstract class NodeJSPlatformType {
 
-    public static NodeJSExecutable get ( Project project ) {
-        NodeJSPlatformProvider prov = project == null ? null : project.getLookup().lookup( NodeJSPlatformProvider.class );
-        if (prov == null) {
-            prov = DEFAULT;
-        }
-        return prov.get();
+    public abstract String name ();
+
+    public static Collection<? extends NodeJSPlatformType> allTypes () {
+        return Lookup.getDefault().lookupAll( NodeJSPlatformType.class );
     }
 
-    private static NodeJSPlatformProvider DEFAULT = new NodeJSPlatformProvider() {
+    public abstract NodeJSExecutable find ( String name );
 
-        @Override
-        public NodeJSExecutable get () {
-            return NodeJSExecutable.getDefault();
-        }
+    public abstract void all ( List<? super NodeJSExecutable> populate );
 
-    };
+    public abstract String displayName ();
+
+    public boolean canAdd () {
+        return false;
+    }
+
+    public String add () {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean canRemove ( NodeJSExecutable exe ) {
+        return false;
+    }
+
+    public void remove ( NodeJSExecutable exe ) {
+        throw new UnsupportedOperationException();
+    }
 }
