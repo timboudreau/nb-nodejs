@@ -46,7 +46,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tim Boudreau
  */
 @ServiceProvider (service = NodeJSExecutable.class, position = Integer.MIN_VALUE)
-@Messages("SYSTEM_NODEJS=System NodeJS")
+@Messages ("SYSTEM_NODEJS=System NodeJS")
 public final class DefaultExecutable extends NodeJSExecutable {
     private static final String NODE_EXE_KEY = "nodejs_binary";
     private static final String PORT_KEY = "port";
@@ -57,8 +57,8 @@ public final class DefaultExecutable extends NodeJSExecutable {
         assert instance == null;
         instance = this;
     }
-    
-    public String displayName() {
+
+    public String displayName () {
         return Bundle.SYSTEM_NODEJS();
     }
 
@@ -70,14 +70,15 @@ public final class DefaultExecutable extends NodeJSExecutable {
     @Override
     public boolean isValid () {
         String path = getNodeExecutable( false );
-        return new File( path ).exists();
+        return path != null && new File( path ).exists()
+                && new File( path ).canExecute();
     }
-    
-    public String toString() {
+
+    public String toString () {
         return "System NodeJS";
     }
-    
-    public String path() {
+
+    public String path () {
         String result = this.getNodeExecutable( false );
         return result == null ? "" : result;
     }

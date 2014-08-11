@@ -169,7 +169,7 @@ public final class ValidateNativeNodeVisualPanel extends JPanel implements Runna
                     FileUtil.copy( in, out );
                 }
             }
-            NativeNodeJS test = new NativeNodeJS( "test", null, f.getAbsolutePath(), "Test" );
+            NativeNodeJS test = new NativeNodeJS( "test", null, f.getAbsolutePath(), "Test", "x" );
             FileObject fob = FileUtil.toFileObject( FileUtil.normalizeFile( probeFile ) );
             Future<Integer> fut = test.run( fob, outFile.getAbsolutePath() );
             Integer result = fut.get();

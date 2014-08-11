@@ -78,7 +78,8 @@ public class NativePlatformType extends NodeJSPlatformType {
                 String path = p.get( "path", null ); //NOI18N
                 String sources = p.get( "sources", null ); //NOI18N
                 String displayName = p.get( "displayName", name );
-                return new NativeNodeJS( name, sources, path, displayName );
+                String version = p.get( "version", "(unknown)");
+                return new NativeNodeJS( name, sources, path, displayName, version );
             }
         } catch ( BackingStoreException ex ) {
             Exceptions.printStackTrace( ex );

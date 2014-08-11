@@ -62,7 +62,7 @@ public class JavaLibraryPanel extends javax.swing.JPanel implements DocumentList
         supp.addChangeListener(cl);
         try {
             if (NotifyDescriptor.OK_OPTION.equals(DialogDisplayer.getDefault().notify(des))) {
-                return new JavaDependency(jTextField1.getText(), jTextField2.getText(), jTextField3.getText());
+                return new JavaDependency(jTextField2.getText(), jTextField1.getText(), jTextField3.getText());
             }
         } finally {
             supp.removeChangeListener(cl);

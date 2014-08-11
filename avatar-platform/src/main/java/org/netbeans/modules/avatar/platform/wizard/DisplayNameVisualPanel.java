@@ -57,7 +57,7 @@ public final class DisplayNameVisualPanel extends JPanel implements DocumentList
                     .addComponent(jTextField1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(0, 452, Short.MAX_VALUE)))
+                        .addGap(0, 489, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

@@ -96,11 +96,12 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         platformList = new javax.swing.JList();
         pathLabel = new javax.swing.JLabel();
         pathField = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
+        nameLabel = new javax.swing.JLabel();
         nameField = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         addButton = new javax.swing.JButton();
         removeButton = new javax.swing.JButton();
+        versionLabel = new javax.swing.JLabel();
+        versionField = new javax.swing.JTextField();
 
         platformList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -115,17 +116,11 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         pathField.setEditable(false);
         pathField.setText(org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.pathField.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.jLabel1.text")); // NOI18N
+        nameLabel.setLabelFor(nameField);
+        org.openide.awt.Mnemonics.setLocalizedText(nameLabel, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.nameLabel.text")); // NOI18N
 
         nameField.setEditable(false);
         nameField.setText(org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.nameField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.jButton1.text")); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.addButton.text")); // NOI18N
         addButton.addActionListener(new java.awt.event.ActionListener() {
@@ -135,6 +130,13 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.removeButton.text")); // NOI18N
+        removeButton.setEnabled(false);
+
+        versionLabel.setLabelFor(versionField);
+        org.openide.awt.Mnemonics.setLocalizedText(versionLabel, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.versionLabel.text")); // NOI18N
+
+        versionField.setEditable(false);
+        versionField.setText(org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.versionField.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -152,15 +154,16 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
+                            .addComponent(nameLabel)
                             .addComponent(pathLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(28, 28, 28)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pathField)
-                            .addComponent(nameField)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 378, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                            .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                            .addComponent(pathField)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(versionLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(versionField)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -174,10 +177,12 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
                             .addComponent(pathField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
+                            .addComponent(nameLabel)
                             .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(versionLabel)
+                            .addComponent(versionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(platforms, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -187,11 +192,6 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        NodeJSExecutable exe = (NodeJSExecutable) platformList.getSelectedValue();
-        NodeJSPlatforms.setDefault( exe.name() );
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         WizardDescriptor wiz = new WizardDescriptor( new PlatformWizardIterator() );
@@ -216,13 +216,14 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField nameField;
+    private javax.swing.JLabel nameLabel;
     private javax.swing.JTextField pathField;
     private javax.swing.JLabel pathLabel;
     private javax.swing.JList platformList;
     private javax.swing.JScrollPane platforms;
     private javax.swing.JButton removeButton;
+    private javax.swing.JTextField versionField;
+    private javax.swing.JLabel versionLabel;
     // End of variables declaration//GEN-END:variables
 }

@@ -43,7 +43,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tim Boudreau
  */
 @ServiceProvider(service = NodeJSPlatformType.class)
-@Messages({"AVATAR_PLATFORM=Avatar Java NodeJS Platforms", "FIND_PLATFORM_TITLE=Find AvatarJS JAR"})
+@Messages({"AVATAR_PLATFORM=Avatar Java NodeJS Platforms", "FIND_PLATFORM_TITLE=Find AvatarJS JAR", "UNKNOWN_VERSION=(unknown version)"})
 public class AvatarPlatformType extends NodeJSPlatformType {
 
     private final Preferences prefs = NbPreferences.forModule(AvatarPlatformType.class).node("platforms"); //NOI18N
@@ -65,7 +65,8 @@ public class AvatarPlatformType extends NodeJSPlatformType {
             if (cn != null) {
                 String dn = cn.get("displayName", null); //NOI18N
                 String jar = cn.get("jar", null); //NOI18N
-                return new AvatarPlatform(new FP(name, jar, dn));
+                String version = cn.get("version", Bundle.UNKNOWN_VERSION());
+                return new AvatarPlatform(new FP(name, jar, dn, version));
             }
         } catch (BackingStoreException ex) {
             Exceptions.printStackTrace(ex);
@@ -84,7 +85,8 @@ public class AvatarPlatformType extends NodeJSPlatformType {
                 if (cn != null) {
                     String dn = cn.get("displayName", null); //NOI18N
                     String jar = cn.get("jar", null); //NOI18N
-                    populate.add(new AvatarPlatform(new FP(name, jar, dn)));
+                    String version = cn.get("version", Bundle.UNKNOWN_VERSION());
+                    populate.add(new AvatarPlatform(new FP(name, jar, dn, version)));
                 }
             }
         } catch (BackingStoreException ex) {
@@ -136,7 +138,7 @@ public class AvatarPlatformType extends NodeJSPlatformType {
     }
 
     public static AvatarPlatform create(File f) {
-        return new AvatarPlatform(new FP("test", f.getAbsolutePath(), "Test"));
+        return new AvatarPlatform(new FP("test", f.getAbsolutePath(), "Test", Bundle.UNKNOWN_VERSION()));
     }
 
     @Override
@@ -153,11 +155,17 @@ public class AvatarPlatformType extends NodeJSPlatformType {
         private final String name;
         private final String jar;
         private final String displayName;
+        private final String version;
 
-        public FP(String name, String jar, String displayName) {
+        public FP(String name, String jar, String displayName, String version) {
             this.name = name;
             this.jar = jar;
             this.displayName = displayName;
+            this.version = version;
+        }
+        
+        public String version() {
+            return version;
         }
 
         @Override

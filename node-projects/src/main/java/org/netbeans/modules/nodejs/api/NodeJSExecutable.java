@@ -33,11 +33,13 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.NbBundle.Messages;
 
 /**
  *
  * @author Tim Boudreau
  */
+@Messages("UNKNOWN_VERSION=(unknown version)")
 public abstract class NodeJSExecutable {
 
     public String name () {
@@ -50,6 +52,10 @@ public abstract class NodeJSExecutable {
 
     public boolean isValid () {
         return true;
+    }
+    
+    public String version() {
+        return Bundle.UNKNOWN_VERSION();
     }
     
     public abstract String path();

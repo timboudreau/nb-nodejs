@@ -62,6 +62,13 @@ public class AvatarPlatform extends NodeJSExecutable {
         this.bundled = p;
     }
 
+    @Override
+    public boolean isValid() {
+        File jar = findAvatarJar();
+        return jar != null && jar.exists()
+                && jar.isFile();
+    }
+
     private File findAvatarJar() {
         if (bundled != null && bundled.jar() != null) {
             return new File(bundled.jar());

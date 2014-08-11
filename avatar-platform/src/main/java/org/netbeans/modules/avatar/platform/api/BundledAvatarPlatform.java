@@ -33,6 +33,8 @@ public abstract class BundledAvatarPlatform {
     public abstract String displayName();
 
     public abstract String jar();
+    
+    public abstract String version();
 
     public String sources() {
         return null;
