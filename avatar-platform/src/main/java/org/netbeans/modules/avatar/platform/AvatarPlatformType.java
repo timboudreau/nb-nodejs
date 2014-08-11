@@ -19,15 +19,20 @@
 package org.netbeans.modules.avatar.platform;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.netbeans.modules.avatar.platform.api.BundledAvatarPlatform;
+import org.netbeans.modules.avatar.platform.wizard.ChooseAvatarJSBinaryPanel;
+import org.netbeans.modules.avatar.platform.wizard.DisplayNamePanel;
+import org.netbeans.modules.avatar.platform.wizard.ValidateAvatarNodePanel;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.api.NodeJSPlatformType;
+import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 import org.openide.util.lookup.ServiceProvider;
@@ -117,7 +122,33 @@ public class AvatarPlatformType extends NodeJSPlatformType {
         return null;
     }
 
-    private final class FP extends BundledAvatarPlatform {
+    @Override
+    public String add(File f, Map<String, Object> props, String displayName) {
+        String file = f.getAbsolutePath();
+        String name = AvatarPlatform.jarToName(f);
+        Preferences p = prefs.node(name);
+        p.put("jar", file); //NOI18N
+        p.put("displayName", displayName);
+        if (props.containsKey("version") && props.get("version") instanceof String) {
+            p.put("version", (String) props.get("version"));
+        }
+        return name;
+    }
+
+    public static AvatarPlatform create(File f) {
+        return new AvatarPlatform(new FP("test", f.getAbsolutePath(), "Test"));
+    }
+
+    @Override
+    public List<WizardDescriptor.Panel<WizardDescriptor>> getAddPlatformWizardPages() {
+        List<WizardDescriptor.Panel<WizardDescriptor>> result = new LinkedList<>();
+        result.add(new ChooseAvatarJSBinaryPanel());
+        result.add(new ValidateAvatarNodePanel());
+        result.add(new DisplayNamePanel());
+        return result;
+    }
+
+    private static final class FP extends BundledAvatarPlatform {
 
         private final String name;
         private final String jar;

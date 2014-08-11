@@ -26,7 +26,6 @@ import javax.swing.Action;
 import static javax.swing.Action.NAME;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.nodejs.api.NodeJSProjectChildNodeFactory;
-import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import org.openide.nodes.ChildFactory;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;

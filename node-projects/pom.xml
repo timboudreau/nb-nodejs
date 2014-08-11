@@ -167,7 +167,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-dialogs</artifactId>
-            <version>${netbeans-version}</version>
+            <version>RELEASE731</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>

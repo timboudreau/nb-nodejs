@@ -35,17 +35,23 @@ import org.openide.util.WeakSet;
  *
  * @author Tim Boudreau
  */
-final class NativeNodeJS extends NodeJSExecutable {
+public final class NativeNodeJS extends NodeJSExecutable {
     private final String name;
 
     private final String sourceLocation;
     private final String binaryLocation;
     private final Set<Future<Integer>> futures = new WeakSet<>();
+    private final String displayName;
 
-    NativeNodeJS ( String name, String sourceLocation, String binaryLocation ) {
+    public NativeNodeJS ( String name, String sourceLocation, String binaryLocation, String displayName ) {
         this.name = name;
         this.sourceLocation = sourceLocation;
         this.binaryLocation = binaryLocation;
+        this.displayName = displayName;
+    }
+    
+    public String displayName() {
+        return displayName == null ? name() : displayName;
     }
     
     public String toString() {
@@ -87,4 +93,6 @@ final class NativeNodeJS extends NodeJSExecutable {
     public void stopRunningProcesses ( Lookup.Provider owner ) {
         ls.stopRunningProcesses( owner );
     }
+    
+    
 }

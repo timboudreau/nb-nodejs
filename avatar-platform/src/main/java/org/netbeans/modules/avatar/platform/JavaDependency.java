@@ -29,7 +29,8 @@ import org.netbeans.api.project.Project;
 import org.netbeans.modules.nodejs.api.ProjectMetadata;
 
 /**
- * A Java dependency, decoded from the non-normative "java" section of a package.json
+ * A Java dependency, decoded from the non-normative "java" section of a
+ * package.json
  *
  * @author Tim Boudreau
  */
@@ -125,7 +126,7 @@ final class JavaDependency {
             }
         }
     }
-    
+
     public static void remove(Project project, JavaDependency dep) {
         ProjectMetadata meta = project.getLookup().lookup(ProjectMetadata.class);
         if (meta != null) { // It belongs to a NodeJSProject
@@ -140,7 +141,7 @@ final class JavaDependency {
                 o = new LinkedList<>();
             }
             List<?> l = (List<?>) o;
-            for (Iterator<?> it=l.iterator(); it.hasNext();) {
+            for (Iterator<?> it = l.iterator(); it.hasNext();) {
                 Object d = it.next();
                 if (d instanceof String) {
                     JavaDependency dd = new JavaDependency((String) d);
@@ -183,7 +184,7 @@ final class JavaDependency {
             }
             deps.remove(dep);
             deps.add(dep);
-            List<Map<String,?>> putBack = new LinkedList<>();
+            List<Map<String, ?>> putBack = new LinkedList<>();
             for (JavaDependency d : deps) {
                 putBack.add(d.toMap());
             }

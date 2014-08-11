@@ -18,7 +18,6 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.avatar.platform;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
@@ -28,7 +27,6 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.ChildFactory;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.lookup.Lookups;

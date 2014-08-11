@@ -36,6 +36,7 @@ import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 import org.openide.util.lookup.ServiceProvider;
@@ -45,6 +46,7 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Tim Boudreau
  */
 @ServiceProvider (service = NodeJSExecutable.class, position = Integer.MIN_VALUE)
+@Messages("SYSTEM_NODEJS=System NodeJS")
 public final class DefaultExecutable extends NodeJSExecutable {
     private static final String NODE_EXE_KEY = "nodejs_binary";
     private static final String PORT_KEY = "port";
@@ -54,6 +56,10 @@ public final class DefaultExecutable extends NodeJSExecutable {
     public DefaultExecutable () {
         assert instance == null;
         instance = this;
+    }
+    
+    public String displayName() {
+        return Bundle.SYSTEM_NODEJS();
     }
 
     @Override

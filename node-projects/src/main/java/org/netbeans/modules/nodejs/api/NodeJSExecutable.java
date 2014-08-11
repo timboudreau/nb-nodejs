@@ -43,6 +43,10 @@ public abstract class NodeJSExecutable {
     public String name () {
         return getClass().getSimpleName();
     }
+    
+    public String displayName() {
+        return name();
+    }
 
     public boolean isValid () {
         return true;
@@ -62,7 +66,7 @@ public abstract class NodeJSExecutable {
         return exe;
     }
 
-    public final void run ( FileObject targetFile, String args ) throws IOException {
+    public final Future<Integer>  run ( FileObject targetFile, String args ) throws IOException {
         if (!targetFile.isValid() || !targetFile.isData()) {
             StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage(
                     NodeJSExecutable.class, "MSG_CANNOT_RUN", targetFile.getPath() ) );
@@ -70,7 +74,7 @@ public abstract class NodeJSExecutable {
         }
         assert !EventQueue.isDispatchThread();
         LifecycleManager.getDefault().saveAll();
-        doRun( targetFile, args );
+        return doRun( targetFile, args );
     }
 
     protected abstract Future<Integer> doRun ( FileObject file, String args ) throws IOException;

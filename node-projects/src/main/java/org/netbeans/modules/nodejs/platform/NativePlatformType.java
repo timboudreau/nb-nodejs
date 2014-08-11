@@ -1,29 +1,35 @@
 /* Copyright (C) 2014 Tim Boudreau
 
- Permission is hereby granted, free of charge, to any person obtaining a copy 
- of this software and associated documentation files (the "Software"), to 
- deal in the Software without restriction, including without limitation the 
- rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- sell copies of the Software, and to permit persons to whom the Software is 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in all 
+ The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.platform;
 
 import java.io.File;
+import java.util.LinkedList;
 import org.netbeans.modules.nodejs.api.NodeJSPlatformType;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
+import org.netbeans.modules.nodejs.platform.wizard.ChooseNodeJSBinaryPanel;
+import org.netbeans.modules.nodejs.platform.wizard.DisplayNamePanel;
+import org.netbeans.modules.nodejs.platform.wizard.ValidateNativeNodePanel;
+import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -38,7 +44,28 @@ import org.openide.util.lookup.ServiceProvider;
 @ServiceProvider (service = NodeJSPlatformType.class)
 @Messages ({"PLATFORM_TYPE=Native NodeJS", "FIND_PLATFORM_TITLE=Find NodeJS Binary"})
 public class NativePlatformType extends NodeJSPlatformType {
-    private final Preferences prefs = NbPreferences.forModule( NodeJSPlatforms.class ).node( "platforms" );
+    private static final Preferences prefs = NbPreferences.forModule( NodeJSPlatforms.class ).node( "platforms" );
+
+    public static final String NAME_NODEJS = "nodejs";
+
+    @Override
+    public String add ( File f, Map<String, Object> props, String displayName ) {
+        String file = f.getAbsolutePath();
+        String name = NAME_NODEJS + "-" + file.replace( '/', '-' );
+        Preferences p = prefs.node( name );
+        p.put( "path", file );
+        p.put( "displayName", displayName );
+        if (props.containsKey( "version" ) && props.get( "version" ) instanceof String) {
+            p.put( "version", (String) props.get( "version" ) );
+        }
+        try {
+            p.flush();
+        } catch ( BackingStoreException ex ) {
+            Exceptions.printStackTrace( ex );
+            return null;
+        }
+        return name;
+    }
 
     @Override
     public NodeJSExecutable find ( String name ) {
@@ -50,7 +77,8 @@ public class NativePlatformType extends NodeJSPlatformType {
             if (p != null) {
                 String path = p.get( "path", null ); //NOI18N
                 String sources = p.get( "sources", null ); //NOI18N
-                return new NativeNodeJS( name, sources, path );
+                String displayName = p.get( "displayName", name );
+                return new NativeNodeJS( name, sources, path, displayName );
             }
         } catch ( BackingStoreException ex ) {
             Exceptions.printStackTrace( ex );
@@ -60,12 +88,12 @@ public class NativePlatformType extends NodeJSPlatformType {
 
     @Override
     public String name () {
-        return "nodejs";
+        return NAME_NODEJS;
     }
 
     @Override
     public void all ( List<? super NodeJSExecutable> populate ) {
-        populate.add(NodeJSExecutable.getDefault());
+        populate.add( NodeJSExecutable.getDefault() );
         try {
             for (String name : prefs.childrenNames()) {
                 NodeJSExecutable ex = find( name );
@@ -95,7 +123,7 @@ public class NativePlatformType extends NodeJSPlatformType {
                 .setFilesOnly( true ).showOpenDialog();
         if (f != null) {
             String file = f.getAbsolutePath();
-            String name = name() + "-" + file.replace('/', '-');
+            String name = name() + "-" + file.replace( '/', '-' );
             Preferences p = prefs.node( name );
             p.put( "path", file );
             try {
@@ -117,5 +145,14 @@ public class NativePlatformType extends NodeJSPlatformType {
             String name = ((NativeNodeJS) exe).name();
             prefs.remove( name );
         }
+    }
+
+    @Override
+    public List<WizardDescriptor.Panel<WizardDescriptor>> getAddPlatformWizardPages () {
+        List<WizardDescriptor.Panel<WizardDescriptor>> result = new LinkedList<>();
+        result.add( new ChooseNodeJSBinaryPanel() );
+        result.add( new ValidateNativeNodePanel() );
+        result.add( new DisplayNamePanel() );
+        return result;
     }
 }

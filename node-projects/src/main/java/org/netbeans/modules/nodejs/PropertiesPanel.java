@@ -38,6 +38,7 @@ import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.forks.EmailAddressValidator;
 import org.netbeans.modules.nodejs.forks.UrlValidator;
 import org.netbeans.modules.nodejs.platform.NodeJSPlatforms;
+import org.netbeans.modules.nodejs.platform.PlatformListCellRenderer;
 import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.netbeans.validation.api.AbstractValidator;
 import org.netbeans.validation.api.Problems;
@@ -100,6 +101,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
         g.add( commandLineField, new WhitespaceValidator() );
         g.add( authorURLField, new AllowNullValidator( new UrlValidator() ) );
         g.add( versionField, new VersionValidator() );
+        platformsBox.setRenderer( new PlatformListCellRenderer());
     }
 
     @Override
@@ -123,6 +125,7 @@ public class PropertiesPanel extends javax.swing.JPanel {
         }
         return result;
     }
+    
 
     private static final class AllowNullValidator extends AbstractValidator<String> {
         //Some validators do not allow nulls - they should and a newer version

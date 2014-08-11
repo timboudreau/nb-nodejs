@@ -1,20 +1,20 @@
 /* Copyright (C) 2014 Tim Boudreau
 
- Permission is hereby granted, free of charge, to any person obtaining a copy 
- of this software and associated documentation files (the "Software"), to 
- deal in the Software without restriction, including without limitation the 
- rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
- sell copies of the Software, and to permit persons to whom the Software is 
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in all 
+ The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.avatar.platform;
 
@@ -31,7 +31,6 @@ import org.netbeans.api.project.Project;
 import org.netbeans.modules.avatar.platform.api.BundledAvatarPlatform;
 import org.netbeans.modules.nodejs.api.LaunchSupport;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
-import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import org.openide.filesystems.FileChooserBuilder;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -54,11 +53,11 @@ public class AvatarPlatform extends NodeJSExecutable {
     public static final String AVATAR_JAR_RELATIVE_PATH = "avatar.jar"; //NOI18N
     public static final String PREFS_KEY_AVATAR_JAR = "avatar-jar"; //NOI18N
     private BundledAvatarPlatform bundled;
-    
+
     public AvatarPlatform() {
         bundled = null;
     }
-    
+
     public AvatarPlatform(BundledAvatarPlatform p) {
         this.bundled = p;
     }
@@ -85,7 +84,6 @@ public class AvatarPlatform extends NodeJSExecutable {
         FileObject java = mgr.getDefaultPlatform().findTool("java"); //NOI18N
         return java == null ? "java" : FileUtil.toFile(java).getAbsolutePath(); //NOI18N
     }
-
 
     // LaunchSupport handles using the external execution API correctly for
     // running node, handling output line clicks and so forth
@@ -171,21 +169,25 @@ public class AvatarPlatform extends NodeJSExecutable {
     public void stopRunningProcesses(Lookup.Provider owner) {
         supp.stopRunningProcesses(owner);
     }
-    
+
     public String toString() {
         return name() + " in " + findAvatarJar();
     }
-    
+
     static String jarToName(File avatarJar) {
         return "avatar~" + (avatarJar == null ? "missing" : avatarJar.getAbsolutePath().replace('/', '-'));
     }
-    
+
     public String name() {
         return jarToName(findAvatarJar());
     }
-    
+
     public String path() {
         File result = findAvatarJar();
         return result == null ? "" : result.getAbsolutePath();
+    }
+
+    public String displayName() {
+        return bundled == null ? name() : bundled.displayName();
     }
 }

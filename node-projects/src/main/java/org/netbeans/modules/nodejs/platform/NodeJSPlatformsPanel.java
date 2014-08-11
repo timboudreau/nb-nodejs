@@ -5,40 +5,39 @@
  */
 package org.netbeans.modules.nodejs.platform;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.text.MessageFormat;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.api.NodeJSPlatformType;
+import org.netbeans.modules.nodejs.platform.wizard.PlatformWizardIterator;
 import org.netbeans.modules.nodejs.ui.UiUtil;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.WizardDescriptor;
+import org.openide.util.NbBundle.Messages;
 
 /**
  *
  * @author Tim Boudreau
  */
+@Messages ("ADD_PLATFORM=Add NodeJS Platform")
 final class NodeJSPlatformsPanel extends javax.swing.JPanel {
 
     public NodeJSPlatformsPanel () {
         initComponents();
-        for (final NodeJSPlatformType type : NodeJSPlatformType.allTypes()) {
-            System.out.println( "TYPE " + type.displayName() );
-            if (type.canAdd()) {
-                JButton addButton = new JButton( type.displayName() );
-                addButton.addActionListener( new ActionListener() {
-                    @Override
-                    public void actionPerformed ( ActionEvent ae ) {
-                        String name = type.add();
-                        refresh( name );
-                    }
-                } );
-                addPanel.add( addButton );
-            }
-        }
+        platformList.setCellRenderer( new PlatformListCellRenderer() );
         platformList.addListSelectionListener( new ListSelectionListener() {
 
             @Override
@@ -47,6 +46,7 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
                 if (o instanceof NodeJSExecutable) {
                     NodeJSExecutable n = (NodeJSExecutable) o;
                     NodeJSPlatformsPanel.this.nameField.setText( n.name() );
+                    pathField.setText(n.path());
                 }
             }
         } );
@@ -82,6 +82,7 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         }
     }
 
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -95,10 +96,11 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         platformList = new javax.swing.JList();
         pathLabel = new javax.swing.JLabel();
         pathField = new javax.swing.JTextField();
-        addPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         nameField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        addButton = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
 
         platformList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -113,9 +115,6 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         pathField.setEditable(false);
         pathField.setText(org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.pathField.text")); // NOI18N
 
-        addPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.addPanel.border.title"))); // NOI18N
-        addPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.jLabel1.text")); // NOI18N
 
         nameField.setEditable(false);
@@ -128,16 +127,29 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.addButton.text")); // NOI18N
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(NodeJSPlatformsPanel.class, "NodeJSPlatformsPanel.removeButton.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(platforms, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(platforms, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(addButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(removeButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(addPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
@@ -165,11 +177,14 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
                             .addComponent(jLabel1)
                             .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(addPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(platforms, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addComponent(jButton1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(platforms, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(addButton)
+                            .addComponent(removeButton))))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -178,9 +193,29 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         NodeJSPlatforms.setDefault( exe.name() );
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        WizardDescriptor wiz = new WizardDescriptor( new PlatformWizardIterator() );
+        if (NodeJSPlatformType.allTypes().size() == 1) {
+            wiz.putProperty( "type", NodeJSPlatformType.allTypes().iterator().next() );
+        }
+        //             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
+        //             // {1} will be replaced by WizardDescriptor.Iterator.name()
+        wiz.setTitleFormat( new MessageFormat( "{0} ({1})" ) );
+        wiz.setTitle( Bundle.ADD_PLATFORM() );
+        if (DialogDisplayer.getDefault().notify( wiz ) == WizardDescriptor.FINISH_OPTION) {
+            System.out.println( "OK " + wiz.getProperties() );
+            NodeJSPlatformType type = (NodeJSPlatformType) wiz.getProperty( "type" );
+            File f = (File) wiz.getProperty( "file" );
+            Map<String, Object> data = (Map<String, Object>) wiz.getProperty( "info" );
+            String displayName = (String) wiz.getProperty( "displayName" );
+            type.add( f, data, displayName );
+            refresh( null );
+        }
+    }//GEN-LAST:event_addButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel addPanel;
+    private javax.swing.JButton addButton;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField nameField;
@@ -188,5 +223,6 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel pathLabel;
     private javax.swing.JList platformList;
     private javax.swing.JScrollPane platforms;
+    private javax.swing.JButton removeButton;
     // End of variables declaration//GEN-END:variables
 }

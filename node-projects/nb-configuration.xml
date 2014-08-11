@@ -33,5 +33,6 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceBeforeAnnotationParen>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceBeforeAnnotationParen>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceWithinMethodDeclParens>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceWithinMethodDeclParens>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceWithinWhileParens>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.spaceWithinWhileParens>
+        <netbeans.compile.on.save>none</netbeans.compile.on.save>
     </properties>
 </project-shared-configuration>
