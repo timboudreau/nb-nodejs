@@ -44,7 +44,7 @@ import org.openide.util.ImageUtilities;
  *
  * @author Tim Boudreau
  */
-@ServiceProvider (service = ProjectFactory.class)
+@ServiceProvider (service = ProjectFactory.class, position = -200000000)
 public class NodeJSProjectFactory implements ProjectFactory2 {
     public static final String PACKAGE_JSON = "package.json"; //NOI18N
     public static final String NODE_MODULES_FOLDER = "node_modules"; //NOI18N
