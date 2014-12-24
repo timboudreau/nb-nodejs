@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.netbeans.modules</groupId>
         <artifactId>netbeans-nodejs</artifactId>
-        <version>2.26</version>
+        <version>2.27</version>
     </parent>
     <artifactId>avatar-platform</artifactId>
     <name>Avatar NodeJS Platform</name>
@@ -136,4 +136,6 @@
             </plugin>
         </plugins>
     </build>
+    <description>Allows the NodeJS plugin to run projects using AvatarJS to executed NodeJS code in a Java VM (separate installation of AvatarJS required)
+</description>
 </project>
