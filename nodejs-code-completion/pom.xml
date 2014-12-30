@@ -4,7 +4,7 @@
     <parent>
         <artifactId>netbeans-nodejs</artifactId>
         <groupId>org.netbeans.modules</groupId>
-        <version>2.27</version>
+        <version>2.28</version>
     </parent>
     <artifactId>nodejscodecompletion</artifactId>
     <packaging>nbm</packaging>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>org.netbeans.modules</groupId>
             <artifactId>nodejs</artifactId>
-            <version>2.10</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <build>

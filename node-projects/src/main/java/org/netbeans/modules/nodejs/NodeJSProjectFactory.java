@@ -29,9 +29,12 @@ import org.openide.util.lookup.ServiceProvider;
 import org.netbeans.api.project.ProjectManager.Result;
 import org.netbeans.spi.project.ProjectFactory2;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.spi.project.ProjectFactory;
@@ -39,22 +42,112 @@ import org.netbeans.spi.project.ProjectState;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbPreferences;
+import org.openide.util.RequestProcessor;
 
 /**
  *
  * @author Tim Boudreau
  */
-@ServiceProvider (service = ProjectFactory.class, position = -200000000)
+@ServiceProvider (service = ProjectFactory.class, position = -2147483648)
 public class NodeJSProjectFactory implements ProjectFactory2 {
     public static final String PACKAGE_JSON = "package.json"; //NOI18N
     public static final String NODE_MODULES_FOLDER = "node_modules"; //NOI18N
     public static final String NB_METADATA = ".nbrun"; //NOI18N
     public static final String DOT_NPMIGNORE = ".npmignore"; //NOI18N
     private final Set<NodeJSProject> cache = new WeakSet<NodeJSProject>();
+    private static final String PREFS_KEY_IGNORED_PROJECTS = "ignore";
+    private final RequestProcessor.Task task;
+    private static final int CACHE_CLEAN_DELAY = 1000 * 60;
+
+    private Set<String> cachedIgnoredPaths;
+
+    public NodeJSProjectFactory () {
+        task = NodeJSProject.NODE_JS_PROJECT_THREAD_POOL.create( new CacheCleaner( this ) );
+    }
+
+    static final class CacheCleaner implements Runnable {
+        private final WeakReference<NodeJSProjectFactory> factory;
+
+        CacheCleaner ( NodeJSProjectFactory factory ) {
+            this.factory = new WeakReference<>( factory );
+        }
+
+        @Override
+        public void run () {
+            NodeJSProjectFactory f = factory.get();
+            if (f != null) {
+                f.clearCaches();
+            }
+        }
+    }
+
+    synchronized void clearCaches () {
+        cachedIgnoredPaths = null;
+    }
+
+    private Set<String> ignoredPaths () {
+        Set<String> result = null;
+        synchronized ( this ) {
+            result = cachedIgnoredPaths;
+        }
+        if (result == null) {
+            Preferences prefs = NbPreferences.forModule( NodeJSProjectFactory.class );
+            String[] paths = prefs.get( PREFS_KEY_IGNORED_PROJECTS, "" ).split( "," );
+            synchronized ( this ) {
+                result = cachedIgnoredPaths = new HashSet<>( Arrays.asList( paths ) );
+            }
+            task.schedule( CACHE_CLEAN_DELAY );
+        }
+        return result;
+    }
+
+    public void ignore ( NodeJSProject project ) {
+        ignore( project.getProjectDirectory() );
+    }
+
+    private boolean isIgnored ( FileObject prj ) {
+        File f = FileUtil.toFile( prj );
+        if (f != null && ignoredPaths().contains( f.getAbsolutePath() )) {
+            return true;
+        }
+        return false;
+    }
+
+    private void ignore ( FileObject fo ) {
+        File f = FileUtil.toFile( fo );
+        if (f != null) {
+            String path = f.getAbsolutePath();
+            Set<String> all = new HashSet<>( ignoredPaths() );
+            if (!all.contains( path )) {
+                all.add( path );
+                StringBuilder sb = new StringBuilder();
+                for (Iterator<String> iter = all.iterator(); iter.hasNext();) {
+                    sb.append( iter.next() );
+                    if (iter.hasNext()) {
+                        sb.append( ',' );
+                    }
+                }
+                Preferences prefs = NbPreferences.forModule( NodeJSProjectFactory.class );
+                prefs.put( PREFS_KEY_IGNORED_PROJECTS, sb.toString() );
+                Set<NodeJSProject> cached = new HashSet<>();
+                synchronized ( this ) {
+                    cached.addAll( cache );
+                    cachedIgnoredPaths = all;
+                }
+                for (NodeJSProject p : cached) {
+                    if (p != null && fo.equals( p.getProjectDirectory() )) {
+                        cache.remove( p );
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public boolean isProject ( FileObject fo ) {
-        return fo.getFileObject( PACKAGE_JSON ) != null;
+        return isIgnored( fo ) ? false : fo.getFileObject( PACKAGE_JSON ) != null;
     }
 
     private FileObject resolve ( FileObject fo ) {
@@ -63,6 +156,9 @@ public class NodeJSProjectFactory implements ProjectFactory2 {
         }
         File f = FileUtil.toFile( fo );
         if (f != null) {
+            if (ignoredPaths().contains( f.getAbsolutePath() )) {
+                return null;
+            }
             try {
                 f = f.getCanonicalFile();
                 if (f != null) {
@@ -79,7 +175,7 @@ public class NodeJSProjectFactory implements ProjectFactory2 {
     NodeJSProject findOwner ( FileObject fo ) throws IOException {
         List<NodeJSProject> l;
         synchronized ( this ) {
-            l = new ArrayList<NodeJSProject>( cache );
+            l = new ArrayList<>( cache );
         }
         //Sort by longest-path first, so the deepest directory which is 
         //a project gets the first chance to claim it in the case of nested
@@ -121,7 +217,7 @@ public class NodeJSProjectFactory implements ProjectFactory2 {
 
     @Override
     public Project loadProject ( FileObject fo, ProjectState ps ) throws IOException {
-        if (!isProject( fo )) {
+        if (!isProject( fo ) || isIgnored( fo )) {
             return null;
         }
         Iterator<NodeJSProject> i;
@@ -159,7 +255,7 @@ public class NodeJSProjectFactory implements ProjectFactory2 {
 
     @Override
     public Result isProject2 ( FileObject fo ) {
-        if (isProject( fo )) {
+        if (isProject( fo ) && !isIgnored( fo )) {
             return new ProjectManager.Result( ImageUtilities.loadImageIcon(
                     "org/netbeans/modules/nodejs/resources/logo.png", false ) ); //NOI18N
         }

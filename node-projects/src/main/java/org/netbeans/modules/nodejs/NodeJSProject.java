@@ -127,7 +127,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     private final Sources sources = new NodeJSProjectSources( this );
     private final NodeJSLogicalViewProvider logicalView = new NodeJSLogicalViewProvider( this );
     private final FileChangeRegistry registry = new FileChangeRegistry( this );
-    static final RequestProcessor NODE_JS_PROJECT_THREAD_POOL = new RequestProcessor( "NodeJS", 3 ); //NOI18N
+    public static final RequestProcessor NODE_JS_PROJECT_THREAD_POOL = new RequestProcessor( "NodeJS", 3 ); //NOI18N
     private final Lookup lookup = Lookups.fixed( this, logicalView,
             new NodeJSProjectProperties( this ), classpath, sources,
             new NodeJsEncodingQuery(), registry, metadata,

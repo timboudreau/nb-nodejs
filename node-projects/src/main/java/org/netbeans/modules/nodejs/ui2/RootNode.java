@@ -74,11 +74,11 @@ public final class RootNode extends AbstractNode implements ChangeListener {
     public RootNode ( NodeJSProject project ) {
         this( project, new InstanceContent() );
     }
-
+    
     public void updateChildren () {
         setChildren( createProjectChildren( getLookup().lookup( NodeJSProject.class ) ) );
     }
-
+    
     @SuppressWarnings ("LeakingThisInConstructor") //NOI18N
     public RootNode ( NodeJSProject project, InstanceContent content ) {
         super( createProjectChildren( project ), new ProxyLookup( project.getLookup(), new AbstractLookup( content ) ) );
@@ -93,20 +93,20 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         } );
         setIconBaseWithExtension( LOGO_ICON );
     }
-
+    
     private static Children createProjectChildren ( NodeJSProject project ) {
         return Children.create( new ProjectChildren( project ), true );
     }
-
+    
     @Override
     public String getShortDescription () {
         NodeJSProjectProperties props = getLookup().lookup( NodeJSProjectProperties.class );
         String desc = props.getDescription();
         return desc == null ? super.getShortDescription() : desc;
     }
-
+    
     private boolean listening;
-
+    
     @Override
     public Image getIcon ( int type ) {
         LibrariesResolver resolver = getLookup().lookup( LibrariesResolver.class );
@@ -117,24 +117,24 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         Image result = super.getIcon( type );
         if (resolver.hasMissingLibraries()) {
             Image badge = ImageUtilities.loadImage( MISSING_LIBRARIES_BADGE );
-            result = ImageUtilities.mergeImages( result , badge, 9, 9);
+            result = ImageUtilities.mergeImages( result, badge, 9, 9 );
         }
         return result;
     }
-
+    
     @Override
     public Image getOpenedIcon ( int type ) {
         return getIcon( type );
     }
-
+    
     @Override
     public Action[] getActions ( boolean ignored ) {
         NodeJSProject project = getLookup().lookup( NodeJSProject.class );
         final ResourceBundle bundle
                 = NbBundle.getBundle( RootNode.class );
-
+        
         List<Action> actions = new ArrayList<>();
-
+        
         actions.add( CommonProjectActions.newFileAction() );
         actions.add( null );
         actions.add( ProjectSensitiveActions.projectCommandAction(
@@ -166,6 +166,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         actions.add( null );
         actions.add( getFilesystemAction() );
         actions.addAll( Lookups.forPath( "Project/NodeJS/Actions" ).lookupAll( Action.class ) ); //NOI18N
+        actions.add( new IgnoreProjectAction( project ) );
         actions.add( new AbstractAction( NbBundle.getMessage( RootNode.class, "PROPERTIES" ) ) { //NOI18N
             @Override
             public void actionPerformed ( ActionEvent e ) {
@@ -175,18 +176,18 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         } );
         final LibrariesResolver resolver = getLookup().lookup( Project.class ).getLookup().lookup( LibrariesResolver.class );
         if (resolver.hasMissingLibraries()) {
-            actions.add(new AbstractAction(NbBundle.getMessage(RootNode.class, "RESOLVE_LIBRARIES")){ //NOI18N
+            actions.add( new AbstractAction( NbBundle.getMessage( RootNode.class, "RESOLVE_LIBRARIES" ) ) { //NOI18N
 
                 @Override
                 public void actionPerformed ( ActionEvent e ) {
                     resolver.install();
                 }
-            });
+            } );
         }
-
+        
         return actions.toArray( new Action[actions.size()] );
     }
-
+    
     private Action getFilesystemAction () {
         Project project = getLookup().lookup( Project.class );
         FileSystemAction a = SystemAction.get( FileSystemAction.class );
@@ -202,7 +203,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
             return a;
         }
     }
-
+    
     @Override
     protected void createPasteTypes ( Transferable t, List<PasteType> s ) {
         Project project = getLookup().lookup( Project.class );
@@ -214,7 +215,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
                     "Project dir disappeared: {0}", project ); //NOI18N
         }
     }
-
+    
     @Override
     public void stateChanged ( ChangeEvent e ) {
         fireIconChange();
