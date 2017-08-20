@@ -28,6 +28,7 @@ import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.api.NodeJSPlatformProvider;
 import org.openide.loaders.DataObject;
 
+import org.openide.LifecycleManager;
 import org.openide.awt.ActionRegistration;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -59,10 +60,7 @@ public final class RunAction implements ActionListener, Runnable {
     @Override
     public void run () {
         try {
-            Savable save = context.getLookup().lookup( Savable.class );
-            if (save != null) {
-                save.save();
-            }
+            LifecycleManager.getDefault().saveAll();
             FileObject fo = context.getPrimaryFile();
             Project p = FileOwnerQuery.getOwner( fo );
             NodeJSExecutable exe = null;

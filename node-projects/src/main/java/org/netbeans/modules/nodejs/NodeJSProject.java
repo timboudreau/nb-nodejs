@@ -689,18 +689,20 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     public void notifyMoved ( Project original, File originalPath, String nueName ) throws IOException {
         getLookup().lookup( NodeJSProjectProperties.class ).setDisplayName( nueName );
     }
+    
+    private void getFileObjectsIfExist(List<? super FileObject> result, String... names) {
+        for (String name : names) {
+            FileObject fo = getProjectDirectory().getFileObject(name);
+            if (fo != null) {
+                result.add(fo);
+            }
+        }
+    }
 
     @Override
     public List<FileObject> getMetadataFiles () {
         List<FileObject> result = new ArrayList<>();
-        FileObject projectProps = getProjectDirectory().getFileObject( NodeJSProjectFactory.PACKAGE_JSON );
-        if (projectProps != null) {
-            result.add( projectProps );
-        }
-        FileObject runProps = getProjectDirectory().getFileObject( NBRUN );
-        if (runProps != null) {
-            result.add( runProps );
-        }
+        getFileObjectsIfExist(result, NodeJSProjectFactory.PACKAGE_JSON, NodeJSProjectFactory.PACKAGE_LOCK_JSON, "README.md", ".gitignore", NBRUN);
         return result;
     }
 

@@ -49,6 +49,18 @@ public class ImportantFilesChildFactory extends ChildFactory.Detachable<FileObje
             if (fo != null && fo.isValid()) {
                 toPopulate.add( fo );
             }
+            fo = root.getFileObject( NodeJSProjectFactory.PACKAGE_LOCK_JSON );
+            if (fo != null && fo.isValid()) {
+                toPopulate.add( fo );
+            }
+            fo = root.getFileObject( "README.md" );
+            if (fo != null && fo.isValid()) {
+                toPopulate.add( fo );
+            }
+            fo = root.getFileObject( ".gitignore" );
+            if (fo != null && fo.isValid()) {
+                toPopulate.add( fo );
+            }
             fo = root.getFileObject( NodeJSProjectFactory.DOT_NPMIGNORE );
             if (fo != null && fo.isValid()) {
                 toPopulate.add( fo );
