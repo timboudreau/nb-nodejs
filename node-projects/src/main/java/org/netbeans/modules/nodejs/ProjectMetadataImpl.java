@@ -18,6 +18,9 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import java.awt.EventQueue;
 import java.beans.PropertyChangeListener;
@@ -25,7 +28,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,9 +39,6 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
@@ -534,8 +533,8 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
             return getMap();
         }
         Object o = getMap().get( key );
-        if (o instanceof Map) {
-            return NbCollections.checkedMapByFilter( (Map) o, String.class, Object.class, false );
+        if (o instanceof Map<?,?>) {
+            return NbCollections.checkedMapByFilter( (Map<?,?>) o, String.class, Object.class, false );
         }
         return null;
     }

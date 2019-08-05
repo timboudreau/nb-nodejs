@@ -28,6 +28,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,9 +38,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
@@ -48,6 +53,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
+import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.Sources;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.api.validation.adapters.DialogBuilder;
@@ -128,17 +134,21 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     private final NodeJSLogicalViewProvider logicalView = new NodeJSLogicalViewProvider( this );
     private final FileChangeRegistry registry = new FileChangeRegistry( this );
     public static final RequestProcessor NODE_JS_PROJECT_THREAD_POOL = new RequestProcessor( "NodeJS", 3 ); //NOI18N
-    private final Lookup lookup = Lookups.fixed( this, logicalView,
-            new NodeJSProjectProperties( this ), classpath, sources,
-            new NodeJsEncodingQuery(), registry, metadata,
-            new PlatformProvider(), new LibrariesResolverImpl(),
-/*            new NodeJsSupportImpl( this ), */
-            NODE_JS_PROJECT_THREAD_POOL );
+    private final Lookup lookup;
+    private final PI pi;
 
     @SuppressWarnings ("LeakingThisInConstructor")
     NodeJSProject ( FileObject dir, ProjectState state ) {
         this.dir = dir;
         this.state = state;
+        this.pi = new PI( dir ).setProject( this );
+        lookup = Lookups.fixed( this, logicalView,
+                new NodeJSProjectProperties( this ), classpath, sources,
+                new NodeJsEncodingQuery(), registry, metadata,
+                new PlatformProvider(), new LibrariesResolverImpl(),
+                pi,
+                /*            new NodeJsSupportImpl( this ), */
+                NODE_JS_PROJECT_THREAD_POOL );
         metadata.addPropertyChangeListener( this );
     }
 
@@ -315,131 +325,175 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public String[] getSupportedActions () {
-        return ALWAYS_ENABLED.toArray( new String[ALWAYS_ENABLED.size()] );
+        return SUPPORTED_ACTIONS.toArray( new String[SUPPORTED_ACTIONS.size()] );
     }
 
     @Override
-    public void invokeAction ( String string, Lookup lkp ) throws IllegalArgumentException {
-        if (COMMAND_RUN.equals( string )) {
-            NodeJSPlatformProvider platformP = getLookup().lookup( NodeJSPlatformProvider.class );
-            final NodeJSExecutable exe = platformP.get();
-            FileObject main = getLookup().lookup( NodeJSProjectProperties.class ).getMainFile();
-            if (main == null) {
-                main = showSelectMainFileDialog();
-                if (main != null) {
-                    NodeJSProjectProperties props = getLookup().lookup( NodeJSProjectProperties.class );
-                    props.setMainFile( main );
-                    StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class,
-                            "MSG_MAIN_FILE_SET", getName(), main.getName() ) );
-                } else {
-                    return;
-                }
+    public void invokeAction ( String action, Lookup lkp ) throws IllegalArgumentException {
+        switch ( action ) {
+            case COMMAND_RUN:
+                runTheProject();
+                break;
+            case COMMAND_TEST:
+                testTheProject();
+                break;
+            case MAIN_FILE_COMMAND:
+                showSetMainFileDialog();
+                break;
+            case CLOSE_COMMAND:
+                OpenProjects.getDefault().close( new Project[]{this} );
+                break;
+            case LIBRARIES_COMMAND:
+                showLibrariesDialog();
+                break;
+            case COMMAND_DELETE:
+                DefaultProjectOperations.performDefaultDeleteOperation( this );
+                break;
+            case COMMAND_MOVE:
+                DefaultProjectOperations.performDefaultMoveOperation( this );
+                break;
+            case COMMAND_COPY:
+                DefaultProjectOperations.performDefaultCopyOperation( this );
+                break;
+            case COMMAND_RENAME :
+                renameTheProject();
+                break;
+            default:
+                throw new AssertionError( action );
+        }
+    }
+
+    void showSetMainFileDialog () {
+        FileObject main = showSelectMainFileDialog();
+        if (main != null) {
+            NodeJSProjectProperties props = getLookup().lookup( NodeJSProjectProperties.class );
+            props.setMainFile( main );
+        }
+    }
+
+    void showLibrariesDialog () throws MissingResourceException {
+        LibrariesPanel pn = new LibrariesPanel( this );
+        DialogDescriptor dd = new DialogDescriptor( pn, NbBundle.getMessage( NodeJSProject.class, "SEARCH_FOR_LIBRARIES" ) ); //NOI18N
+        DialogDisplayer.getDefault().notify( dd );
+    }
+
+    boolean renameTheProject () throws MissingResourceException, IllegalArgumentException {
+        String label = NbBundle.getMessage( NodeJSProject.class, "LBL_PROJECT_RENAME" ); //NOI18N
+        NotifyDescriptor.InputLine l = new NotifyDescriptor.InputLine( label, NbBundle.getMessage( NodeJSProject.class, "TTL_PROJECT_RENAME" ) ); //NOI18N
+        if (DialogDisplayer.getDefault().notify( l ).equals( NotifyDescriptor.OK_OPTION )) {
+            String txt = l.getInputText();
+            Validator<String> v = ValidatorUtils.merge( StringValidators.REQUIRE_NON_EMPTY_STRING, StringValidators.REQUIRE_VALID_FILENAME );
+            Problems p = new Problems();
+            v.validate( p, label, txt );
+            if (p.hasFatal()) {
+                NotifyDescriptor.Message msg = new NotifyDescriptor.Message( p.getLeadProblem().getMessage(), NotifyDescriptor.ERROR_MESSAGE );
+                DialogDisplayer.getDefault().notify( msg );
+                return true;
             }
-            final FileObject toRun = main;
-            if (toRun != null && toRun.isValid()) {
-                final Runnable runIt = new Runnable() {
-                    @Override
-                    public void run () {
-                        try {
-                            exe.run( toRun, getLookup().lookup( NodeJSProjectProperties.class ).getRunArguments() );
-                        } catch ( IOException ex ) {
-                            throw new IllegalArgumentException( ex );
-                        }
-                    }
-                };
-                Object o = metadata.getMap().get( "dependencies" ); //NOI18N
-                boolean needRunNPMInstall = false;
-                if (o instanceof Map<?, ?>) {
-                    FileObject nodeModules = getProjectDirectory().getFileObject( NodeJSProjectFactory.NODE_MODULES_FOLDER );
-                    needRunNPMInstall = nodeModules == null;
-                    if (needRunNPMInstall) {
-                        String msg = NbBundle.getMessage( NodeJSProject.class, "DETAIL_RUN_NPM_INSTALL" ); //NOI18N
-                        String title = NbBundle.getMessage( NodeJSProject.class, "TITLE_RUN_NPM_INSTALL" ); //NOI18N
-                        NotifyDescriptor nd = new NotifyDescriptor.Confirmation( msg, title, NotifyDescriptor.YES_NO_CANCEL_OPTION );
-                        Object dlgResult = DialogDisplayer.getDefault().notify( nd );
-                        needRunNPMInstall = NotifyDescriptor.YES_OPTION.equals( dlgResult );
-                        if (NotifyDescriptor.CANCEL_OPTION.equals( dlgResult )) {
-                            return;
-                        }
-                    }
-                }
-                if (needRunNPMInstall) {
-                    NODE_JS_PROJECT_THREAD_POOL.post( new Runnable() {
-                        @Override
-                        public void run () {
-                            try {
-                                Future<Integer> f = Npm.getDefault().runWithOutputWindow( FileUtil.toFile( getProjectDirectory() ), "install" ); //NOI18N
-                                int exitCode = f.get();
-                                if (exitCode == 0) {
-                                    runIt.run();
-                                } else {
-                                    StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "NPM_INSTALL_FAILED" ) ); //NOI18N
-                                }
-                            } catch ( IOException ex ) {
-                                Exceptions.printStackTrace( ex );
-                            } catch ( InterruptedException ex ) {
-                                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "RUN_CANCELLED" ) ); //NOI18N
-                                Logger.getLogger( NodeJSProject.class.getName() ).log( Level.INFO, "Interrupted running NPM", ex ); //NOI18N
-                            } catch ( ExecutionException ex ) {
-                                Exceptions.printStackTrace( ex );
-                            }
-                        }
-                    } );
-                } else {
-                    NODE_JS_PROJECT_THREAD_POOL.post( runIt );
-                }
-            } else {
-                Toolkit.getDefaultToolkit().beep();
+            DefaultProjectOperations.performDefaultRenameOperation( this, l.getInputText() );
+        }
+        return false;
+    }
+
+    void testTheProject () {
+        NodeJSProjectProperties props = getLookup().lookup( NodeJSProjectProperties.class );
+        String testCommand = props.getTestCommand();
+        if (testCommand != null) {
+            try {
+                Npm.getDefault().runWithOutputWindow( FileUtil.toFile( getProjectDirectory() ), "test" );
+            } catch ( IOException ex ) {
+                Exceptions.printStackTrace( ex );
             }
-        } else if (MAIN_FILE_COMMAND.equals( string )) {
-            FileObject main = showSelectMainFileDialog();
+        }
+    }
+
+    boolean runTheProject () throws MissingResourceException {
+        NodeJSPlatformProvider platformP = getLookup().lookup( NodeJSPlatformProvider.class );
+        final NodeJSExecutable exe = platformP.get();
+        FileObject main = getLookup().lookup( NodeJSProjectProperties.class ).getMainFile();
+        if (main == null) {
+            main = showSelectMainFileDialog();
             if (main != null) {
                 NodeJSProjectProperties props = getLookup().lookup( NodeJSProjectProperties.class );
                 props.setMainFile( main );
+                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class,
+                        "MSG_MAIN_FILE_SET", getName(), main.getName() ) );
+            } else {
+                return true;
             }
-        } else if (PROPERTIES_COMMAND.equals( string )) {
-        } else if (CLOSE_COMMAND.equals( string )) {
-            OpenProjects.getDefault().close( new Project[]{this} );
-        } else if (LIBRARIES_COMMAND.equals( string )) {
-            LibrariesPanel pn = new LibrariesPanel( this );
-            DialogDescriptor dd = new DialogDescriptor( pn, NbBundle.getMessage( NodeJSProject.class, "SEARCH_FOR_LIBRARIES" ) ); //NOI18N
-            DialogDisplayer.getDefault().notify( dd );
-        } else if (COMMAND_DELETE.equals( string )) {
-            DefaultProjectOperations.performDefaultDeleteOperation( this );
-        } else if (COMMAND_MOVE.equals( string )) {
-            DefaultProjectOperations.performDefaultMoveOperation( this );
-        } else if (COMMAND_RENAME.equals( string )) {
-            String label = NbBundle.getMessage( NodeJSProject.class, "LBL_PROJECT_RENAME" ); //NOI18N
-            NotifyDescriptor.InputLine l = new NotifyDescriptor.InputLine( label, NbBundle.getMessage( NodeJSProject.class, "TTL_PROJECT_RENAME" ) ); //NOI18N
-            if (DialogDisplayer.getDefault().notify( l ).equals( NotifyDescriptor.OK_OPTION )) {
-                String txt = l.getInputText();
-                Validator<String> v = ValidatorUtils.merge( StringValidators.REQUIRE_NON_EMPTY_STRING, StringValidators.REQUIRE_VALID_FILENAME );
-                Problems p = new Problems();
-                v.validate( p, label, txt );
-                if (p.hasFatal()) {
-                    NotifyDescriptor.Message msg = new NotifyDescriptor.Message( p.getLeadProblem().getMessage(), NotifyDescriptor.ERROR_MESSAGE );
-                    DialogDisplayer.getDefault().notify( msg );
-                    return;
-                }
-                DefaultProjectOperations.performDefaultRenameOperation( this, l.getInputText() );
-            }
-        } else if (COMMAND_COPY.equals( string )) {
-            DefaultProjectOperations.performDefaultCopyOperation( this );
-        } else {
-            throw new AssertionError( string );
         }
+        final FileObject toRun = main;
+        if (toRun != null && toRun.isValid()) {
+            final Runnable runIt = new Runnable() {
+                @Override
+                public void run () {
+                    try {
+                        exe.run( toRun, getLookup().lookup( NodeJSProjectProperties.class ).getRunArguments() );
+                    } catch ( IOException ex ) {
+                        throw new IllegalArgumentException( ex );
+                    }
+                }
+            };
+            Object o = metadata.getMap().get( "dependencies" ); //NOI18N
+            boolean needRunNPMInstall = false;
+            if (o instanceof Map<?, ?>) {
+                FileObject nodeModules = getProjectDirectory().getFileObject( NodeJSProjectFactory.NODE_MODULES_FOLDER );
+                needRunNPMInstall = nodeModules == null;
+                if (needRunNPMInstall) {
+                    String msg = NbBundle.getMessage( NodeJSProject.class, "DETAIL_RUN_NPM_INSTALL" ); //NOI18N
+                    String title = NbBundle.getMessage( NodeJSProject.class, "TITLE_RUN_NPM_INSTALL" ); //NOI18N
+                    NotifyDescriptor nd = new NotifyDescriptor.Confirmation( msg, title, NotifyDescriptor.YES_NO_CANCEL_OPTION );
+                    Object dlgResult = DialogDisplayer.getDefault().notify( nd );
+                    needRunNPMInstall = NotifyDescriptor.YES_OPTION.equals( dlgResult );
+                    if (NotifyDescriptor.CANCEL_OPTION.equals( dlgResult )) {
+                        return true;
+                    }
+                }
+            }
+            if (needRunNPMInstall) {
+                NODE_JS_PROJECT_THREAD_POOL.post( new Runnable() {
+                    @Override
+                    public void run () {
+                        try {
+                            Future<Integer> f = Npm.getDefault().runWithOutputWindow( FileUtil.toFile( getProjectDirectory() ), "install" ); //NOI18N
+                            int exitCode = f.get();
+                            if (exitCode == 0) {
+                                runIt.run();
+                            } else {
+                                StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "NPM_INSTALL_FAILED" ) ); //NOI18N
+                            }
+                        } catch ( IOException ex ) {
+                            Exceptions.printStackTrace( ex );
+                        } catch ( InterruptedException ex ) {
+                            StatusDisplayer.getDefault().setStatusText( NbBundle.getMessage( NodeJSProject.class, "RUN_CANCELLED" ) ); //NOI18N
+                            Logger.getLogger( NodeJSProject.class.getName() ).log( Level.INFO, "Interrupted running NPM", ex ); //NOI18N
+                        } catch ( ExecutionException ex ) {
+                            Exceptions.printStackTrace( ex );
+                        }
+                    }
+                } );
+            } else {
+                NODE_JS_PROJECT_THREAD_POOL.post( runIt );
+            }
+        } else {
+            Toolkit.getDefaultToolkit().beep();
+        }
+        return false;
     }
-    private static final Set<String> ALWAYS_ENABLED = new HashSet<>( Arrays.asList(
+    private static final Set<String> SUPPORTED_ACTIONS = new HashSet<>( Arrays.asList(
             LIBRARIES_COMMAND, COMMAND_DELETE, COMMAND_MOVE, COMMAND_COPY,
-            COMMAND_RENAME, MAIN_FILE_COMMAND, CLOSE_COMMAND, COMMAND_RUN ) );
+            COMMAND_RENAME, MAIN_FILE_COMMAND, CLOSE_COMMAND, COMMAND_RUN, COMMAND_TEST ) );
 
     @Override
-    public boolean isActionEnabled ( String string, Lookup lkp ) throws IllegalArgumentException {
-        if (COMMAND_RUN.equals( string )) {
-            return getLookup().lookup( NodeJSProjectProperties.class ).getMainFile() != null;
+    public boolean isActionEnabled ( String action, Lookup lkp ) throws IllegalArgumentException {
+        switch ( action ) {
+            case COMMAND_RUN:
+                return getLookup().lookup( NodeJSProjectProperties.class ).getMainFile() != null;
+            case COMMAND_TEST:
+                return getLookup().lookup( NodeJSProjectProperties.class ).getTestCommand() != null;
+            default:
+                return SUPPORTED_ACTIONS.contains( action );
         }
-        boolean result = ALWAYS_ENABLED.contains( string );
-        return result;
     }
 
     @Override
@@ -648,7 +702,105 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public Icon getIcon () {
-        return ImageUtilities.loadImageIcon( "org/netbeans/modules/nodejs/resources/logo.png", true );
+        return ImageUtilities.loadImageIcon( "org/netbeans/modules/nodejs/resources/logo.png", false );
+    }
+
+    static final class PI implements ProjectInformation, PropertyChangeListener, Serializable {
+
+        private final FileObject dir;
+        private transient WeakReference<NodeJSProject> project;
+        private transient volatile PropertyChangeSupport supp;
+
+        public PI ( FileObject dir ) {
+            this.dir = dir;
+        }
+
+        synchronized PI setProject ( NodeJSProject prj ) {
+            if (prj != null) {
+                project = new WeakReference<>( prj );
+                prj.addPropertyChangeListener( WeakListeners.propertyChange( prj, this ) );
+            }
+            return this;
+        }
+
+        private synchronized NodeJSProject project () {
+            return project.get();
+        }
+
+        private <T> T fromProjectIfPresent ( Function<NodeJSProject, T> ifPresent, Supplier<T> fallback ) {
+            NodeJSProject prj = project();
+            if (prj != null) {
+                return ifPresent.apply( prj );
+            }
+            return fallback.get();
+        }
+
+        @Override
+        public String getName () {
+            return fromProjectIfPresent( NodeJSProject::getName, dir::getName );
+        }
+
+        @Override
+        public String getDisplayName () {
+            return fromProjectIfPresent( NodeJSProject::getDisplayName, this::getName );
+        }
+
+        @Override
+        public Icon getIcon () {
+            return fromProjectIfPresent( NodeJSProject::getIcon,
+                    () -> ImageUtilities.loadImageIcon( "org/netbeans/modules/nodejs/resources/logo.png", false ) );
+        }
+
+        @Override
+        public Project getProject () {
+            return fromProjectIfPresent( prj -> prj, () -> {
+                try {
+                    Project result = ProjectManager.getDefault().findProject( dir );
+                    if (result != null) {
+                        NodeJSProject prj = result.getLookup().lookup( NodeJSProject.class );
+                        setProject( prj );
+                    }
+                    return result;
+                } catch ( IOException | IllegalArgumentException ex ) {
+                    Exceptions.printStackTrace( ex );
+                    return null;
+                }
+            } );
+        }
+
+        private PropertyChangeSupport supp ( boolean create ) {
+            PropertyChangeSupport s = supp;
+            if (s == null && create) {
+                synchronized ( this ) {
+                    s = supp;
+                    if (s == null) {
+                        supp = s = new PropertyChangeSupport( this );
+                    }
+                }
+            }
+            return s;
+        }
+
+        @Override
+        public void addPropertyChangeListener ( PropertyChangeListener pl ) {
+            supp( true ).addPropertyChangeListener( pl );
+        }
+
+        @Override
+        public void removePropertyChangeListener ( PropertyChangeListener pl ) {
+            PropertyChangeSupport s = supp( false );
+            if (s != null) {
+                s.removePropertyChangeListener( pl );
+            }
+        }
+
+        @Override
+        public void propertyChange ( PropertyChangeEvent evt ) {
+            PropertyChangeSupport s = supp( false );
+            if (s != null) {
+                s.firePropertyChange( evt.getPropertyName(), evt.getOldValue(), evt.getNewValue() );
+            }
+        }
     }
 
     @Override
@@ -690,12 +842,12 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     public void notifyMoved ( Project original, File originalPath, String nueName ) throws IOException {
         getLookup().lookup( NodeJSProjectProperties.class ).setDisplayName( nueName );
     }
-    
-    private void getFileObjectsIfExist(List<? super FileObject> result, String... names) {
+
+    private void getFileObjectsIfExist ( List<? super FileObject> result, String... names ) {
         for (String name : names) {
-            FileObject fo = getProjectDirectory().getFileObject(name);
+            FileObject fo = getProjectDirectory().getFileObject( name );
             if (fo != null) {
-                result.add(fo);
+                result.add( fo );
             }
         }
     }
@@ -703,7 +855,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
     @Override
     public List<FileObject> getMetadataFiles () {
         List<FileObject> result = new ArrayList<>();
-        getFileObjectsIfExist(result, NodeJSProjectFactory.PACKAGE_JSON, NodeJSProjectFactory.PACKAGE_LOCK_JSON, "README.md", ".gitignore", NBRUN);
+        getFileObjectsIfExist( result, NodeJSProjectFactory.PACKAGE_JSON, NodeJSProjectFactory.PACKAGE_LOCK_JSON, "README.md", ".gitignore", NBRUN );
         return result;
     }
 

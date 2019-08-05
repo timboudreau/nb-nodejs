@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public interface ProjectMetadata {
     public static final String PROP_MAIN_FILE = "main"; //NOi18N
-    public static final String PROP_TEST_FILE = "test"; //NOi18N
+    public static final String PROP_TEST_SCRIPT = "scripts.test"; //NOi18N
     public static final String PROP_NAME = "name"; //NOi18N
     public static final String PROP_DESCRIPTION = "description"; //NOi18N
     public static final String PROP_LICENSE_KIND = "license.type"; //NOi18N

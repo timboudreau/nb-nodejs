@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.node;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,7 +39,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;

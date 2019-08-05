@@ -23,7 +23,6 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ChangeSupport;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
@@ -80,12 +79,16 @@ public abstract class LaunchSupport {
             b = b.addArgument( cmdLineArgs[i] );
         }
 
-        b = b.addArgument( f.getAbsolutePath() )
-                .workingDirectory( f.getParentFile() )
-                .redirectErrorStream( true );
+        if (f.isFile()) {
+            b = b.addArgument( f.getAbsolutePath() )
+                    .workingDirectory( f.getParentFile() );
+        } else {
+            b = b.workingDirectory( f );
+        }
+        b = b.redirectErrorStream( true );
 
         if (args != null) {
-            for (String arg : args.split( " " )) { //NOI18N
+            for (String arg : args.split( "\\s" )) { //NOI18N
                 b = b.addArgument( arg );
             }
         }

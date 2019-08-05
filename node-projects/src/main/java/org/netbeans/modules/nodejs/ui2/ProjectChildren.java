@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
@@ -99,17 +100,18 @@ final class ProjectChildren extends ChildFactory.Detachable<Key<?>> {
     @Override
     protected boolean createKeys ( List<Key<?>> toPopulate ) {
         VisibilityQuery vq = VisibilityQuery.getDefault();
-        Set<FileObject> meta = new HashSet<FileObject>( project.getMetadataFiles() );
+        Predicate<FileObject> important = ImportantFilesChildFactory.importantFileTester( project );
+        Set<FileObject> meta = new HashSet<>( project.getMetadataFiles() );
         for (FileObject fo : project.getDataFiles()) {
             if (NodeJSProjectFactory.NODE_MODULES_FOLDER.equals( fo.getName() ) && fo.isFolder()) {
                 continue;
             }
-            if (vq.isVisible( fo ) && !meta.contains( fo )) {
+            if (vq.isVisible( fo ) && !meta.contains( fo ) && !important.test( fo )) {
                 toPopulate.add( new Key<FileObject>( fo ) );
             }
         }
-        toPopulate.add( Key.IMPORTANT_FILES );
-        toPopulate.add( Key.LIBRARIES );
+        toPopulate.add( IMPORTANT_FILES );
+        toPopulate.add( LIBRARIES );
         ChildNodeRegistry reg = Lookup.getDefault().lookup( ChildNodeRegistry.class );
         reg.populateKeys( project, toPopulate );
         Collections.sort( toPopulate );

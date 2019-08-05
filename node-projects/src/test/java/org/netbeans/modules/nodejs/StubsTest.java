@@ -1,5 +1,6 @@
 package org.netbeans.modules.nodejs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,14 +14,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.modules.nodejs.api.NodeJSUtils;
 import org.netbeans.modules.nodejs.api.Stubs;
 import org.netbeans.modules.nodejs.node.LibrariesChildFactory;
@@ -68,6 +68,13 @@ public class StubsTest {
 
         booProject = new NodeJSProject( booDir, new PS() );
         fac.register( booProject );
+
+        ProjectInformation info = prj.getLookup().lookup(ProjectInformation.class);
+        assertNotNull(info);
+        assertTrue(info instanceof NodeJSProject);
+        assertNotNull(info.getDisplayName());
+        assertNotNull(info.getName());
+        assertNotNull(info.getIcon());
     }
 
     private void copy ( String name ) throws IOException {

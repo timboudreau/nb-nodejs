@@ -20,8 +20,6 @@ package org.netbeans.modules.nodejs;
 
 import org.netbeans.modules.nodejs.api.ProjectMetadata;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,6 +161,10 @@ public class NodeJSProjectProperties {
     public FileObject getSourceDir () {
         FileObject result = project.getProjectDirectory();
         return result;
+    }
+
+    public String getTestCommand () {
+        return project.metadata().getValue( ProjectMetadata.PROP_TEST_SCRIPT );
     }
 
     public String getAuthorEmail () {

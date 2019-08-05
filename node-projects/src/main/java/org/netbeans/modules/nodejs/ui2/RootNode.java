@@ -1,4 +1,4 @@
-/* Copyright (C) 2012 Tim Boudreau
+/* Copyright (C) 2012-2019 Tim Boudreau
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to
@@ -23,14 +23,18 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.Project;
@@ -38,14 +42,18 @@ import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.modules.nodejs.LibrariesResolver;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectProperties;
+import org.netbeans.modules.nodejs.Npm;
 import org.netbeans.modules.nodejs.PropertiesPanel;
 import org.netbeans.modules.nodejs.node.AddLibraryAction;
+import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.ui.support.CommonProjectActions;
 import org.netbeans.spi.project.ui.support.ProjectSensitiveActions;
 import org.openide.actions.FileSystemAction;
 import org.openide.actions.FindAction;
 import org.openide.actions.PasteAction;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.nodes.AbstractNode;
@@ -55,6 +63,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
+import org.openide.util.actions.Presenter;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.AbstractLookup;
@@ -74,11 +83,11 @@ public final class RootNode extends AbstractNode implements ChangeListener {
     public RootNode ( NodeJSProject project ) {
         this( project, new InstanceContent() );
     }
-    
+
     public void updateChildren () {
         setChildren( createProjectChildren( getLookup().lookup( NodeJSProject.class ) ) );
     }
-    
+
     @SuppressWarnings ("LeakingThisInConstructor") //NOI18N
     public RootNode ( NodeJSProject project, InstanceContent content ) {
         super( createProjectChildren( project ), new ProxyLookup( project.getLookup(), new AbstractLookup( content ) ) );
@@ -93,20 +102,20 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         } );
         setIconBaseWithExtension( LOGO_ICON );
     }
-    
+
     private static Children createProjectChildren ( NodeJSProject project ) {
         return Children.create( new ProjectChildren( project ), true );
     }
-    
+
     @Override
     public String getShortDescription () {
         NodeJSProjectProperties props = getLookup().lookup( NodeJSProjectProperties.class );
         String desc = props.getDescription();
         return desc == null ? super.getShortDescription() : desc;
     }
-    
+
     private boolean listening;
-    
+
     @Override
     public Image getIcon ( int type ) {
         LibrariesResolver resolver = getLookup().lookup( LibrariesResolver.class );
@@ -121,25 +130,33 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         }
         return result;
     }
-    
+
     @Override
     public Image getOpenedIcon ( int type ) {
         return getIcon( type );
     }
-    
+
     @Override
     public Action[] getActions ( boolean ignored ) {
         NodeJSProject project = getLookup().lookup( NodeJSProject.class );
         final ResourceBundle bundle
                 = NbBundle.getBundle( RootNode.class );
-        
+
         List<Action> actions = new ArrayList<>();
-        
+
         actions.add( CommonProjectActions.newFileAction() );
         actions.add( null );
         actions.add( ProjectSensitiveActions.projectCommandAction(
                 ActionProvider.COMMAND_RUN,
                 bundle.getString( "LBL_RunAction_Name" ), null ) ); // NOI18N
+        actions.add( ProjectSensitiveActions.projectCommandAction(
+                ActionProvider.COMMAND_TEST,
+                bundle.getString( "LBL_TestAction_Name" ), null ) ); // NOI18N
+
+        if (isScriptsPopupAvailable()) {
+            actions.add( new AdhocScriptAction( project ) );
+        }
+
         actions.add( null );
         actions.add( CommonProjectActions.setAsMainProjectAction() );
         actions.add( null );
@@ -184,10 +201,10 @@ public final class RootNode extends AbstractNode implements ChangeListener {
                 }
             } );
         }
-        
+
         return actions.toArray( new Action[actions.size()] );
     }
-    
+
     private Action getFilesystemAction () {
         Project project = getLookup().lookup( Project.class );
         FileSystemAction a = SystemAction.get( FileSystemAction.class );
@@ -203,7 +220,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
             return a;
         }
     }
-    
+
     @Override
     protected void createPasteTypes ( Transferable t, List<PasteType> s ) {
         Project project = getLookup().lookup( Project.class );
@@ -215,9 +232,90 @@ public final class RootNode extends AbstractNode implements ChangeListener {
                     "Project dir disappeared: {0}", project ); //NOI18N
         }
     }
-    
+
     @Override
     public void stateChanged ( ChangeEvent e ) {
         fireIconChange();
+    }
+
+    private boolean isScriptsPopupAvailable () {
+        NodeJSProject prj = getLookup().lookup( NodeJSProject.class );
+        Map<String, Object> m = prj.getMetadata().getMap( "scripts" );
+        if (m == null) {
+            return false;
+        }
+        boolean hasNonStandardScripts = false;
+        loop:
+        for (Map.Entry<String, Object> e : m.entrySet()) {
+            switch ( e.getKey() ) {
+                case "run":
+                case "test":
+                    continue;
+                default:
+                    hasNonStandardScripts = true;
+                    break loop;
+            }
+        }
+        return hasNonStandardScripts;
+    }
+
+    static final class AdhocScriptAction extends AbstractAction implements Presenter.Popup {
+        private final NodeJSProject project;
+
+        AdhocScriptAction ( NodeJSProject project ) {
+            super( NbBundle.getMessage( AdhocScriptAction.class, "SCRIPTS" ) ); // NOI18N
+            this.project = project;
+        }
+
+        @Override
+        public void actionPerformed ( ActionEvent e ) {
+            // do nothing
+        }
+
+        @Override
+        public JMenuItem getPopupPresenter () {
+            JMenu result = new JMenu( (String) getValue( NAME ) );
+            Map<String, Object> m = project.getMetadata().getMap( "scripts" ); //NOI18N
+            if (m == null) {
+                return result;
+            }
+            for (Map.Entry<String, Object> e : m.entrySet()) {
+                switch ( e.getKey() ) {
+                    case "run": //NOI18N
+                    case "test": //NOI18N
+                        continue;
+                    default:
+                        if (e.getValue() instanceof String) {
+                            String name = UiUtil.toMenuTitle( e.getKey() );
+                            JMenuItem item = new JMenuItem( name );
+                            item.setAction( new RunScriptAction( project.getProjectDirectory(), e.getKey(), name ) );
+                            result.add( item );
+                        }
+                        break;
+                }
+            }
+            return result;
+        }
+
+        static final class RunScriptAction extends AbstractAction {
+            private final FileObject dir;
+            private final String scriptKey;
+
+            public RunScriptAction ( FileObject dir, String scriptKey, String name ) {
+                super( name );
+                this.dir = dir;
+                this.scriptKey = scriptKey;
+            }
+
+            @Override
+            public void actionPerformed ( ActionEvent e ) {
+                try {
+                    Npm.getDefault().runWithOutputWindow( FileUtil.toFile( dir ), "run-script", scriptKey );
+                } catch ( IOException ex ) {
+                    Exceptions.printStackTrace( ex );
+                }
+            }
+
+        }
     }
 }

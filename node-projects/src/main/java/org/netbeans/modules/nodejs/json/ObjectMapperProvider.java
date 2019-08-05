@@ -18,10 +18,11 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.json;
 
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.DeserializationConfig;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 
 /**
  * Jackson's ObjectMapper is stateful, so we need to create new ones; and we
@@ -33,11 +34,10 @@ public class ObjectMapperProvider {
     public static ObjectMapper newObjectMapper () {
         ObjectMapper m = new ObjectMapper();
         m.configure( JsonParser.Feature.ALLOW_COMMENTS, true );
-        m.configure( DeserializationConfig.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true );
-        m.configure( SerializationConfig.Feature.INDENT_OUTPUT, true );
-        m.configure( SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true );
-        m.configure( SerializationConfig.Feature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, true );
-        m.configure( SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true );
+        m.configure( DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true );
+        m.configure( SerializationFeature.INDENT_OUTPUT, true );
+        m.configure( SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true );
+        m.configure( SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, true );
         m.configure( JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
         m.configure( JsonParser.Feature.AUTO_CLOSE_SOURCE, true );
         return m;

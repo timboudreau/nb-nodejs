@@ -23,6 +23,7 @@ import java.awt.Container;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.MissingResourceException;
+import java.util.function.Consumer;
 import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -35,6 +36,57 @@ import org.openide.util.NbBundle;
  */
 public class UiUtil {
     private UiUtil () {
+    }
+
+    private static void splitOnCaps ( String key, Consumer<String> c ) {
+        int max = key.length();
+        if (max == 0) {
+            c.accept( key );
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean lastWasUpper = true;
+        for (int i = 0; i < max; i++) {
+            char ch = key.charAt( i );
+            boolean isUpper = Character.isUpperCase( ch );
+            if (i != 0 && sb.length() > 0 && !lastWasUpper && isUpper) {
+                c.accept( sb.toString() );
+                sb.setLength( 0 );
+            }
+            sb.append( ch );
+            lastWasUpper = isUpper;
+        }
+        if (sb.length() > 0) {
+            c.accept( sb.toString() );
+        }
+    }
+
+    private static void splitOnSeparators ( String s, Consumer<String> c ) {
+        String[] parts = s.split( "[\\s_\\-]" ); //NOI18N
+        for (int i = 0; i < parts.length; i++) {
+            String word = parts[i].trim();
+            if (word.isEmpty()) {
+                continue;
+            }
+            char[] chars = word.toLowerCase().toCharArray();
+            if (chars.length > 0) {
+                chars[0] = Character.toUpperCase( chars[0] );
+            }
+            c.accept( new String( chars ) );
+        }
+    }
+
+    public static String toMenuTitle ( String key ) {
+        StringBuilder sb = new StringBuilder();
+        splitOnCaps( key, capSplitPart -> {
+            splitOnSeparators( capSplitPart, word -> {
+                if (sb.length() > 0) {
+                    sb.append( ' ' );
+                }
+                sb.append( word );
+            } );
+        } );
+        return sb.toString();
     }
 
     public static void prepareComponents ( Container container ) {
@@ -55,12 +107,12 @@ public class UiUtil {
             }
             if (c instanceof JLabel) {
                 String text = ((JLabel) c).getText();
-                if (text.indexOf( "&" ) >= 0) {
+                if (text.contains( "&" )) {
                     Mnemonics.setLocalizedText( (JLabel) c, text );
                 }
             } else if (c instanceof AbstractButton) {
                 String text = ((AbstractButton) c).getText();
-                if (text.indexOf( "&" ) >= 0) {
+                if (text.contains( "&" )) {
                     Mnemonics.setLocalizedText( (AbstractButton) c, text );
                 }
             }

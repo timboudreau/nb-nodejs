@@ -413,7 +413,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
                             dest.mkdirs();
                         }
                         System.out.println( "Dest is " + dest );
-                        ProcessBuilder b2 = new ProcessBuilder( s, "clone", "https://github.com/joyent/node.git", name );
+                        ProcessBuilder b2 = new ProcessBuilder( s, "clone", "https://github.com/nodejs/node", name );
                         b2.directory( dest.getParentFile() );
                         System.out.println( "starting git clone in " + dest.getAbsolutePath() );
                         Process p2 = b2.start();

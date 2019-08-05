@@ -15,7 +15,6 @@ var modules = [
     'dns',
     'domain',
     'events',
-    'freelist',
     'fs',
     'http',
     'https',
