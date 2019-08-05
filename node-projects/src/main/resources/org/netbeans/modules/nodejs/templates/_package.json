@@ -8,9 +8,10 @@
         "email": "${email}"
     },
     "keywords": [],
-    "licenses": {
-        "type": "${license}"
-    },
+    "licenses": "${license}",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },    
     "repository": {
         "type": "git",
         "url": "git://github.com/${login}/${projectName}.git"

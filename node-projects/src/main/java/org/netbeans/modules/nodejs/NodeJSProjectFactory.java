@@ -52,6 +52,7 @@ import org.openide.util.RequestProcessor;
 @ServiceProvider (service = ProjectFactory.class, position = -2147483648)
 public class NodeJSProjectFactory implements ProjectFactory2 {
     public static final String PACKAGE_JSON = "package.json"; //NOI18N
+    public static final String PACKAGE_LOCK_JSON = "package-lock.json"; //NOI18N
     public static final String NODE_MODULES_FOLDER = "node_modules"; //NOI18N
     public static final String NB_METADATA = ".nbrun"; //NOI18N
     public static final String DOT_NPMIGNORE = ".npmignore"; //NOI18N

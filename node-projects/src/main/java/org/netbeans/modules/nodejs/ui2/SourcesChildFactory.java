@@ -53,6 +53,9 @@ public class SourcesChildFactory extends ChildFactory.Detachable<Entry> implemen
         boolean result = !fo.isValid()
                 || fo.getNameExt().equals( NodeJSProjectFactory.NODE_MODULES_FOLDER )
                 || fo.getNameExt().equals( NodeJSProjectFactory.PACKAGE_JSON )
+                || fo.getNameExt().equals( NodeJSProjectFactory.PACKAGE_LOCK_JSON )
+                || fo.getNameExt().equals( ".gitignore" )
+                || fo.getNameExt().equals( "README.md" )
                 || fo.getNameExt().equals( NodeJSProjectFactory.NB_METADATA )
                 || !VisibilityQuery.getDefault().isVisible( fo );
         return result;

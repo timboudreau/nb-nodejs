@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var fs = require('fs'),
+const fs = require('fs'),
     path = require('path'),
     util = require ('util');
 
@@ -20,12 +20,12 @@ if (commandLineArguments.length === 0 || commandLineArguments[0] === '-h'
 
 // SAMPLE: Just read a file and echo it to the command-line
 var file = commandLineArguments[0];
-fs.exists (file, function exists(exists) {
+fs.exists (file, (exists) => {
     if (!exists) {
         process.stderr.write("No such file: " + file + '\n');
         return process.exit(1);
     }
-    fs.readFile(file, 'utf8', function (err, contents) {
+    fs.readFile(file, 'utf8', (err, contents) => {
         if (err) {
             process.stderr.write("Error: " + (err.stack || err));
             return process.exit(1);
