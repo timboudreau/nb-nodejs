@@ -18,7 +18,6 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.node;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -48,6 +47,7 @@ import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
 import org.netbeans.modules.nodejs.json.JsonPanel;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
+import static org.netbeans.modules.nodejs.json.ObjectMapperProvider.STRING_OBJECT_MAP;
 import org.netbeans.modules.nodejs.node.AddLibraryAction.LibraryAndVersion;
 import org.openide.awt.HtmlBrowser.URLDisplayer;
 import org.openide.filesystems.FileObject;
@@ -274,8 +274,8 @@ final class LibraryFilterNode extends FilterNode {
     public Image getIcon ( int type ) {
         Image result = ImageUtilities.loadImage( key.getType()
                 == ProjectNodeKeyTypes.BUILT_IN_LIBRARY
-                ? "org/netbeans/modules/nodejs/resources/libs.png" //NOI18N
-                : "org/netbeans/modules/nodejs/resources/libs.png" ); //NOI18N
+                        ? "org/netbeans/modules/nodejs/resources/libs.png" //NOI18N
+                        : "org/netbeans/modules/nodejs/resources/libs.png" ); //NOI18N
         if (!key.isDirect() && key.getType() != ProjectNodeKeyTypes.BUILT_IN_LIBRARY) {
             result = ImageUtilities.createDisabledImage( result );
         }
@@ -323,7 +323,7 @@ final class LibraryFilterNode extends FilterNode {
             // Handle race condition after library update
             if (fld != null && fld.getParent() != null && fld.getParent().getParent() != null) {
                 sb.append( " (&lt;-" ).append( //NOI18N
-                    fld.getParent().getParent().getName() ).append( ")" ); //NOI18N
+                        fld.getParent().getParent().getName() ).append( ")" ); //NOI18N
             }
         }
         return sb.toString();
@@ -408,7 +408,8 @@ final class LibraryFilterNode extends FilterNode {
                 l.add( new BugAction( url ) );
             } catch ( MalformedURLException ex ) {
                 Logger.getLogger( LibraryFilterNode.class.getName() ).log( Level.INFO,
-                        "Bad bug URL in " + //NOI18N
+                        "Bad bug URL in "
+                        + //NOI18N
                         getLookup().lookup( DataObject.class ).getPrimaryFile().getPath()
                         + ":" + bugUrl, ex ); //NOI18N
             }
@@ -423,7 +424,7 @@ final class LibraryFilterNode extends FilterNode {
         if (key.isDirect() && key.getType() == ProjectNodeKeyTypes.LIBRARY) {
             l.add( 1, new AbstractAction() {
                 {
-                    putValue( NAME, NbBundle.getMessage( LibraryFilterNode.class, 
+                    putValue( NAME, NbBundle.getMessage( LibraryFilterNode.class,
                             "REMOVE_DEPENDENCY", getDisplayName() ) ); //NOI18N
                 }
 
@@ -528,14 +529,10 @@ final class LibraryFilterNode extends FilterNode {
                 .getPrimaryFile().getFileObject( NodeJSProjectFactory.PACKAGE_JSON );
         if (json != null && json.isValid()) {
             try {
-                InputStream in = json.getInputStream();
-                try {
-                    TypeReference<Map<String, Object>> tr = new TypeReference<Map<String, Object>>() {
-                    };
-                    Map<String, Object> m = ObjectMapperProvider.newObjectMapper().readValue( in, tr );
+                try (InputStream in = json.getInputStream()) {
+                    Map<String, Object> m = ObjectMapperProvider.newObjectMapper()
+                            .readValue( in, STRING_OBJECT_MAP );
                     return m;
-                } finally {
-                    in.close();
                 }
             } catch ( IOException ex ) {
                 Logger.getLogger( LibraryFilterNode.class.getName() ).log(

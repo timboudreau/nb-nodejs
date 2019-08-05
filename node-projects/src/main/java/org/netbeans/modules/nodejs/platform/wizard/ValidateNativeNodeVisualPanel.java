@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.swing.JPanel;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
+import static org.netbeans.modules.nodejs.json.ObjectMapperProvider.STRING_OBJECT_MAP;
 import org.netbeans.modules.nodejs.platform.NativeNodeJS;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -175,7 +176,7 @@ public final class ValidateNativeNodeVisualPanel extends JPanel implements Runna
             Integer result = fut.get();
             if (result != null && result == 0) {
                 FileObject fo = FileUtil.toFileObject( FileUtil.normalizeFile( outFile ) );
-                Map<String, Object> m = loaded = ObjectMapperProvider.newObjectMapper().readValue( fo.asText(), Map.class );
+                Map<String, Object> m = loaded = ObjectMapperProvider.newObjectMapper().readValue( fo.asText(), STRING_OBJECT_MAP );
                 StringBuilder sb = new StringBuilder();
                 for (Map.Entry<String, Object> e : m.entrySet()) {
                     sb.append( e.getKey() ).append( " = " ).append( e.getValue() ).append( '\n' );

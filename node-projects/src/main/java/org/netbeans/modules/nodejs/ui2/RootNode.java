@@ -79,6 +79,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
     public static final String LIBRARY_ICON = "org/netbeans/modules/nodejs/resources/libs.png"; //NOI18N
     public static final String LOGO_ICON = "org/netbeans/modules/nodejs/resources/logo.png"; //NOI18N
     public static final String MISSING_LIBRARIES_BADGE = "org/netbeans/modules/nodejs/resources/warn.png"; //NOI18N
+    private static final long serialVersionUID = 1;
 
     public RootNode ( NodeJSProject project ) {
         this( project, new InstanceContent() );
@@ -185,6 +186,8 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         actions.addAll( Lookups.forPath( "Project/NodeJS/Actions" ).lookupAll( Action.class ) ); //NOI18N
         actions.add( new IgnoreProjectAction( project ) );
         actions.add( new AbstractAction( NbBundle.getMessage( RootNode.class, "PROPERTIES" ) ) { //NOI18N
+            private static final long serialVersionUID = 1;
+
             @Override
             public void actionPerformed ( ActionEvent e ) {
                 Project project = getLookup().lookup( Project.class );
@@ -194,6 +197,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         final LibrariesResolver resolver = getLookup().lookup( Project.class ).getLookup().lookup( LibrariesResolver.class );
         if (resolver.hasMissingLibraries()) {
             actions.add( new AbstractAction( NbBundle.getMessage( RootNode.class, "RESOLVE_LIBRARIES" ) ) { //NOI18N
+                private static final long serialVersionUID = 1;
 
                 @Override
                 public void actionPerformed ( ActionEvent e ) {
@@ -261,6 +265,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
 
     static final class AdhocScriptAction extends AbstractAction implements Presenter.Popup {
         private final NodeJSProject project;
+        private static final long serialVersionUID = 1;
 
         AdhocScriptAction ( NodeJSProject project ) {
             super( NbBundle.getMessage( AdhocScriptAction.class, "SCRIPTS" ) ); // NOI18N
@@ -300,6 +305,7 @@ public final class RootNode extends AbstractNode implements ChangeListener {
         static final class RunScriptAction extends AbstractAction {
             private final FileObject dir;
             private final String scriptKey;
+            private static final long serialVersionUID = 1;
 
             public RunScriptAction ( FileObject dir, String scriptKey, String name ) {
                 super( name );

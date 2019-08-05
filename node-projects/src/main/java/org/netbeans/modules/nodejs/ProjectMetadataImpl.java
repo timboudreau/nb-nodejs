@@ -504,7 +504,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
 
     @Override
     public void addMap ( String key, Map<String, Object> m ) {
-        Map into = getMap();
+        Map<String, Object> into = getMap();
         if (key == null && into != m) {
             into.putAll( m );
             supp.firePropertyChange( null, null, null );
@@ -518,7 +518,7 @@ public final class ProjectMetadataImpl extends FileChangeAdapter implements Proj
 
     @Override
     public void addList ( String key, List<?> l ) {
-        Map into = getMap();
+        Map<String,Object> into = getMap();
         Object old = into.get( key );
         into.put( key, l );
         if (!Objects.equals( old, l )) {

@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs.ui2;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,7 +31,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.netbeans.modules.nodejs.NodeJSProject;
-import org.netbeans.modules.nodejs.NodeJSProjectFactory;
+import static org.netbeans.modules.nodejs.NodeJSProjectFactory.DOT_NPMIGNORE;
+import static org.netbeans.modules.nodejs.NodeJSProjectFactory.PACKAGE_JSON;
+import static org.netbeans.modules.nodejs.NodeJSProjectFactory.PACKAGE_LOCK_JSON;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
@@ -47,6 +50,14 @@ public class ImportantFilesChildFactory extends ChildFactory.Detachable<FileObje
 
     private static final Pattern PROBABLE_LICENSE_FILE = Pattern.compile( ".*?licens.*", Pattern.CASE_INSENSITIVE );
     private static final Pattern PROBABLE_CHANGE_LOG_FILE = Pattern.compile( ".*?changelog.*", Pattern.CASE_INSENSITIVE );
+    private static final Pattern PROBABLE_TO_DO_FILE = Pattern.compile( "to.?do.*", Pattern.CASE_INSENSITIVE );
+    private static final String DOT_GITIGNORE = ".gitignore";
+    private static final String DOT_TRAVIS_YML = ".travis.yml";
+    private static final String README_MD = "README.md";
+    private static Set<String> COMMON_IMPORTANT_FILES = new HashSet<>( Arrays.asList(
+            PACKAGE_LOCK_JSON,
+            PACKAGE_JSON, DOT_NPMIGNORE, DOT_GITIGNORE,
+            DOT_TRAVIS_YML, README_MD ) );
 
     public ImportantFilesChildFactory ( NodeJSProject project ) {
         this.project = project;
@@ -64,29 +75,15 @@ public class ImportantFilesChildFactory extends ChildFactory.Detachable<FileObje
     }
 
     static void importantFiles ( FileObject root, Collection<? super FileObject> toPopulate ) {
-        FileObject fo = root.getFileObject( NodeJSProjectFactory.PACKAGE_JSON );
-        if (fo != null && fo.isValid()) {
-            toPopulate.add( fo );
-        }
-        fo = root.getFileObject( NodeJSProjectFactory.PACKAGE_LOCK_JSON );
-        if (fo != null && fo.isValid()) {
-            toPopulate.add( fo );
-        }
-        fo = root.getFileObject( "README.md" );
-        if (fo != null && fo.isValid()) {
-            toPopulate.add( fo );
-        }
-        fo = root.getFileObject( ".gitignore" );
-        if (fo != null && fo.isValid()) {
-            toPopulate.add( fo );
-        }
-        fo = root.getFileObject( NodeJSProjectFactory.DOT_NPMIGNORE );
-        if (fo != null && fo.isValid()) {
-            toPopulate.add( fo );
+        for (String name : COMMON_IMPORTANT_FILES) {
+            FileObject fo = root.getFileObject( name );
+            if (fo != null) {
+                toPopulate.add( fo );
+            }
         }
         for (FileObject ch : root.getChildren()) {
             String name = ch.getName();
-            if (!name.endsWith( ".js" ) && !name.endsWith( ".sh" ) && !name.endsWith( ".json" )) {
+            if (!COMMON_IMPORTANT_FILES.contains( name ) && !isCodeFile( name )) {
                 if (name.toLowerCase().contains( "readme" ) && !toPopulate.contains( ch )) {
                     toPopulate.add( ch );
                     continue;
@@ -101,8 +98,17 @@ public class ImportantFilesChildFactory extends ChildFactory.Detachable<FileObje
                     toPopulate.add( ch );
                     continue;
                 }
+                m = PROBABLE_TO_DO_FILE.matcher( name );
+                if (m.matches()) {
+                    toPopulate.add( ch );
+                    continue;
+                }
             }
         }
+    }
+
+    private static boolean isCodeFile ( String name ) {
+        return name.endsWith( ".js" ) && !name.endsWith( ".sh" ) && !name.endsWith( ".json" );
     }
 
     @Override

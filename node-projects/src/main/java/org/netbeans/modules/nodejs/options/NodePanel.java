@@ -30,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.nodejs.DefaultExecutable;
 import org.netbeans.modules.nodejs.Npm;
 import org.netbeans.modules.nodejs.forks.EmailAddressValidator;
@@ -391,7 +390,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
             public void run () {
                 if (!EventQueue.isDispatchThread()) {
                     downloading = true;
-                    ProgressHandle h = ProgressHandleFactory.createHandle( NbBundle.getMessage( NodePanel.class, "DOWNLOADING_SOURCES" ) );
+                    ProgressHandle h = ProgressHandle.createHandle( NbBundle.getMessage( NodePanel.class, "DOWNLOADING_SOURCES" ) );
                     h.start( 4 );
                     h.progress( "which git" );
                     System.out.println( "run which git" );
@@ -436,10 +435,10 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
                     switch ( eqCount++ ) {
                         case 0:
                             if (dest != null) {
-                            sourcesField.setText( dest.getAbsolutePath() );
-                            g.performValidation(); //get rid of the warning
+                                sourcesField.setText( dest.getAbsolutePath() );
+                                g.performValidation(); //get rid of the warning
+                            }
                             break;
-                        }
                         case 1:
                             downloadButton.setEnabled( true );
                             if (dest != null && dest.exists()) {
@@ -482,9 +481,9 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
                 emailField.setText( getEmail() );
                 loginField.setText( p.get( "login", "YOUR_LOGIN" ) );
                 Npm npm = Npm.getDefault();
-                String npmPath = npm.exePath( false);
+                String npmPath = npm.exePath( false );
                 if (npmPath != null) {
-                    npmField.setText(npmPath);
+                    npmField.setText( npmPath );
                 }
             }
         } );
@@ -516,7 +515,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
     }
 
     public static String getAuthor () {
-        String nm = DotGitConfig.getDefault().get( "user", "name", System.getProperty("user.name"));
+        String nm = DotGitConfig.getDefault().get( "user", "name", System.getProperty( "user.name" ) );
         return preferences().get( "author", nm );
     }
 
@@ -525,7 +524,7 @@ public final class NodePanel extends JPanel implements ValidationUI, DocumentLis
     }
 
     public static String getEmail () {
-        String em = DotGitConfig.getDefault().get( "user", "email", "you@email.example");
+        String em = DotGitConfig.getDefault().get( "user", "email", "you@email.example" );
         return preferences().get( "email", em );
     }
 

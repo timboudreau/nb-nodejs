@@ -39,7 +39,6 @@ import org.netbeans.api.extexecution.ExecutionDescriptor;
 import org.netbeans.api.extexecution.ExecutionService;
 import org.netbeans.api.extexecution.ExternalProcessBuilder;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.nodejs.NodeJSProject;
 import org.netbeans.modules.nodejs.NodeJSProjectFactory;
 import org.netbeans.modules.nodejs.Npm;
@@ -76,9 +75,9 @@ public class AddLibraryAction extends AbstractAction {
         if (DialogDisplayer.getDefault().notify( dd ).equals( DialogDescriptor.OK_OPTION )) {
             final Set<String> libraries = new HashSet<>( pn.getLibraries() );
             if (libraries.size() > 0) {
-                final String npmPath = Npm.getDefault().exe( );
+                final String npmPath = Npm.getDefault().exe();
                 final AtomicInteger jobs = new AtomicInteger();
-                final ProgressHandle h = ProgressHandleFactory.createHandle( NbBundle.getMessage( AddLibraryAction.class,
+                final ProgressHandle h = ProgressHandle.createHandle( NbBundle.getMessage( AddLibraryAction.class,
                         "MSG_RUNNING_NPM", libraries.size(), project.getDisplayName() ) ); //NOI18N
                 RequestProcessor.getDefault().post( new Runnable() {
                     @Override
@@ -116,7 +115,7 @@ public class AddLibraryAction extends AbstractAction {
                                             }
                                         } finally {
                                             List<LibraryAndVersion> l = libraries( project );
-                                            updateDependencies( project, l);
+                                            updateDependencies( project, l );
                                         }
                                     }
                                 } ).charset( Charset.forName( "UTF-8" ) ).frontWindowOnError( true ); //NOI18N
@@ -135,12 +134,12 @@ public class AddLibraryAction extends AbstractAction {
     static synchronized List<LibraryAndVersion> updateDependencies ( NodeJSProject prj, List<LibraryAndVersion> onDisk, String... remove ) {
         List<LibraryAndVersion> l = new ArrayList<>();
         ProjectMetadataImpl metadata = prj.metadata();
-        Set<String> toRemove = new HashSet<>(Arrays.<String>asList(remove));
+        Set<String> toRemove = new HashSet<>( Arrays.<String>asList( remove ) );
         if (metadata != null) {
             Map<String, Object> deps = metadata.getMap( "dependencies" );
             if (deps != null) {
                 for (Map.Entry<String, Object> e : deps.entrySet()) {
-                    if (toRemove.contains(e.getKey())) {
+                    if (toRemove.contains( e.getKey() )) {
                         continue;
                     }
                     if (e.getValue() instanceof String) {
@@ -165,7 +164,7 @@ public class AddLibraryAction extends AbstractAction {
             for (LibraryAndVersion lib : l) {
                 map.put( lib.name, lib.version );
             }
-            Map m = metadata.getMap();
+            Map<String, Object> m = metadata.getMap();
             m.put( "dependencies", map );
             try {
                 metadata.save();

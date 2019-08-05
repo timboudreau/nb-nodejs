@@ -50,7 +50,6 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectManager;
@@ -255,7 +254,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
         @Override
         public synchronized void run () {
-            ProgressHandle handle = ProgressHandleFactory.createHandle(
+            ProgressHandle handle = ProgressHandle.createHandle(
                     NbBundle.getMessage( NodeJSProject.class, "RUNNING_NPM_INSTALL", getName() ) ); //NOI18N
             handle.start();
             try {
@@ -710,6 +709,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
         private final FileObject dir;
         private transient WeakReference<NodeJSProject> project;
         private transient volatile PropertyChangeSupport supp;
+        private static final long serialVersionUID = 1;
 
         public PI ( FileObject dir ) {
             this.dir = dir;

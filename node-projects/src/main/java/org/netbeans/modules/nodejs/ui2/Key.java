@@ -34,6 +34,7 @@ public class Key<T> implements Comparable<Key<?>> {
     public static final Key<KeyType> LIBRARIES = new Key<>(
             KeyType.LIBRARIES, KeyType.LIBRARIES );
 
+    @SuppressWarnings("unchecked")
     Key ( FileObject obj ) {
         this( KeyType.SOURCES, (T) obj );
     }
@@ -69,6 +70,7 @@ public class Key<T> implements Comparable<Key<?>> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals ( Object obj ) {
         if (obj == null) {
             return false;

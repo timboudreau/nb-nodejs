@@ -5,26 +5,18 @@
  */
 package org.netbeans.modules.nodejs.platform;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.api.NodeJSPlatformType;
 import org.netbeans.modules.nodejs.platform.wizard.PlatformWizardIterator;
 import org.netbeans.modules.nodejs.ui.UiUtil;
 import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle.Messages;
 
@@ -35,19 +27,16 @@ import org.openide.util.NbBundle.Messages;
 @Messages ("ADD_PLATFORM=Add NodeJS Platform")
 final class NodeJSPlatformsPanel extends javax.swing.JPanel {
 
+    @SuppressWarnings ("rawType")
     public NodeJSPlatformsPanel () {
         initComponents();
         platformList.setCellRenderer( new PlatformListCellRenderer() );
-        platformList.addListSelectionListener( new ListSelectionListener() {
-
-            @Override
-            public void valueChanged ( ListSelectionEvent lse ) {
-                Object o = platformList.getSelectedValue();
-                if (o instanceof NodeJSExecutable) {
-                    NodeJSExecutable n = (NodeJSExecutable) o;
-                    NodeJSPlatformsPanel.this.nameField.setText( n.name() );
-                    pathField.setText(n.path());
-                }
+        platformList.addListSelectionListener( (ListSelectionEvent lse) -> {
+            Object o = platformList.getSelectedValue();
+            if (o instanceof NodeJSExecutable) {
+                NodeJSExecutable n = (NodeJSExecutable) o;
+                NodeJSPlatformsPanel.this.nameField.setText( n.name() );
+                pathField.setText( n.path() );
             }
         } );
         refresh( null );
@@ -81,7 +70,6 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
             platformList.setSelectedValue( selectMe, true );
         }
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -193,6 +181,7 @@ final class NodeJSPlatformsPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    @SuppressWarnings ("unchecked")
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         WizardDescriptor wiz = new WizardDescriptor( new PlatformWizardIterator() );
         if (NodeJSPlatformType.allTypes().size() == 1) {

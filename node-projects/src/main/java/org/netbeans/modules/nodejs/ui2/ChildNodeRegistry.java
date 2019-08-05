@@ -32,9 +32,9 @@ import org.openide.util.lookup.ServiceProvider;
 public class ChildNodeRegistry {
 
     public void populateKeys ( NodeJSProject project, List<? super Key<?>> keys ) {
-        for (NodeJSProjectChildNodeFactory k : Lookup.getDefault().lookupAll(NodeJSProjectChildNodeFactory.class )) {
+        for (NodeJSProjectChildNodeFactory<?> k : Lookup.getDefault().lookupAll(NodeJSProjectChildNodeFactory.class )) {
             if (k.isPresent( project )) {
-                Key<NodeJSProjectChildNodeFactory> key = new Key<>( k, k );
+                Key<NodeJSProjectChildNodeFactory<?>> key = new Key<>( k, k );
                 keys.add( key );
             }
         }

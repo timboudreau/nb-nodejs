@@ -276,6 +276,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <showDeprecation>true</showDeprecation>
+                    <compilerArgs>
+                        -Xlint:unchecked
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

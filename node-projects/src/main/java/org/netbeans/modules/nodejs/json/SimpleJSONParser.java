@@ -621,17 +621,18 @@ public final class SimpleJSONParser {
             }
         }
 
+        @SuppressWarnings("unchecked")
         private void booleanArrayElement ( String value ) {
             List<Object> l = null;
             if ((l == null) && (!this.currList.isEmpty())) {
-                l = (List) this.currList.peek();
+                l = (List<Object>) this.currList.peek();
             } else if (l == null) {
                 throw new SimpleJSONParser.Internal( "No array present for array value " + value );
             }
             if ("true".equals( value )) {
-                l.add( Boolean.valueOf( true ) );
+                l.add(true);
             } else if ("false".equals( value )) {
-                l.add( Boolean.valueOf( false ) );
+                l.add(false);
             } else {
                 throw new SimpleJSONParser.Internal( "Illegal boolean value '" + value + "'" );
             }
@@ -639,7 +640,7 @@ public final class SimpleJSONParser {
 
         private void booleanValue ( String s ) {
             if ("true".equals( s )) {
-                String key = (String) this.currKey.pop();
+                String key = this.currKey.pop();
                 this.curr.put( key, Boolean.TRUE );
             } else if ("false".equals( s )) {
                 String key = this.currKey.pop();
@@ -795,6 +796,7 @@ public final class SimpleJSONParser {
         sb.append( ']' );
     }
 
+    @SuppressWarnings("unchecked")
     private static final void reflectOut ( Object o, StringBuilder sb, int indent ) {
         if (indent > 30) {
             return;
@@ -858,6 +860,7 @@ public final class SimpleJSONParser {
         sb.append( ind ).append( '}' ).append( '\n' );
     }
 
+    @SuppressWarnings("unchecked")
     private static final void out ( Map<String, Object> m, StringBuilder sb, int indent ) {
         char[] indentChars = new char[indent * INDENT_COUNT];
         Arrays.fill( indentChars, ' ' );

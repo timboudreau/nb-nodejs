@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.netbeans.modules.nodejs.api.NodeJSExecutable;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
+import static org.netbeans.modules.nodejs.json.ObjectMapperProvider.STRING_OBJECT_MAP;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -90,7 +90,7 @@ public abstract class NodeJSPlatformType implements Comparable<NodeJSPlatformTyp
 
     public static Map<String, Object> toJson ( File outFile ) throws IOException {
         FileObject fo = FileUtil.toFileObject( FileUtil.normalizeFile( outFile ) );
-        Map<String, Object> m = ObjectMapperProvider.newObjectMapper().readValue( fo.asText(), Map.class );
+        Map<String, Object> m = ObjectMapperProvider.newObjectMapper().readValue( fo.asText(), STRING_OBJECT_MAP);
         return m;
     }
 }

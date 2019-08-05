@@ -39,10 +39,10 @@ import org.openide.util.lookup.ServiceProvider;
  */
 @Messages(value = {"JAVA_LIBRARIES=Java Libraries", "ADD_LIBRARY=Add &Java Library"})
 @ServiceProvider(service = NodeJSProjectChildNodeFactory.class)
-public class JavaLibrariesProjectChildNode implements NodeJSProjectChildNodeFactory {
+public class JavaLibrariesProjectChildNode implements NodeJSProjectChildNodeFactory<JavaDependency> {
 
     @Override
-    public ChildFactory createChildren(Project project) {
+    public ChildFactory<JavaDependency> createChildren(Project project) {
         return new JavaLibrariesChildren(project);
     }
 

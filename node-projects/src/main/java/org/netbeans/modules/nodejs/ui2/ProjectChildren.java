@@ -141,8 +141,8 @@ final class ProjectChildren extends ChildFactory.Detachable<Key<?>> {
                 default:
                     throw new AssertionError( kt );
             }
-        } else if (key.get() instanceof NodeJSProjectChildNodeFactory) {
-            NodeJSProjectChildNodeFactory val = (NodeJSProjectChildNodeFactory) key.get();
+        } else if (key.get() instanceof NodeJSProjectChildNodeFactory<?>) {
+            NodeJSProjectChildNodeFactory<?> val = (NodeJSProjectChildNodeFactory<?>) key.get();
             kids = val.createChildren( project );
         } else {
             throw new IllegalArgumentException( "Unknown key type " + key + " " + key.get().getClass().getName() ); //NOI18N
@@ -173,18 +173,18 @@ final class ProjectChildren extends ChildFactory.Detachable<Key<?>> {
     }
 
     private static final class GenericNode extends AbstractNode {
-        private final Key key;
+        private final Key<?> key;
 
-        public GenericNode ( Key key, ChildFactory<?> factory, NodeJSProject project ) {
+        public GenericNode ( Key<?> key, ChildFactory<?> factory, NodeJSProject project ) {
             this( key, factory, project, new InstanceContent() );
         }
 
-        public GenericNode ( Key key, ChildFactory<?> factory, NodeJSProject project, InstanceContent content ) {
+        public GenericNode ( Key<?> key, ChildFactory<?> factory, NodeJSProject project, InstanceContent content ) {
             this( key, factory, project, content, new Mut( Lookups.fixed( project, key ), new AbstractLookup( content ) ) );
         }
 
         @SuppressWarnings ("LeakingThisInConstructor")
-        public GenericNode ( Key key, ChildFactory<?> factory, NodeJSProject project, InstanceContent content, Mut lkp ) {
+        public GenericNode ( Key<?> key, ChildFactory<?> factory, NodeJSProject project, InstanceContent content, Mut lkp ) {
             super( Children.create( factory, true ), lkp );
             content.add( this );
             if (key.type() == KeyType.SOURCES) {
@@ -214,7 +214,7 @@ final class ProjectChildren extends ChildFactory.Detachable<Key<?>> {
                 return new Action[]{new AddLibraryAction( NbBundle.getBundle( GenericNode.class ), project, l.getView() )};
             } else if (key.get() instanceof NodeJSProjectChildNodeFactory) {
                 List<Action> l = new LinkedList<>();
-                NodeJSProjectChildNodeFactory f = (NodeJSProjectChildNodeFactory) key.get();
+                NodeJSProjectChildNodeFactory<?> f = (NodeJSProjectChildNodeFactory<?>) key.get();
                 f.getActions( getLookup().lookup( Project.class ), l );
                 return l.toArray( new Action[l.size()] );
             }

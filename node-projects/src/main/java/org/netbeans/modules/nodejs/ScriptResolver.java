@@ -25,7 +25,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.MIMEResolver;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -34,8 +33,9 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author tim
  */
-@ServiceProvider (service = MIMEResolver.class, position = 3214327)
-public class ScriptResolver extends MIMEResolver {
+@ServiceProvider (service = org.openide.filesystems.MIMEResolver.class, position = 3214327)
+@SuppressWarnings("deprecation")
+public class ScriptResolver extends org.openide.filesystems.MIMEResolver {
     private static final byte[] lookFor;
 
     static {

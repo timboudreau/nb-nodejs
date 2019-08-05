@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.modules.nodejs.api.NodeJSUtils;
 import org.netbeans.modules.nodejs.api.Stubs;
+import static org.netbeans.modules.nodejs.json.ObjectMapperProvider.STRING_OBJECT_MAP;
 import org.netbeans.modules.nodejs.node.LibrariesChildFactory;
 import org.netbeans.modules.nodejs.node.ProjectNodeKey;
 import org.netbeans.spi.project.ProjectState;
@@ -164,7 +165,7 @@ public class StubsTest {
         FileObject booMetadata = booProject.getProjectDirectory().getFileObject("package.json");
         try (InputStream in = booMetadata.getInputStream()) {
             ObjectMapper m = new ObjectMapper();
-            Map<String,Object> map = m.readValue( in, Map.class);
+            Map<String,Object> map = m.readValue( in, STRING_OBJECT_MAP );
             String path = (String) map.get("main");
             assertNotNull(path);
             assertEquals("./boo.js", path);
@@ -175,7 +176,7 @@ public class StubsTest {
         props.save();
         try (InputStream in = booMetadata.getInputStream()) {
             ObjectMapper m = new ObjectMapper();
-            Map<String,Object> map = m.readValue( in, Map.class);
+            Map<String,Object> map = m.readValue( in, STRING_OBJECT_MAP );
             assertFalse( "If author fields are clear, empty entries "
                     + "should not remain in package.json", map.containsKey( "author" ));
         }

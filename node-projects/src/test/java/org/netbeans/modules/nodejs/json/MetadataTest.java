@@ -41,7 +41,7 @@ public class MetadataTest {
 
     @Test
     public void testLoading () {
-        Map m = impl.getMap();
+        Map<String,Object> m = impl.getMap();
         System.out.println( "GOT " + m );
         assertNotNull( m );
         assertFalse( m.isEmpty() );

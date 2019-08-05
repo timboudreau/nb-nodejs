@@ -1,12 +1,12 @@
 package org.netbeans.modules.nodejs;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.netbeans.modules.nodejs.json.ObjectMapperProvider;
+import static org.netbeans.modules.nodejs.json.ObjectMapperProvider.STRING_OBJECT_MAP;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
@@ -102,7 +102,7 @@ final class NbInfo implements Runnable {
             fileFound = true;
             Map<String, String> loadedData = null;
             try (InputStream in = fo.getInputStream()) {
-                loadedData = ObjectMapperProvider.newObjectMapper().readValue( in, Map.class );
+                loadedData = ObjectMapperProvider.newObjectMapper().readValue( in, STRING_OBJECT_MAP );
             } catch ( IOException ex ) {
                 Exceptions.printStackTrace( ex );
             } finally {

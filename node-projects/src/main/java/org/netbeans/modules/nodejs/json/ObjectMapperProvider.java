@@ -19,9 +19,11 @@
 package org.netbeans.modules.nodejs.json;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.Map;
 
 
 /**
@@ -41,5 +43,11 @@ public class ObjectMapperProvider {
         m.configure( JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
         m.configure( JsonParser.Feature.AUTO_CLOSE_SOURCE, true );
         return m;
+    }
+
+    public static final TypeReference<Map<String,Object>> STRING_OBJECT_MAP
+            = new TR();
+
+    private static final class TR extends TypeReference<Map<String,Object>> {
     }
 }
