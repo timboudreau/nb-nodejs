@@ -132,6 +132,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
             new NodeJSProjectProperties( this ), classpath, sources,
             new NodeJsEncodingQuery(), registry, metadata,
             new PlatformProvider(), new LibrariesResolverImpl(),
+/*            new NodeJsSupportImpl( this ), */
             NODE_JS_PROJECT_THREAD_POOL );
 
     @SuppressWarnings ("LeakingThisInConstructor")
@@ -647,7 +648,7 @@ public class NodeJSProject implements Project, ProjectConfiguration, ActionProvi
 
     @Override
     public Icon getIcon () {
-        return ImageUtilities.loadImageIcon( NodeJSProject.class.getPackage().getName().replace( '.', '/' ) + "/project.png", true );
+        return ImageUtilities.loadImageIcon( "org/netbeans/modules/nodejs/resources/logo.png", true );
     }
 
     @Override

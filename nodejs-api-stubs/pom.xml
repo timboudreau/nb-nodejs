@@ -4,7 +4,7 @@
     <parent>
         <artifactId>netbeans-nodejs</artifactId>
         <groupId>org.netbeans.modules</groupId>
-        <version>2.28</version>
+        <version>3.01</version>
     </parent>
     <artifactId>nodejs-api-stubs</artifactId>
     <packaging>nbm</packaging>

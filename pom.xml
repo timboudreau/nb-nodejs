@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.netbeans.modules</groupId>
     <artifactId>netbeans-nodejs</artifactId>
-    <version>2.28</version>
+    <version>3.01</version>
     <packaging>pom</packaging>
     <name>Netbeans NodeJS Parent</name>
     <modules>
@@ -14,9 +14,9 @@
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans-version>RELEASE72</netbeans-version>
+        <netbeans-version>RELEASE82</netbeans-version>
         <!--<netbeans-dev-version>dev-SNAPSHOT</netbeans-dev-version>-->
-        <netbeans-dev-version>RELEASE72</netbeans-dev-version>
+        <netbeans-dev-version>RELEASE82</netbeans-dev-version>
         <jackson-version>1.9.9</jackson-version>
     </properties>
     <repositories>

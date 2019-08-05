@@ -4,7 +4,7 @@
     <parent>
         <artifactId>netbeans-nodejs</artifactId>
         <groupId>org.netbeans.modules</groupId>
-        <version>2.28</version>
+        <version>3.01</version>
     </parent>
     <packaging>nbm</packaging>
     <artifactId>nodejs</artifactId>
@@ -16,12 +16,49 @@
         for running projects using Node's runtime and for managing
         libraries with npm.
     </description>
-    
+
     <properties>
         <project.build.nbmName>nb-nodejs</project.build.nbmName>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-progress-nb</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util-ui</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-javascript2-nodejs</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-javascript-nodejs</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-projectuiapi-base</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-filesystems-nb</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-web-common</artifactId>
+            <version>${netbeans-version}</version>
+        </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-annotations-common</artifactId>
@@ -31,44 +68,43 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-extexecution</artifactId>
             <version>${netbeans-version}</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-projectapi</artifactId>
             <version>${netbeans-version}</version>
-            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-projectapi-nb</artifactId>
+            <version>${netbeans-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-masterfs</artifactId>
             <version>${netbeans-version}</version>
             <scope>test</scope>
-            <type>jar</type>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-projectuiapi</artifactId>
             <version>${netbeans-version}</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.external</groupId>
             <artifactId>ValidationAPI</artifactId>
             <version>${netbeans-version}</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-java-classpath</artifactId>
             <version>${netbeans-version}</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-swing-validation</artifactId>
             <version>${netbeans-version}</version>
-            <type>jar</type>
         </dependency>
 
         <!-- Transitive Dependencies -->
@@ -172,7 +208,6 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-project-ant</artifactId>
             <version>${netbeans-version}</version>
-            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
@@ -186,11 +221,11 @@
                     <useDefaultManifestFile>true</useDefaultManifestFile>
                     <finalName>nodejs</finalName>
                 </configuration>
-            </plugin>            
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.14</version>
+                <version>4.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <useOSGiDependencies>false</useOSGiDependencies>
@@ -204,6 +239,8 @@
                     <publicPackages>
                         <publicPackage>org.netbeans.modules.nodejs.api</publicPackage>
                     </publicPackages>
+                    <verifyRuntime>warn</verifyRuntime>
+
                     <finalName>nodejs</finalName>
                 </configuration>
                 <executions>
