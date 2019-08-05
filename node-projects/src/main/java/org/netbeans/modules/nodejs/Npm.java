@@ -18,6 +18,7 @@
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 package org.netbeans.modules.nodejs;
 
+import java.awt.HeadlessException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import org.netbeans.modules.nodejs.api.LaunchSupport;
@@ -85,22 +88,22 @@ public class Npm {
         }
         return result;
     }
-    
+
     public Future<Integer> runWithOutputWindow ( File workingDir, String... cmd ) throws IOException {
-        return runWithOutputWindow (workingDir, Collections.<String,String>emptyMap(), cmd);
+        return runWithOutputWindow( workingDir, Collections.<String, String>emptyMap(), cmd );
     }
 
-    public Future<Integer> runWithOutputWindow ( File workingDir, Map<String,String> env, String... cmd ) throws IOException {
+    public Future<Integer> runWithOutputWindow ( File workingDir, Map<String, String> env, String... cmd ) throws IOException {
         LaunchSupport supp = new LaunchSupport( NodeJSExecutable.getDefault() ) {
             @Override
-            protected String[] getLaunchCommandLine ( boolean showDialog, Map<String,String> env ) {
+            protected String[] getLaunchCommandLine ( boolean showDialog, Map<String, String> env ) {
                 return new String[]{exe()};
             }
         };
         List<String> l = new LinkedList<>();
         l.add( exe() );
         l.addAll( Arrays.asList( cmd ) );
-        return supp.runWithOutputWindow( l.toArray( new String[l.size()] ), FileUtil.toFileObject( FileUtil.normalizeFile( workingDir ) ), env, "");
+        return supp.runWithOutputWindow( l.toArray( new String[l.size()] ), FileUtil.toFileObject( FileUtil.normalizeFile( workingDir ) ), env, "" );
     }
 
     public String run ( File workingDir, String... cmd ) {
@@ -163,28 +166,33 @@ public class Npm {
     public String askUser ( boolean initialDialog ) {
         String msg = NbBundle.getMessage( Npm.class, "MSG_FIND_NPM" );
         String title = NbBundle.getMessage( Npm.class, "TTL_FIND_NPM" );
-        if (!initialDialog || DialogDescriptor.OK_OPTION.equals( DialogDisplayer.getDefault().notify( new NotifyDescriptor.Confirmation( msg, title ) ) )) {
-            String approve = NbBundle.getMessage( Npm.class, "APPROVE_FIND_NPM" );
+        try {
+            if (!initialDialog || DialogDescriptor.OK_OPTION.equals( DialogDisplayer.getDefault().notify( new NotifyDescriptor.Confirmation( msg, title ) ) )) {
+                String approve = NbBundle.getMessage( Npm.class, "APPROVE_FIND_NPM" );
 
-            File[] roots = File.listRoots();
+                File[] roots = File.listRoots();
 
-            FileChooserBuilder bldr = new FileChooserBuilder( Npm.class ).setApproveText( approve ).setFilesOnly( true ).setFileFilter( new javax.swing.filechooser.FileFilter() {
-                @Override
-                public boolean accept ( File f ) {
-                    return f.isDirectory() || f.isFile() && f.canExecute();
+                FileChooserBuilder bldr = new FileChooserBuilder( Npm.class ).setApproveText( approve ).setFilesOnly( true ).setFileFilter( new javax.swing.filechooser.FileFilter() {
+                    @Override
+                    public boolean accept ( File f ) {
+                        return f.isDirectory() || f.isFile() && f.canExecute();
+                    }
+
+                    @Override
+                    public String getDescription () {
+                        return null;
+                    }
+                } ).setTitle( title );
+                if (roots.length > 0) {
+                    bldr.setDefaultWorkingDirectory( roots[0] );
                 }
 
-                @Override
-                public String getDescription () {
-                    return null;
-                }
-            } ).setTitle( title );
-            if (roots.length > 0) {
-                bldr.setDefaultWorkingDirectory( roots[0] );
+                File f = bldr.showOpenDialog();
+                return f == null || !f.exists() ? null : f.getAbsolutePath();
             }
-
-            File f = bldr.showOpenDialog();
-            return f == null || !f.exists() ? null : f.getAbsolutePath();
+        } catch ( HeadlessException ex ) {
+            // unit test
+            Logger.getLogger( Npm.class.getName() ).log( Level.INFO, "Headless.", ex );
         }
         return null;
     }
