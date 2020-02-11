@@ -43,7 +43,7 @@ Copyright (C) 2012-2019 Tim Boudreau
         <repository>
             <id>netbeans</id>
             <name>NetBeans</name>
-            <url>http://bits.netbeans.org/maven2/</url>
+            <url>https://bits.netbeans.org/maven2/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -51,7 +51,7 @@ Copyright (C) 2012-2019 Tim Boudreau
         <repository>
             <id>netbeans-dev</id>
             <name>NetBeans-Dev-Snapshots</name>
-            <url>http://bits.netbeans.org/nexus/content/repositories/snapshots/</url>
+            <url>https://bits.netbeans.org/nexus/content/repositories/snapshots/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
