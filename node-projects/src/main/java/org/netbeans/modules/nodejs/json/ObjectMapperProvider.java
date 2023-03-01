@@ -33,16 +33,21 @@ import java.util.Map;
  * @author Tim Boudreau
  */
 public class ObjectMapperProvider {
+    
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    static {
+        MAPPER.configure( JsonParser.Feature.ALLOW_COMMENTS, true );
+        MAPPER.configure( DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true );
+        MAPPER.configure( SerializationFeature.INDENT_OUTPUT, true );
+        MAPPER.configure( SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true );
+        MAPPER.configure( SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, true );
+        MAPPER.configure( JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
+        MAPPER.configure( JsonParser.Feature.AUTO_CLOSE_SOURCE, true );
+        
+    }
+    
     public static ObjectMapper newObjectMapper () {
-        ObjectMapper m = new ObjectMapper();
-        m.configure( JsonParser.Feature.ALLOW_COMMENTS, true );
-        m.configure( DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true );
-        m.configure( SerializationFeature.INDENT_OUTPUT, true );
-        m.configure( SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true );
-        m.configure( SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, true );
-        m.configure( JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
-        m.configure( JsonParser.Feature.AUTO_CLOSE_SOURCE, true );
-        return m;
+        return MAPPER.copy();
     }
 
     public static final TypeReference<Map<String,Object>> STRING_OBJECT_MAP
