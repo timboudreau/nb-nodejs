@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
     <parent>
         <artifactId>netbeans-nodejs</artifactId>
         <groupId>org.netbeans.modules</groupId>
-        <version>2.32</version>
+        <version>2.33</version>
     </parent>
     <packaging>nbm</packaging>
     <artifactId>nodejs</artifactId>
@@ -243,9 +243,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
             <plugin>
                 <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>4.2</version>
+                <version>4.8</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <moduleType>normal</moduleType>
                     <useOSGiDependencies>false</useOSGiDependencies>
                     <keystore>~/ssh/timboudreau.com.keystore</keystore>
                     <keystorealias>tim</keystorealias>
@@ -272,7 +273,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.10.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -285,4 +286,3 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
         </plugins>
     </build>
 </project>
-

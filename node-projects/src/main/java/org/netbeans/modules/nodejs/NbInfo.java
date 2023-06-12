@@ -100,7 +100,7 @@ final class NbInfo implements Runnable {
         FileObject fo = prj.getProjectDirectory().getFileObject( ".nbinfo" );
         if (fo != null) {
             fileFound = true;
-            Map<String, String> loadedData = null;
+            Map<String, Object> loadedData = null;
             try (InputStream in = fo.getInputStream()) {
                 loadedData = ObjectMapperProvider.newObjectMapper().readValue( in, STRING_OBJECT_MAP );
             } catch ( IOException ex ) {
@@ -108,8 +108,10 @@ final class NbInfo implements Runnable {
             } finally {
                 if (loadedData != null) {
                     synchronized ( this ) {
-                        platform = loadedData.get( "platformName" );
-                        runArguments = loadedData.get( "arguments" );
+                        Object pl = loadedData.get( "platformName" );
+                        Object ra = loadedData.get( "arguments" );
+                        platform = pl != null ? pl.toString() : null;
+                        runArguments = ra != null ? ra.toString() : null;
                     }
                 }
             }
