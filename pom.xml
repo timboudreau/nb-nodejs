@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (C) 2012-2019 Tim Boudreau
 
@@ -34,7 +34,7 @@ Copyright (C) 2012-2019 Tim Boudreau
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans-version>RELEASE82</netbeans-version>
+        <netbeans-version>RELEASE126</netbeans-version>
         <!--<netbeans-dev-version>dev-SNAPSHOT</netbeans-dev-version>-->
         <netbeans-dev-version>RELEASE82</netbeans-dev-version>
         <jackson-version>2.9.9</jackson-version>
@@ -60,9 +60,9 @@ Copyright (C) 2012-2019 Tim Boudreau
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>4.1</version>
+                <version>4.2</version>
                 <extensions>true</extensions>
                 <configuration>
                     <useOSGiDependencies>true</useOSGiDependencies>
